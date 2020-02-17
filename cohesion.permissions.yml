@@ -1,0 +1,101 @@
+# Cohesion Permissions
+administer cohesion settings:
+  title: Administer Cohesion configuration
+  description: 'Grant access to administer Cohesion account settings and global settings.'
+  restrict access: TRUE
+
+administer cohesion:
+  title: Administer Cohesion
+  description: 'Grant access to the Cohesion menu.'
+
+bypass xss cohesion:
+  title: Bypass XSS validation in element forms
+  description: 'Allow site builders to add script tags and other potentially dangerous markup to elements within Cohesion.'
+  restrict access: TRUE
+
+access components:
+  title: Cohesion Access components group
+  description: 'Grant access to the Cohesion components within the sidebar browser.'
+
+access elements:
+  title: Cohesion Access elements group
+  description: 'Grant access to the Cohesion elements within the sidebar browser.'
+
+access helpers:
+  title: Cohesion Access helpers group
+  description: 'Grant access to the Cohesion helpers within the sidebar browser.'
+
+access fields:
+  title: Cohesion Access fields group
+  description: 'Grant access to the Cohesion fields within the sidebar browser.'
+
+access component content:
+  title: Cohesion Access component content group
+  description: 'Grant access to the Cohesion component content within the sidebar browser.'
+
+
+access content elements group:
+  title: Cohesion Elements - Content elements group
+  description: 'Grant access to the Cohesion content elements group within the sidebar browser.'
+access layout elements group:
+  title: Cohesion Elements - Layout elements group
+  description: 'Grant access to the Cohesion layout elements group within the sidebar browser.'
+access media elements group:
+  title: Cohesion Elements - Media elements group
+  description: 'Grant access to the Cohesion media elements group within the sidebar browser.'
+access interactive elements group:
+  title: Cohesion Elements - Interactive elements group
+  description: 'Grant access to the Cohesion interactive elements group within the sidebar browser.'
+access view elements group:
+  title: Cohesion Elements - View elements group
+  description: 'Grant access to the Cohesion view elements group within the sidebar browser.'
+access menu elements group:
+  title: Cohesion Elements - Menu elements group
+  description: 'Grant access to the Cohesion menu elements group within the sidebar browser.'
+access drupal core elements group:
+  title: Cohesion Elements - Core elements group
+  description: 'Grant access to the Cohesion core elements group within the sidebar browser.'
+access custom elements group:
+  title: Cohesion Elements - Custom elements group
+  description: 'Grant access to the Cohesion custom elements group within the sidebar browser.'
+access component builder elements group:
+  title: Cohesion Elements - Component builder elements group
+  description: 'Grant access to the Cohesion component builder elements group within the sidebar browser.'
+
+access styles:
+  title: Cohesion Elements tab - Styles
+  description: 'Grant access to the element styles tab.'
+access markup:
+  title: Cohesion Elements tab - Markup
+  description: 'Grant access to the element markup tab.'
+access seo:
+  title: Cohesion Elements tab - SEO
+  description: 'Grant access to the element SEO tab.'
+access analytics:
+  title: Cohesion Elements tab - Analytics
+  description: 'Grant access to the element analytics tab.'
+access context visibility:
+  title: Cohesion Elements tab - Context visibility
+  description: 'Grant access to the element context visibility tab.'
+access tokens:
+  title: Cohesion Elements tab - Token browser and toggle variable mode
+  description: 'Grant access to open the token browser and to toggle variable mode.'
+access animate on view:
+  title: Cohesion Elements tab - Animate on view
+  description: 'Grant access to the element animate on view tab.'
+access hide no data:
+  title: Cohesion Elements tab - Hide if no data
+  description: 'Grant access to the element hide if no data tab.'
+
+# Access permissions for element groups under fields tab
+access form layout fields group:
+  title: Cohesion Component builder - Form layout group
+  description: 'Grant access to the Cohesion form layout group within the sidebar browser.'
+access form help fields group:
+  title: Cohesion Component builder - Form help group
+  description: 'Grant access to the Cohesion form help group within the sidebar browser.'
+access form fields fields group:
+  title: Cohesion Component builder - Form fields group
+  description: 'Grant access to the Cohesion form fields group within the sidebar browser.'
+
+

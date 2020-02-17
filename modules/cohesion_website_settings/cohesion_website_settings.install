@@ -1,0 +1,15 @@
+<?php
+
+use Drupal\cohesion_website_settings\Entity\WebsiteSettings;
+
+/**
+ * Remove legacy scss_variables website settings entity.
+ */
+function cohesion_website_settings_update_8501(&$sandbox) {
+  // If the legacy entity exists.
+  if ($entity = WebsiteSettings::load('scss_variables')) {
+    // Remove it.
+    $entity->delete();
+  }
+
+}
