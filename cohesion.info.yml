@@ -1,0 +1,14 @@
+name: Cohesion core
+type: module
+description: 'Defines the base Cohesion entities, import and administration controllers and drush commands.'
+core: 8.x
+version: 8.x-6.0.0
+package: cohesion
+dependencies:
+  - drupal:system
+  - contextual
+  - imce
+  - token
+  - entity_reference_revisions
+  - settings_tray
+  - rest

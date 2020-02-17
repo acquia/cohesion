@@ -1,0 +1,7 @@
+name: Cohesion style guide manager
+type: module
+description: 'Defines a set of configuration that can be applied per theme.'
+core: 8.x
+package: cohesion
+dependencies:
+  - cohesion

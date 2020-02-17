@@ -1,0 +1,7 @@
+name: Cohesion elements
+type: module
+description: 'Defines the component and helper configuration entities for creating reusable layout configurations within Cohesion.'
+core: 8.x
+package: cohesion
+dependencies:
+  - cohesion

@@ -1,0 +1,7 @@
+name: Cohesion custom styles
+type: module
+description: 'Defines the custom style configuration entities for creating custom CSS class styles.'
+core: 8.x
+package: cohesion
+dependencies:
+  - cohesion
