@@ -1,0 +1,7 @@
+name: Cohesion base styles
+type: module
+description: 'Defines the base style configuration entities for creating HTML element base styles.'
+core: 8.x
+package: cohesion
+dependencies:
+  - cohesion

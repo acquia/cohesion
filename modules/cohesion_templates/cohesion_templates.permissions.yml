@@ -1,0 +1,12 @@
+administer master templates:
+  title: Cohesion Master templates
+  description: 'Grant access to create, edit and manage Cohesion master templates.'
+administer content templates:
+  title: Cohesion Content templates
+  description: 'Grant access to create, edit and manage Cohesion content templates.'
+administer view templates:
+  title: Cohesion View templates
+  description: 'Grant access to create, edit and manage Cohesion view templates.'
+administer menu templates:
+  title: Cohesion Menu templates
+  description: 'Grant access to create, edit and manage Cohesion menu templates.'
