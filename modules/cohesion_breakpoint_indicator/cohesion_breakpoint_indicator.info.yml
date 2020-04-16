@@ -1,0 +1,7 @@
+name: Cohesion breakpoint indicator
+description: Adds a breakpoint indicator to Cohesion, which displays the current breakpoint you're viewing.
+type: module
+package: cohesion
+core_version_requirement: ^8.7.7 || ^9
+dependencies:
+  - cohesion

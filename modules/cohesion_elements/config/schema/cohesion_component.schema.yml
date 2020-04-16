@@ -1,0 +1,25 @@
+cohesion_elements.cohesion_component.*:
+  type: cohesion_config_entity
+  label: 'Component configuration'
+  mapping:
+    category:
+      type: string
+      label: 'Component category'
+    preview_image:
+      type: sequence
+      label: 'Preview image'
+    has_quick_edit:
+      type: boolean
+      label: 'Has quick edit'
+    entity_type_access:
+      type: sequence
+      label: 'Entity type access'
+    bundle_access:
+      type: sequence
+      label: 'Bundle access'
+    twig_template:
+      type: path
+      label: 'Twig template filename'
+    weight:
+      type: integer
+      label: 'Weight'

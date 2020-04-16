@@ -1,0 +1,7 @@
+name: Cohesion example custom element
+type: module
+description: 'A working example of a custom Cohesion element to show a developer how they can create one.'
+core_version_requirement: ^8.7.7 || ^9
+package: cohesion
+dependencies:
+  - cohesion

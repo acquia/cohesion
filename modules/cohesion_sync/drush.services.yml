@@ -1,0 +1,5 @@
+services:
+  cohesion_sync.commands:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncCommands
+    tags:
+      - { name: drush.command }

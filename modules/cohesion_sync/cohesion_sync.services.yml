@@ -1,0 +1,13 @@
+services:
+  # Group of entities (website settings)
+  plugin.manager.cohesion_sync.processor:
+    class: Drupal\cohesion_sync\SyncPluginManager
+    parent: default_plugin_manager
+
+  cohesion_sync.packager:
+    class: Drupal\cohesion_sync\PackagerManager
+    arguments: ['@entity.repository', '@entity_type.manager', '@plugin.manager.cohesion_sync.processor', '@cohesion_usage.update_manager', '@file_system', '@logger.factory', '@config.storage']
+
+  cohesion_sync.drush_helpers:
+    class: \Drupal\cohesion_sync\Drush\CommandHelpers
+    arguments: ['@entity.manager', '@config.factory', '@cohesion_sync.packager', '@entity.repository']
