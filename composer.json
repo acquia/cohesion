@@ -1,6 +1,14 @@
 {
     "name": "acquia/cohesion",
     "description": "Acquia Cohesion",
+    "license": "GPL-2.0+",
+    "authors":[
+      {
+        "name": "Acquia Engineering",
+        "homepage": "https://www.acquia.com",
+        "role": "Maintainer"
+      }
+    ],
     "version": "6.1.0",
     "type": "drupal-module",
     "minimum-stability": "dev",
