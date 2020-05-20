@@ -1,0 +1,7 @@
+name: Cohesion style helpers
+type: module
+description: 'Defines the style helper configuration entities for creating reusable style configurations in Cohesion.'
+core_version_requirement: ^8.7.7 || ^9
+package: cohesion
+dependencies:
+  - cohesion

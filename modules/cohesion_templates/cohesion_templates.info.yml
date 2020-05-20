@@ -1,0 +1,7 @@
+name: Cohesion templates
+type: module
+description: 'Defines the template configuration entities for creating Cohesion templates.'
+core_version_requirement: ^8.7.7 || ^9
+package: cohesion
+dependencies:
+  - cohesion

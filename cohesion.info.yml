@@ -1,0 +1,13 @@
+name: Cohesion core
+type: module
+description: 'Defines the base Cohesion entities, import and administration controllers and drush commands.'
+version: 8.x-6.1.0
+package: cohesion
+core_version_requirement: ^8.7.7 || ^9
+dependencies:
+  - contextual
+  - imce
+  - token
+  - entity_reference_revisions
+  - settings_tray
+  - rest

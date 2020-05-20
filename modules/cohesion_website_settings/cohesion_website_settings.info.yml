@@ -1,0 +1,10 @@
+name: Cohesion website settings
+type: module
+description: 'Defines the website settings configuration entities.'
+core_version_requirement: ^8.7.7 || ^9
+package: cohesion
+libraries:
+  - core/jquery.ui
+  - core/jquery.ui.animate
+dependencies:
+  - cohesion
