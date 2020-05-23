@@ -1,0 +1,19 @@
+administer components:
+  title: Cohesion components
+  description: 'Grant access to create, edit and manage Cohesion components.'
+administer component content:
+  title: Cohesion component content
+  description: 'Grant access to create, edit and manage Cohesion component content.'
+administer component categories:
+  title: Cohesion component categories
+  description: 'Grant access to create, edit and manage Cohesion component categories.'
+
+administer helpers:
+  title: Cohesion helpers
+  description: 'Grant access to create, edit and manage Cohesion helpers.'
+administer helper categories:
+  title: Cohesion helpers categories
+  description: 'Grant access to create, edit and manage Cohesion helper categories.'
+
+permission_callbacks:
+  - \Drupal\cohesion_elements\CategoryPermissions::getPermissions
