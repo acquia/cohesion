@@ -1,0 +1,19 @@
+cohesion_style_guide.cohesion_style_guide.*:
+  type: cohesion_config_entity
+  label: 'Style guide configuration'
+  mapping:
+    has_quick_edit:
+      type: boolean
+      label: 'Has quick edit'
+    entity_type_access:
+      type: sequence
+      label: 'Entity type access'
+    bundle_access:
+      type: sequence
+      label: 'Bundle access'
+    twig_template:
+      type: path
+      label: 'Twig template filename'
+    weight:
+      type: integer
+      label: 'Weight'
