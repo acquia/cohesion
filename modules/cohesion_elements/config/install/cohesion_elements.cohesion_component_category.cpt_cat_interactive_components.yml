@@ -1,0 +1,13 @@
+uuid: d5402ffa-c089-4573-93f0-e9f5d57944d5
+langcode: en
+status: true
+dependencies: {  }
+label: 'Interactive components'
+id: cpt_cat_interactive_components
+json_values: '{}'
+json_mapper: '{}'
+last_entity_update: entityupdate_0005
+modified: false
+selectable: true
+class: category-7
+weight: -7
