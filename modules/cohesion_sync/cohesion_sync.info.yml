@@ -1,0 +1,7 @@
+name: Cohesion sync
+type: module
+description: 'Share packages of dependent configuation between sites.'
+core_version_requirement: ^8.8.0 || ^9
+package: cohesion
+dependencies:
+  - cohesion
