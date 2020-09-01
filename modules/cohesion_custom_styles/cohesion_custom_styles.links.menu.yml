@@ -1,0 +1,13 @@
+# Site Studio entity styles menu items definition
+entity.cohesion_custom_style:
+  title: 'Custom styles'
+  route_name: entity.cohesion_custom_style.collection
+  description: 'Manage your custom styles'
+  parent: cohesion.settings.styles
+  weight: 20
+
+cohesion.cohesion_custom_style.add_page:
+  title: Add custom style
+  description: 'Add a new custom style.'
+  route_name: entity.cohesion_custom_style.add_page
+  parent: entity.cohesion_custom_style
