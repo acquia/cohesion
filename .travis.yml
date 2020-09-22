@@ -1,0 +1,25 @@
+language: php
+
+services:
+  - mysql
+
+before_install:
+  - mysql -e 'CREATE USER "webadmin"@"%" IDENTIFIED BY "webadmin"; create database drupal; GRANT ALL ON drupal.* TO "webadmin"@"%";'
+  - COMPOSER_MEMORY_LIMIT=-1 composer create-project acquia/lightning-project:8.7.1 drupal --no-install
+  - cd $TRAVIS_BUILD_DIR/drupal && COMPOSER_MEMORY_LIMIT=-1 composer require acquia/lightning:4.1.0
+  - cd $TRAVIS_BUILD_DIR/drupal && COMPOSER_MEMORY_LIMIT=-1 composer require drush/drush
+
+install:
+  - composer clearcache
+  - cd $TRAVIS_BUILD_DIR && rsync -av . ./drupal/docroot/modules/contrib/cohesion --exclude drupal
+  - cd $TRAVIS_BUILD_DIR/drupal && cat ./docroot/modules/contrib/cohesion/composer.json | jq -r '.require | to_entries[] | "\(.key):\(.value)"' | grep 'drupal/' | xargs -L 1 composer require --no-update --no-scripts -n
+  - cd $TRAVIS_BUILD_DIR/drupal && cat ./docroot/modules/contrib/cohesion/composer.json | jq -r '."require-dev" | to_entries[] | "\(.key):\(.value)"' | xargs -L 1 composer require --no-update --no-scripts -n
+  - cd $TRAVIS_BUILD_DIR/drupal && cat ./docroot/modules/contrib/cohesion/composer.json | jq -r '.suggest | to_entries[] | "\(.key)"' | grep 'drupal/' | xargs -L 1 composer require --no-update --no-scripts -n
+  - cd $TRAVIS_BUILD_DIR/drupal && COMPOSER_MEMORY_LIMIT=-1 composer update --with-all-dependencies -n
+  - cd $TRAVIS_BUILD_DIR/drupal && ./vendor/bin/drush si lightning --account-name=webadmin --account-pass=webadmin --db-url=mysql://webadmin:webadmin@127.0.0.1/drupal --site-name=Lightning -y
+  - cd $TRAVIS_BUILD_DIR/drupal && ./vendor/bin/drush en -y cohesion
+
+script:
+  - cd $TRAVIS_BUILD_DIR/drupal && SYMFONY_DEPRECATIONS_HELPER=weak ./vendor/bin/phpunit -c ./docroot/core/phpunit.xml.dist --testsuite=unit --group Cohesion
+
+cache: false
