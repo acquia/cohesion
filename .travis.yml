@@ -8,6 +8,13 @@ php: "7.2"
 services:
   - mysql
 
+os: linux
+dist: bionic
+
+# Activate build config validation.
+# @see https://docs.travis-ci.com/user/build-config-validation
+version: ~> 1.0
+
 addons:
   # Chrome is used via ChromeDriver for web testing and browser automation.
   chrome: stable
