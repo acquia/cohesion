@@ -132,6 +132,7 @@ before_install:
 
 # Create the test fixture and place the SUT.
 install:
+  - cd $TRAVIS_BUILD_DIR
   - ../orca/bin/travis/install.sh
   - composer clearcache
   - cd $TRAVIS_BUILD_DIR && rsync -av . ./drupal/docroot/modules/contrib/cohesion --exclude drupal
@@ -144,24 +145,26 @@ install:
 
 # Display details about the fixture.
 before_script:
+  - cd $TRAVIS_BUILD_DIR
   - ../orca/bin/travis/before_script.sh
 
 # Run the test script.
 script:
+  - cd $TRAVIS_BUILD_DIR
   - ../orca/bin/travis/script.sh
   - cd $TRAVIS_BUILD_DIR/drupal && SYMFONY_DEPRECATIONS_HELPER=weak ./vendor/bin/phpunit -c ./docroot/core/phpunit.xml.dist --testsuite=unit --group Cohesion
 
 # Reserved for future use.
-before_cache: ../orca/bin/travis/before_cache.sh
+before_cache: cd cd $TRAVIS_BUILD_DIR && ../orca/bin/travis/before_cache.sh
 
 # Conditionally send code coverage data to Coveralls.
-after_success: ../orca/bin/travis/after_success.sh
+after_success: cd cd $TRAVIS_BUILD_DIR && ../orca/bin/travis/after_success.sh
 
 # Display debugging information in case of failure.
-after_failure: ../orca/bin/travis/after_failure.sh
+after_failure: cd cd $TRAVIS_BUILD_DIR && ../orca/bin/travis/after_failure.sh
 
 # Perform final, post-script tasks.
-after_script: ../orca/bin/travis/after_script.sh
+after_script: cd cd $TRAVIS_BUILD_DIR && ../orca/bin/travis/after_script.sh
 
 # before_install:
 #   - mysql -e 'CREATE USER "webadmin"@"%" IDENTIFIED BY "webadmin"; create database drupal; GRANT ALL ON drupal.* TO "webadmin"@"%";'
