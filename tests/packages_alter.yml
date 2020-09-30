@@ -3,5 +3,5 @@
 # more information, including the schema.
 ---
 # Add the Example module.
-drupal/cohesion:
+acquia/cohesion:
   version_dev: "dev-develop"
