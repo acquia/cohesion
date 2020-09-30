@@ -127,7 +127,7 @@ before_install:
   - pwd && ls -al
   - cd .. && pwd && ls -al
   - cd .. && pwd && ls -al
-  - ../orca/bin/travis/before_install.sh
+  - cd $TRAVIS_BUILD_DIR && ../orca/bin/travis/before_install.sh
   # - mysql -e 'CREATE USER "webadmin"@"%" IDENTIFIED BY "webadmin"; create database drupal; GRANT ALL ON drupal.* TO "webadmin"@"%";'
   # - COMPOSER_MEMORY_LIMIT=-1 composer create-project acquia/lightning-project:8.7.1 drupal --no-install
   # - cd $TRAVIS_BUILD_DIR/drupal && COMPOSER_MEMORY_LIMIT=-1 composer require acquia/lightning:4.1.0
