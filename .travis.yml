@@ -30,7 +30,7 @@ env:
   # Change the following values for your implementation.
   global:
     # Provide your package's name.
-    - ORCA_SUT_NAME=drupal/cohesion
+    - ORCA_SUT_NAME=acquia/cohesion
     # Specify the name of the nearest Git version branch, e.g., 1.x or 8.x-1.x.
     # This may be the destination branch of a pull request or the nearest
     # ancestor of a topic branch. ORCA will rename the checked out Git branch to
