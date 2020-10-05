@@ -6,4 +6,4 @@
 acquia/cohesion:
   version_dev: "dev-develop"
 drupal/acquia_contenthub:
-  version_dev: "dev-master"
+  version_dev: "*"
