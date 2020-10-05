@@ -28,6 +28,7 @@
     },
     "require-dev": {
         "drupal/acquia_contenthub": "^2.17",
+        "drupal/tmgmt": "^1.11",
         "phpunit/phpunit": "^6.5",
         "symfony/phpunit-bridge": "^4.3",
         "behat/mink": "^1.7",
