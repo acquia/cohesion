@@ -124,11 +124,6 @@ before_install:
   # Set Node.js to a version compatible with Drupal 9 + Nightwatch.js.
   - nvm use 12.13.1
   - composer create-project --no-dev acquia/orca ../orca "$ORCA_VERSION"
-  - echo '' >> ../orca/resources/phpstan.neon
-  - echo 'ignoreErrors:' >> ../orca/resources/phpstan.neon
-  - echo '  - "Class Drupal\tmgmt_content\DefaultFieldProcessor not found and could not be autoloaded."' >> ../orca/resources/phpstan.neon
-  - echo '' >> ../orca/resources/phpstan.neon
-  - cat ../orca/resources/phpstan.neon
   - ../orca/bin/travis/before_install.sh
   # - mysql -e 'CREATE USER "webadmin"@"%" IDENTIFIED BY "webadmin"; create database drupal; GRANT ALL ON drupal.* TO "webadmin"@"%";'
   # - COMPOSER_MEMORY_LIMIT=-1 composer create-project acquia/lightning-project:8.7.1 drupal --no-install

@@ -8,11 +8,13 @@ use Drupal\cohesion_elements\Entity\CohesionLayout;
 use Drupal\cohesion_elements\Entity\Component;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FieldItemListInterface;
+/** @phpstan-ignore-next-line */
 use Drupal\tmgmt_content\DefaultFieldProcessor;
 
 /**
  * Field processor for the link field.
  */
+/** @phpstan-ignore-next-line */
 class CohesionLayoutFieldProcessor extends DefaultFieldProcessor {
 
   /**
