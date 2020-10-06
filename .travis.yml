@@ -148,7 +148,6 @@ before_script:
 
 # Run the test script.
 script:
-  - cat /home/travis/build/acquia/orca-build/docroot/modules/contrib/cohesion/src/CohesionLayoutFieldProcessor.php
   - ../orca/bin/travis/script.sh
   # - cd $TRAVIS_BUILD_DIR/drupal && SYMFONY_DEPRECATIONS_HELPER=weak ./vendor/bin/phpunit -c ./docroot/core/phpunit.xml.dist --testsuite=unit --group Cohesion
 

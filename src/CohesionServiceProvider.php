@@ -44,8 +44,10 @@ class CohesionServiceProvider extends ServiceProviderBase {
     if (isset($modules['acquia_contenthub'])) {
       $container->register('cohesion_entity_reference.field.cdf.unserializer', CohesionEntityReferenceField::class)
         ->addTag('event_subscriber');
+        /** @phpstan-ignore-next-line */
       $container->register('cohesion_entity_reference.field.cdf.serializer', CohesionEntityReferenceFieldSerializer::class)
         ->addTag('event_subscriber');
+        /** @phpstan-ignore-next-line */
       $container->register('cohesion_entity_reference.dependency_calculator', CohesionEntityReferenceFieldDependencyCollector::class)
         ->addTag('event_subscriber');
     }
