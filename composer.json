@@ -24,9 +24,6 @@
         "cweagans/composer-patches": "^1.6",
         "drupal/entity_reference_revisions": "^1.7",
         "drupal/imce": "^2.2",
-        "drupal/acquia_contenthub": "^2.17",
-        "drupal/tmgmt": "^1.11",
-        "drupal/tmgmt_content_moderation": "1.0.x-dev",
         "drupal/token": "^1.5"
     },
     "require-dev": {
