@@ -24,12 +24,12 @@
         "cweagans/composer-patches": "^1.6",
         "drupal/entity_reference_revisions": "^1.7",
         "drupal/imce": "^2.2",
-        "drupal/token": "^1.5"
-    },
-    "require-dev": {
         "drupal/acquia_contenthub": "^2.17",
         "drupal/tmgmt": "^1.11",
         "drupal/tmgmt_content_moderation": "1.0.x-dev",
+        "drupal/token": "^1.5"
+    },
+    "require-dev": {
         "phpunit/phpunit": "^6.5",
         "symfony/phpunit-bridge": "^4.3",
         "behat/mink": "^1.7",
