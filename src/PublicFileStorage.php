@@ -2,14 +2,17 @@
 
 namespace Drupal\cohesion;
 
+use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
-use Twig\Error\LoaderError;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Twig\Loader\LoaderInterface;
 
 /**
  * Defines a backend to store templates in the public files directory.
  */
 final class PublicFileStorage implements TemplateStorageInterface {
+
+  use LoggerChannelTrait;
 
   /**
    * The decorated Twig loader service.
@@ -19,13 +22,23 @@ final class PublicFileStorage implements TemplateStorageInterface {
   private $twigLoader;
 
   /**
+   * The file system service.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  private $fileSystem;
+
+  /**
    * PublicFileStorage constructor.
    *
    * @param \Twig\Loader\LoaderInterface $twig_loader
    *   The decorated Twig loader service.
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   *   The file system service.
    */
-  public function __construct(LoaderInterface $twig_loader) {
+  public function __construct(LoaderInterface $twig_loader, FileSystemInterface $file_system) {
     $this->twigLoader = $twig_loader;
+    $this->fileSystem = $file_system;
   }
 
   /**
@@ -75,29 +88,26 @@ final class PublicFileStorage implements TemplateStorageInterface {
    * @param $content
    * @param $filename
    *
-   * @return bool
-   *
    * @throws \Exception
    */
   private function saveTemplate($content, $filename) {
     // Create the template twig directory if needed.
     if (!file_exists(COHESION_TEMPLATE_PATH)) {
-      \Drupal::service('file_system')->mkdir(COHESION_TEMPLATE_PATH, 0777, FALSE);
+      $this->fileSystem->mkdir(COHESION_TEMPLATE_PATH, 0777, FALSE);
     }
 
     // Save the compiled twig file.
     $template_file = COHESION_TEMPLATE_PATH . '/' . $filename;
-    $template_saved = FALSE;
 
     try {
-      $template_saved = \Drupal::service('file_system')->saveData($content, $template_file, FileSystemInterface::EXISTS_REPLACE);
-      \Drupal::logger('cohesion_templates')->notice("Template created: @template_file", ['@template_file' => $template_file]);
+      $this->fileSystem->saveData($content, $template_file, FileSystemInterface::EXISTS_REPLACE);
+      $this->getLogger('cohesion_templates')->notice("Template created: @template_file", [
+        '@template_file' => $template_file,
+      ]);
     }
-    catch (\Throwable $e) {
+    catch (FileException $e) {
       \Drupal::service('cohesion.utils')->errorHandler('Unable to create template file: ' . $template_file . $e->getMessage());
     }
-
-    return $template_saved;
   }
 
   /**
@@ -107,12 +117,9 @@ final class PublicFileStorage implements TemplateStorageInterface {
    * @param null $data
    * @param null $filename
    *
-   * @return array|null
-   *
    * @throws \Exception
    */
   private function saveTemporaryTemplate($data = NULL, $filename = NULL) {
-    $temp_files = [];
     if (!$filename) {
       return NULL;
     }
@@ -130,8 +137,6 @@ final class PublicFileStorage implements TemplateStorageInterface {
     else {
       \Drupal::service('cohesion.utils')->errorHandler('Unable to create template file: ' . $temp_file);
     }
-
-    return $temp_files;
   }
 
   /**
@@ -146,8 +151,7 @@ final class PublicFileStorage implements TemplateStorageInterface {
     }
 
     if (is_dir($template_path)) {
-      $template_files = \Drupal::service('file_system')
-        ->scanDirectory($template_path, '/' . preg_quote('.html.twig') . '$/');
+      $template_files = $this->fileSystem->scanDirectory($template_path, '/' . preg_quote('.html.twig') . '$/');
     }
     else {
       $template_files = [];

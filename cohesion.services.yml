@@ -1,10 +1,18 @@
 services:
 
-  cohesion.template_storage:
+  cohesion.template_storage.database:
     class: Drupal\cohesion\DatabaseStorage
     arguments: ['@keyvalue', '@file_system']
     tags:
       - { name: twig.loader, priority: 200 }
+    # This alias determines which storage backend is the default.
+    alias: cohesion.template_storage
+
+  cohesion.template_storage.files:
+    class: Drupal\cohesion\PublicFileStorage
+    arguments: ['@twig.loader.filesystem', '@file_system']
+    tags:
+      - { name: twig.loader, priority: 198 }
 
   stream_wrapper.cohesion:
     class: Drupal\cohesion\StreamWrapper\CohesionStream
