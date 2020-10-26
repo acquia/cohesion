@@ -8,6 +8,7 @@ use Drupal\cohesion_elements\Plugin\Field\FieldType\CohesionEntityReferenceRevis
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\tmgmt\JobItemInterface;
 use Drupal\tmgmt\JobInterface;
+use Drupal\cohesion\PublicFileStorage;
 use Drupal\cohesion_elements\Entity\CohesionLayout;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StreamWrapper\PublicStream;
@@ -413,48 +414,32 @@ function cohesion_css_alter(&$css, $assets) {
  * Allow loading of theme templates from the Site Studio template store.
  */
 function cohesion_theme_registry_alter(&$theme_registry) {
-  $template_location = COHESION_TEMPLATE_PATH;
-  $template_extension = '.html.twig';
-
-  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-  $file_system = \Drupal::service('file_system');
-
-  // Get real path to templates and extract relative path for theme hooks.
-  // Note: The theme registry expects template paths relative to DRUPAL_ROOT.
-  if ($wrapper = \Drupal::service('stream_wrapper_manager')
-    ->getViaUri($template_location)) {
-    $template_path = $wrapper->basePath() . '/cohesion/templates';
-  }
-  else {
-    // Do nothing if template path is not valid.
-    \Drupal::logger('cohesion')
-      ->error(t('Unable to get stream wrapper for Site Studio templates path: @uri', ['@uri' => $template_location]));
+  $template_path = PublicFileStorage::getTemplatePath();
+  if (empty($template_path)) {
     return FALSE;
   }
 
-  if(is_dir($template_path)){
-    // Scan for template files and override their location in the theme registry.
-    $template_files = $file_system->scanDirectory($template_path, '/' . preg_quote($template_extension) . '$/');
+  // Scan for template files and override their location in the theme registry.
+  $template_files = Drupal::service('cohesion.template_storage')->listAll();
 
-    foreach ($template_files as $file) {
-      $template = $file_system->basename($file->filename, $template_extension);
-      $theme_hook = str_replace('-', '_', $template);
+  foreach ($template_files as $file) {
+    $template = Drupal::service('file_system')->basename($file, '.html.twig');
+    $theme_hook = str_replace('-', '_', $template);
 
-      list($base_theme_hook, $specific) = explode('__', $theme_hook, 2);
+    [$base_theme_hook] = explode('__', $theme_hook, 2);
 
-      // Override existing theme hook or duplicate the base hook (if one exists).
-      if (isset($theme_registry[$base_theme_hook]) || $base_theme_hook === 'component') {
-        if (isset($theme_registry[$theme_hook]) && $theme_registry[$theme_hook]) {
-          $theme_registry[$theme_hook]['path'] = $template_path;
-        }
-        else {
-          // And entry to the theme registry.
-          $theme_info = isset($theme_registry[$base_theme_hook]) ? $theme_registry[$base_theme_hook] : [];
-          $theme_info['template'] = str_replace('_', '-', $theme_hook);
-          $theme_info['path'] = $template_path;
-          $theme_info['base hook'] = 'component';
-          $theme_registry[$theme_hook] = $theme_info;
-        }
+    // Override existing theme hook or duplicate the base hook (if one exists).
+    if (isset($theme_registry[$base_theme_hook]) || $base_theme_hook === 'component') {
+      if (isset($theme_registry[$theme_hook]) && $theme_registry[$theme_hook]) {
+        $theme_registry[$theme_hook]['path'] = $template_path;
+      }
+      else {
+        // And entry to the theme registry.
+        $theme_info = isset($theme_registry[$base_theme_hook]) ? $theme_registry[$base_theme_hook] : [];
+        $theme_info['template'] = str_replace('_', '-', $theme_hook);
+        $theme_info['path'] = $template_path;
+        $theme_info['base hook'] = 'component';
+        $theme_registry[$theme_hook] = $theme_info;
       }
     }
   }

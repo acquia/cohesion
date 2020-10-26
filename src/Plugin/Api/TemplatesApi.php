@@ -2,6 +2,7 @@
 
 namespace Drupal\cohesion\Plugin\Api;
 
+use Drupal\cohesion\PublicFileStorage;
 use Drupal\cohesion_templates\Entity\ContentTemplates;
 use Drupal\cohesion\Entity\EntityJsonValuesInterface;
 use Drupal\cohesion\LayoutCanvas\LayoutCanvas;
@@ -237,80 +238,8 @@ class TemplatesApi extends ApiPluginBase {
       \Drupal::logger('cohesion_templates')->notice("Template metadata did not contain a filename: @template_file", ['@template_file' => $this->filename]);
     }
 
-    $twig_filename = $this->filename . '.html.twig';
-
-    $running_dx8_batch = &drupal_static('running_dx8_batch');
-    if (!$running_dx8_batch) {
-      $this->saveTemplate($decoded_template['twig'], $twig_filename);
-    }
-    else {
-      $this->saveTemporaryTemplate($decoded_template['twig'], $twig_filename);
-    }
-  }
-
-  /**
-   * Save a .twig template that has been compiled by the API.
-   *
-   * @param $content
-   * @param $filename
-   *
-   * @return bool
-   *
-   * @throws \Exception
-   */
-  private function saveTemplate($content, $filename) {
-    // Create the template twig directory if needed.
-    if (!file_exists(COHESION_TEMPLATE_PATH)) {
-      \Drupal::service('file_system')->mkdir(COHESION_TEMPLATE_PATH, 0777, FALSE);
-    }
-
-    // Save the compiled twig file.
-    $template_file = COHESION_TEMPLATE_PATH . '/' . $filename;
-    $template_saved = FALSE;
-
-    try {
-      $template_saved = \Drupal::service('file_system')->saveData($content, $template_file, FileSystemInterface::EXISTS_REPLACE);
-      \Drupal::logger('cohesion_templates')->notice("Template created: @template_file", ['@template_file' => $template_file]);
-    }
-    catch (\Throwable $e) {
-      \Drupal::service('cohesion.utils')->errorHandler('Unable to create template file: ' . $template_file . $e->getMessage());
-    }
-
-    return $template_saved;
-  }
-
-  /**
-   * When rebuilding, .twig templates are stored temporarily, so rebuilds that
-   * fail do not result in a broken looking site.
-   *
-   * @param null $data
-   * @param null $filename
-   *
-   * @return array|null
-   *
-   * @throws \Exception
-   */
-  public function saveTemporaryTemplate($data = NULL, $filename = NULL) {
-    $temp_files = [];
-    if (!$filename) {
-      return NULL;
-    }
-
-    // Build the path to the temporary file.
-    $temporary_directory = \Drupal::service('cohesion.local_files_manager')->scratchDirectory();
-    $temp_file = $temporary_directory . '/' . $filename;
-
-    if (file_put_contents($temp_file, $data) !== FALSE) {
-      // Register temporary template files.
-      $templates = \Drupal::keyValue('cohesion.temporary_template')->get('temporary_templates', []);
-      $templates[] = $temp_file;
-      \Drupal::keyValue('cohesion.temporary_template')->set('temporary_templates', $templates);
-    }
-    else {
-      \Drupal::service('cohesion.utils')->errorHandler('Unable to create template file: ' . $temp_file);
-    }
-
-    return $temp_files;
+    \Drupal::service('cohesion.template_storage')
+      ->save($this->filename . '.html.twig', $decoded_template['twig']);
   }
 
   /**
