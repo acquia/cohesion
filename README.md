@@ -43,7 +43,7 @@ The `cohesion` drush command has the following operations:
 
 Re-save and run pending updates on all Site Studio config entities.
 
-Drush 9 format: 
+Drush 9^ format:
 
 ```
 drush cohesion:rebuild
@@ -59,7 +59,7 @@ drush cohesion-rebuild
 
 Import assets and rebuild element styles (replacement for the CRON).
 
-Drush 9 format:
+Drush 9^ format:
 
 ```
 drush cohesion:import
