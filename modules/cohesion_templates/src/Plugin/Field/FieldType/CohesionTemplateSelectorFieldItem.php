@@ -50,7 +50,8 @@ class CohesionTemplateSelectorFieldItem extends FieldItemBase implements FieldIt
    * {@inheritdoc}
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
-    $properties['selected_template'] = DataDefinition::create('string');
+    $properties['selected_template'] = DataDefinition::create('string')
+      ->setLabel(t('Selected template'));
     return $properties;
   }
 
