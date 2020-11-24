@@ -1,0 +1,151 @@
+language: php
+
+# The lowest version of PHP supported by all of Drupal, Acquia, and ORCA itself.
+# @see https://www.drupal.org/docs/8/system-requirements/php-requirements
+# @see https://docs.acquia.com/acquia-cloud/arch/tech-platform/
+php: "7.3"
+
+services:
+  - mysql
+
+os: linux
+dist: bionic
+
+# Activate build config validation.
+# @see https://docs.travis-ci.com/user/build-config-validation
+version: ~> 1.0
+
+addons:
+  # Chrome is used via ChromeDriver for web testing and browser automation.
+  chrome: stable
+
+cache:
+  directories:
+    - "$HOME/.composer/cache"
+    - "$HOME/.drush/cache"
+    - "$HOME/.rvm"
+    - "${TMPDIR:-/tmp}/phpstan/cache"
+
+env:
+  # Change the following values for your implementation.
+  global:
+    # Provide your package's name.
+    - ORCA_SUT_NAME=acquia/cohesion
+    # Specify the name of the nearest Git version branch, e.g., 1.x or 8.x-1.x.
+    # This may be the destination branch of a pull request or the nearest
+    # ancestor of a topic branch. ORCA will rename the checked out Git branch to
+    # this value to make Composer resolve dependencies correctly on pull
+    # requests and topic branches.
+    - ORCA_SUT_BRANCH=develop
+    # Specify the version of ORCA to use. Use dev-master to track the latest
+    # release, dev-develop to track Dev/HEAD, or any other Composer version
+    # string. Since ORCA uses Semantic Versioning, the current major version
+    # branch is recommended in order to receive new features but not unexpected
+    # backward compatibility breaking changes.
+    # @see https://getcomposer.org/doc/articles/versions.md
+    # @see https://semver.org/
+    # It is also recommended to watch ORCA releases.
+    # @see https://help.github.com/en/enterprise/2.20/user/github/receiving-notifications-about-activity-on-github/watching-and-unwatching-releases-for-a-repository
+    - ORCA_VERSION=^2
+    # If your package isn't in ORCA's packages.yml or conflicts with details
+    # that are, you can modify the active packages configuration at runtime by
+    # uncommenting the following line and specifying your own alter file.
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_PACKAGES_CONFIG_ALTER
+    - ORCA_PACKAGES_CONFIG_ALTER=../cohesion/tests/packages_alter.yml
+    #
+    # If your package is a Drupal installation profile, uncomment the following
+    # line and specify its machine name.
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_FIXTURE_PROFILE
+    # - ORCA_FIXTURE_PROFILE=example
+    #
+    # If your package is a Composer project template or requires a different
+    # one to test with, uncomment the following line and specify its Packagist
+    # name.
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_FIXTURE_PROJECT_TEMPLATE
+    # - ORCA_FIXTURE_PROJECT_TEMPLATE=acquia/drupal-minimal-project
+    #
+    # Change the PHP Code Sniffer standard used for static analysis. Acceptable
+    # values are "AcquiaPHP", "AcquiaDrupalStrict", and
+    # "AcquiaDrupalTransitional". Defaults to "AcquiaDrupalTransitional".
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_PHPCS_STANDARD
+    # - ORCA_PHPCS_STANDARD=AcquiaDrupalTransitional
+    #
+    # To enable telemetry with Amplitude on cron runs, uncomment the following
+    # line and set ORCA_AMPLITUDE_API_KEY in your Travis CI repository settings:
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_TELEMETRY_ENABLE
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_AMPLITUDE_API_KEY
+    # - ORCA_TELEMETRY_ENABLE=TRUE
+
+# Execution time is drastically reduced by splitting the build into multiple
+# concurrent jobs.
+jobs:
+  # Mark the build as finished once the only remaining jobs are allowed to fail.
+  fast_finish: true
+  include:
+    # The standard ORCA jobs provide broad out-of-the-box coverage.
+    # @see https://github.com/acquia/orca/blob/master/docs/understanding-orca.md#continuous-integration
+    - { name: "Static code analysis", env: ORCA_JOB=STATIC_CODE_ANALYSIS }
+    - { name: "Deprecated code scan", env: ORCA_JOB=DEPRECATED_CODE_SCAN }
+    - { name: "Isolated test w/ recommended package versions", env: ORCA_JOB=ISOLATED_RECOMMENDED }
+    # To send PHPUnit test coverage data to Coveralls (coveralls.io), configure
+    # your GitHub repository and uncomment the following line. The job on the
+    # line immediately before is otherwise identical and can be removed. Note:
+    # this setting implies ORCA_COVERAGE_ENABLE, which need not be set
+    # separately.
+    # @see https://github.com/acquia/orca/blob/master/docs/faq.md#coveralls
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_COVERALLS_ENABLE
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#ORCA_COVERAGE_ENABLE
+    # - { name: "Isolated test w/ recommended package versions and code coverage", env: ORCA_JOB=ISOLATED_RECOMMENDED ORCA_COVERALLS_ENABLE=TRUE }
+    #
+    # To generate test coverage data to send somewhere other than Coveralls, use
+    # the ORCA_COVERAGE_ENABLE variable instead.
+    # - { name: "Isolated test w/ recommended package versions and code coverage", env: ORCA_JOB=ISOLATED_RECOMMENDED ORCA_COVERAGE_ENABLE=TRUE }
+    - { name: "Integrated test w/ recommended package versions", env: ORCA_JOB=INTEGRATED_RECOMMENDED }
+    - { name: "Integrated test w/ recommended package versions & previous minor release of Drupal core", env: ORCA_JOB=CORE_PREVIOUS }
+    - { name: "Isolated test w/ dev package versions", env: ORCA_JOB=ISOLATED_DEV }
+    - { name: "Integrated test w/ dev package versions", env: ORCA_JOB=INTEGRATED_DEV }
+    - { name: "Integrated test w/ dev package versions & next minor dev version of Drupal core", env: ORCA_JOB=CORE_NEXT }
+    - { name: "D9 readiness test", php: "7.3", env: ORCA_JOB=D9_READINESS}
+    # Custom testing needs involving only minor variations on the standard setup
+    # can be achieved without custom scripting using the "CUSTOM" ORCA_JOB.
+    # @see https://github.com/acquia/orca/blob/master/docs/advanced-usage.md#travis-ci-scripts
+    # - { name: "Custom job", env: ORCA_JOB=CUSTOM ORCA_CUSTOM_FIXTURE_INIT_ARGS="--profile=standard" ORCA_CUSTOM_TESTS_RUN_ARGS="--sut-only" }
+  # For various reasons, some jobs are allowed to fail without failing the whole
+  # build. They should still be watched for advance notice of future problems.
+  # @see https://docs.travis-ci.com/user/customizing-the-build#rows-that-are-allowed-to-fail
+  allow_failures:
+    # Dev jobs are allowed to fail due to their inherent instability.
+    - env: ORCA_JOB=ISOLATED_DEV
+    - env: ORCA_JOB=INTEGRATED_DEV
+    - env: ORCA_JOB=CORE_NEXT
+
+# Install ORCA and prepare the environment.
+before_install:
+  # Set Node.js to a version compatible with Drupal 9 + Nightwatch.js.
+  - nvm use 12.13.1
+  - composer create-project --no-dev acquia/orca ../orca "$ORCA_VERSION"
+  - ../orca/bin/travis/before_install.sh
+
+# Create the test fixture and place the SUT.
+install:
+  - ../orca/bin/travis/install.sh
+
+# Display details about the fixture.
+before_script:
+  - ../orca/bin/travis/before_script.sh
+
+# Run the test script.
+script:
+  - ../orca/bin/travis/script.sh
+
+# Reserved for future use.
+before_cache: ../orca/bin/travis/before_cache.sh
+
+# Conditionally send code coverage data to Coveralls.
+after_success: ../orca/bin/travis/after_success.sh
+
+# Display debugging information in case of failure.
+after_failure: ../orca/bin/travis/after_failure.sh
+
+# Perform final, post-script tasks.
+after_script: ../orca/bin/travis/after_script.sh
