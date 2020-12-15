@@ -16,8 +16,7 @@ cohesion_custom_styles.cohesion_custom_style.*:
       label: 'Extended from'
     weight:
       type: integer
-      label: 'Weight'  
-
+      label: 'Weight'
 cohesion_custom_styles.cohesion_custom_style_type.*:
   type: cohesion_config_entity
   label: 'Custom style type config'
