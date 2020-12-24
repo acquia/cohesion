@@ -329,6 +329,19 @@ function _cohesion_templates_get_master_template() {
     $entities = [];
     $router_string = '';
 
+    // Allow master templates to use be defined at route level.
+    $route_template = \Drupal::routeMatch()->getRouteObject()->getOption('cohesion_master_template');
+
+    if (!empty($route_template)) {
+      $candidate_template_storage = \Drupal::entityTypeManager()
+        ->getStorage('cohesion_master_templates');
+
+      $candidate_template = $candidate_template_storage->load('mstr_tpl_' . $route_template);
+      if ($candidate_template instanceof MasterTemplates) {
+        return $candidate_template->get('id');
+      }
+    }
+
     foreach (\Drupal::routeMatch()->getParameters() as $param_key => $param) {
       if ($param instanceof ContentEntityInterface) {
         $entities[] = $param;
