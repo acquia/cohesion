@@ -1,0 +1,9 @@
+api_url: ''
+api_key: ''
+organization_key: ''
+site_id: ''
+# tracks API request status - 'NO_CONTENT' = no data waiting, 'PROCESSING', 'READY', 'ERROR'/null
+api_build_status: 'NO_CONTENT'
+google_map_api_key: ''
+elements_permissions: '{}'
+sidebar_view_style: 'thumbnails'
