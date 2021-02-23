@@ -68,6 +68,13 @@ class ExportSettingsForm extends ExportFormBase {
       '#weight' => 2,
     ];
 
+    $form['json_output_multiline'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Output data (json_values) in multiple lines for better readability.'),
+      '#default_value' => $this->configSyncSettings->get('json_output_multiline') ?? FALSE,
+      '#weight' => 3,
+    ];
+
     // Add the save button.
     $form['actions'] = [
       '#type' => 'actions',
@@ -87,6 +94,7 @@ class ExportSettingsForm extends ExportFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->configSyncSettings->set('enabled_entity_types', $form_state->getValue('enabled_entity_types'));
+    $this->configSyncSettings->set('json_output_multiline', $form_state->getValue('json_output_multiline'));
     $this->configSyncSettings->save();
 
     \Drupal::messenger()->addMessage($this->t('Entity access has been updated.'));

@@ -13,3 +13,4 @@ enabled_entity_types:
   cohesion_style_helper: cohesion_style_helper
   cohesion_view_templates: cohesion_view_templates
   cohesion_website_settings: cohesion_website_settings
+json_output_multiline: false

@@ -5,3 +5,5 @@ cohesion.sync.settings:
       type: sequence
       sequence:
         type: string
+    json_output_multiline:
+      type: boolean

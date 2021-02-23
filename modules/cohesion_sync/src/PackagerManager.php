@@ -5,6 +5,7 @@ namespace Drupal\cohesion_sync;
 use Drupal\cohesion\Entity\ContentIntegrityInterface;
 use Drupal\cohesion\UsageUpdateManager;
 use Drupal\cohesion_sync\Entity\Package;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\Config\StorageInterface;
@@ -18,6 +19,8 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 define('ENTRY_NEW_IMPORTED', 1);
 define('ENTRY_EXISTING_ASK', 2);
@@ -75,6 +78,11 @@ class PackagerManager {
   protected $configStorage;
 
   /**
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * @var \Drupal\Core\Extension\ModuleExtensionList
    */
   protected $extensionListModule;
@@ -96,8 +104,9 @@ class PackagerManager {
    * @param \Drupal\Core\File\FileSystem $file_system
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    * @param \Drupal\Core\Config\StorageInterface $config_storage
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    */
-  public function __construct(EntityRepository $entityRepository, EntityTypeManagerInterface $entityTypeManager, SyncPluginManager $sync_plugin_manager, UsageUpdateManager $usage_update_manager, FileSystem $file_system, LoggerChannelFactoryInterface $logger_factory, StorageInterface $config_storage) {
+  public function __construct(EntityRepository $entityRepository, EntityTypeManagerInterface $entityTypeManager, SyncPluginManager $sync_plugin_manager, UsageUpdateManager $usage_update_manager, FileSystem $file_system, LoggerChannelFactoryInterface $logger_factory, StorageInterface $config_storage, ConfigFactoryInterface $config_factory) {
     $this->entityRepository = $entityRepository;
     $this->entityTypeManager = $entityTypeManager;
     $this->syncPluginManager = $sync_plugin_manager;
@@ -105,6 +114,7 @@ class PackagerManager {
     $this->fileSystem = $file_system;
     $this->logger = $logger_factory->get('cohesion_sync');
     $this->configStorage = $config_storage;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -530,7 +540,11 @@ class PackagerManager {
           ];
 
           if ($yaml) {
-            yield Yaml::encode([$item]);
+            if (is_array($item)) {
+              $item = $this->processYamlData($item);
+            }
+
+            yield $this->yamlEncode([$item]);
           }
           else {
             yield $item;
@@ -689,6 +703,77 @@ class PackagerManager {
           }
         }
       }
+    }
+  }
+
+
+  /**
+   * Wrapper function to get config print output multiple lines.
+   *
+   * @return bool
+   *   TRUE if configuration set to print output multiple lines.
+   */
+  protected function isJsonOutputModeMultiline() {
+    static $config = NULL;
+
+    if (is_null($config)) {
+      $config = $this->configFactory->get('cohesion.sync.settings')->get('json_output_multiline') ?? FALSE;
+    }
+
+    return $config;
+  }
+
+  /**
+   * Do additional processing for the YAML data.
+   *
+   * Do this before finally printing into file.
+   *
+   * @param array $data
+   *   Data being sent to YAML.
+   *
+   * @return array
+   */
+  protected function processYamlData(array $data) {
+    // Return as is if no conversion required.
+    if (!($this->isJsonOutputModeMultiline())) {
+      return $data;
+    }
+
+    // For now we do this only for json_values and json_mapper.
+    // @todo make the fields dynamic.
+    foreach (['json_mapper', 'json_values'] as $field) {
+      if (isset($data['export'][$field])) {
+        $json = json_decode($data['export'][$field], TRUE);
+        $data['export'][$field] = json_encode($json, JSON_PRETTY_PRINT);
+      }
+    }
+
+    return $data;
+  }
+
+  /**
+   * Get the YAML data with multiple lines in string data.
+   *
+   * Here the change is that we pass the additional flag
+   * SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK to allow
+   * printing string values in multiple lines.
+   *
+   * @param mixed $data
+   *   The data to encode.
+   *
+   * @return string
+   *   The encoded data.
+   *
+   * @see \Drupal\Component\Serialization\YamlSymfony::encode()
+   */
+  protected function yamlEncode(array $data) {
+    try {
+      // Set the indentation to 2 to match Drupal's coding standards.
+      $yaml = new Dumper(2);
+      return $yaml->dump($data, PHP_INT_MAX, 0, SymfonyYaml::DUMP_EXCEPTION_ON_INVALID_TYPE | SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+    }
+    catch (\Exception $e) {
+      throw new InvalidDataTypeException($e->getMessage(), $e->getCode(), $e);
     }
   }
 
