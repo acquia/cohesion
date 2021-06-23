@@ -822,6 +822,28 @@ class TwigExtension extends \Twig_Extension {
         elseif ($condition == 'OR' && empty($active_contexts)) {
           return FALSE;
         }
+        // In case we found more than one context:
+        elseif (count($contexts) > 1) {
+          $array_to_check_contexts = [];
+
+          foreach ($contexts as $cn) {
+            if ($condition == 'OR') {
+              if (in_array($cn, $active_contexts)) {
+                $array_to_check_contexts[] = TRUE;
+              }
+              else {
+                $array_to_check_contexts[] = FALSE;
+              }
+            }
+          }
+          // This "empty" is to ignore the condition in case it was not met.
+          if (in_array(TRUE, $array_to_check_contexts) || empty($array_to_check_contexts)) {
+            return TRUE;
+          }
+          else {
+            return FALSE;
+          }
+        }
       }
     }
 
