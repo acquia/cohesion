@@ -1,0 +1,11 @@
+{#
+/**
+* @file
+* Site Studio view layout.
+*/
+#}
+{% if rows is defined %}
+    {% for row in rows %}
+        {{ row }}
+    {% endfor %}
+{% endif %}

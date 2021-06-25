@@ -1,0 +1,59 @@
+# Site Studio website settings menu items definition
+entity.cohesion_website_settings.collection:
+  title: 'Website settings'
+  route_name: entity.cohesion_website_settings.collection
+  description: 'Manage your website settings'
+  parent: cohesion.settings
+  weight: 30
+
+cohesion_website_settings_menulink.base_unit_settings:
+  title: 'Base unit settings'
+  description: 'Manage your base unit settings'
+  route_name: entity.cohesion_website_settings.edit_form
+  route_parameters: { cohesion_website_settings: 'base_unit_settings'}
+  parent: entity.cohesion_website_settings.collection
+  weight: 1
+
+cohesion_website_settings_menulink.color_palette:
+  title: 'Color palette'
+  description: 'Manage your color palette'
+  route_name: cohesion_website_settings.color_palette_edit_form
+  parent: entity.cohesion_website_settings.collection
+  weight: 2
+
+cohesion_website_settings_menulink.default_font_settings:
+  title: 'Default font settings'
+  description: 'Manage your default font settings'
+  route_name: entity.cohesion_website_settings.edit_form
+  route_parameters: { cohesion_website_settings: 'default_font_settings'}
+  parent: entity.cohesion_website_settings.collection
+  weight: 3
+
+cohesion_website_settings_menulink.font_libraries:
+  title: 'Font libraries'
+  description: 'Manage your font libraries'
+  route_name: cohesion_website_settings.font_libraries_edit_form
+  parent: entity.cohesion_website_settings.collection
+  weight: 4
+
+cohesion_website_settings_menulink.icon_libraries:
+  title: 'Icon libraries'
+  description: 'Manage your icon libraries'
+  route_name: cohesion_website_settings.icon_libraries_edit_form
+  parent: entity.cohesion_website_settings.collection
+  weight: 5
+
+cohesion_website_settings_menulink.responsive_grid_settings:
+  title: 'Responsive grid settings'
+  description: 'Manage your responsive grid settings'
+  route_name: entity.cohesion_website_settings.edit_form
+  route_parameters: { cohesion_website_settings: 'responsive_grid_settings'}
+  parent: entity.cohesion_website_settings.collection
+  weight: 6
+
+cohesion_website_settings_menulink.scss_variables_settings:
+  title: 'SCSS variables'
+  description: 'Manage your SCSS variables'
+  route_name: cohesion_website_settings.scss_variables_edit_form
+  parent: entity.cohesion_website_settings.collection
+  weight: 7

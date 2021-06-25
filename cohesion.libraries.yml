@@ -1,0 +1,84 @@
+coh-theme:
+  css:
+    base:
+      css/reset.css: { weight: -20 }
+      css/base-default.css: { media: all, weight: -19, preprocess: false }
+    theme:
+      css/theme-default.css: {media: all, weight: -19, preprocess: false }
+
+cohesion-admin-scripts:
+  js:
+    js/ios.js: {}
+    public://cohesion/scripts/dx8/vendor.js: { }
+    public://cohesion/scripts/dx8/scripts.js: { }
+    public://cohesion/scripts/dx8/app.js: { }
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - editor/drupal.editor
+    - editor/drupal.editor.admin
+    - ckeditor/drupal.ckeditor
+    - core/drupalSettings
+
+cohesion-admin-styles:
+  css:
+    base:
+      public://cohesion/styles/dx8/vendor.css: {}
+      public://cohesion/styles/dx8/main.css: {}
+
+drupal.machine-name:
+  js:
+    js/machine-name.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.form
+
+coh-module:
+  css: []
+
+admin-icon-libraries:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-icon-libraries.css: { media: all }
+
+admin-responsive-grid-settings:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-responsive-grid-settings.css: { media: all }
+
+admin-grid-settings:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-responsive-grid.css: { media: all, weight: 99 }
+
+cohesion-accordion-element:
+  js:
+    js/cohesion-accordion-element.js: {}
+  dependencies:
+    - core/jquery
+
+# temporary - remove this after code has been moved into angular.
+cohesion_token:
+  css:
+    component:
+      css/cohesion-token.css: { weight: -10 }
+
+cohesion-ui:
+  css:
+    theme:
+      css/cohesion-ui.css: { weight: -10}
+
+cohesion-list-builder-sort:
+  js:
+    js/cohesion-list-builder-sort.js: {}
+    js/list-builder-sort.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupalSettings
+  css:
+    component:
+      css/list-builder-sort.css: {}

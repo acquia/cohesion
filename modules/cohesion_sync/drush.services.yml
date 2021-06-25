@@ -1,0 +1,6 @@
+services:
+  cohesion_sync.commands:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncCommands
+    arguments: ['@cohesion_sync.drush_helpers']
+    tags:
+      - { name: drush.command }
