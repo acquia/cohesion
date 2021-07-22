@@ -1,0 +1,29 @@
+{
+  "name": "site-studio",
+  "version": "1.0.0",
+  "description": "Site Studio",
+  "main": "",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "coverage:clean": "rm -rf .nyc_output && rm -rf coverage",
+    "coverage:report:scss-gateway": "nyc --reporter=lcov --reporter=text-summary mocha ./cohesion-services/scss-gateway/node/test/**/*.test.js -- -R spec --recursive --extension .js --exit",
+    "coverage:report:dx8-gateway": "nyc --reporter=lcov --reporter=text-summary mocha ./cohesion-services/dx8-gateway/node/app/test/**/*.test.js -- -R spec --recursive --extension .js --exit",
+    "coverage:publish": "cat ./coverage/lcov.info | coveralls --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acquia/cohesion-dev.git"
+  },
+  "author": "Acquia Engineering <cohesion-devs@acquia.com>",
+  "bugs": {
+    "url": "https://github.com/acquia/cohesion-dev/issues"
+  },
+  "homepage": "https://github.com/acquia/cohesion-dev#readme",
+  "devDependencies": {
+    "coveralls": "^3.1.0",
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0"
+  }
+}
