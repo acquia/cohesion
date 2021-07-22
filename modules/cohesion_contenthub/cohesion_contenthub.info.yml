@@ -1,0 +1,9 @@
+name: Site Studio Content Hub
+type: module
+description: 'Adds support for for Acquia Content Hub.'
+core_version_requirement: ^8.8.0 || ^9
+package: Site Studio
+dependencies:
+  - cohesion
+  - acquia_contenthub_publisher
+  - depcalc

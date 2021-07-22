@@ -1,0 +1,35 @@
+services:
+  cohesion_entity_reference.dependency_calculator:
+    class: Drupal\cohesion_contenthub\EventSubscriber\DependencyCollector\CohesionEntityReferenceFieldDependencyCollector
+    tags:
+      - { name: event_subscriber }
+  cohesion_contenthub.json_value.dependency_calculator:
+    class: Drupal\cohesion_contenthub\EventSubscriber\DependencyCollector\CohesionLayoutCanvasDependencyCollector
+    arguments: [ '@entity_type.manager']
+    tags:
+      - { name: event_subscriber }
+  cohesion_contenthub.publisher.remove_config_entities:
+    class: Drupal\cohesion_contenthub\EventSubscriber\PrunePublishCdfEntities\RemoveConfigEntities
+    tags:
+      - { name: event_subscriber }
+  cohesion_contenthub.publisher.is_not_cohesion_config:
+    class: Drupal\cohesion_contenthub\EventSubscriber\EnqueueEligibility\IsNotCohesionConfig
+    tags:
+      - { name: event_subscriber }
+  cohesion_contenthub.publisher.is_not_cohesion_layout:
+    class: Drupal\cohesion_contenthub\EventSubscriber\EnqueueEligibility\IsNotCohesionLayout
+    tags:
+      - { name: event_subscriber }
+  cohesion_entity_reference.field.cdf.unserializer:
+    class: Drupal\cohesion_contenthub\EventSubscriber\UnserializeContentField\CohesionEntityReferenceField
+    tags:
+      - { name: event_subscriber }
+  cohesion_entity_reference.field.cdf.serializer:
+    class: Drupal\cohesion_contenthub\EventSubscriber\SerializeContentField\CohesionEntityReferenceFieldSerializer
+    tags:
+      - { name: event_subscriber }
+  cohesion_contenthub.layout_canvas.serializer:
+    class: Drupal\cohesion_contenthub\EventSubscriber\SerializeContentField\CohesionLayoutCanvasSerializer
+    arguments: [ '@entity_type.manager' ]
+    tags:
+      - { name: event_subscriber }

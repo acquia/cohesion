@@ -1,0 +1,10 @@
+{
+    "name": "drupal/cohesion_content_hub",
+    "type": "drupal-module",
+    "description": "Adds support for Acquia Content Hub.",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "drupal/depcalc": "~1.2",
+        "drupal/acquia_contenthub": "~2",
+    }
+}

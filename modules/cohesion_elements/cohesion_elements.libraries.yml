@@ -1,0 +1,21 @@
+settings-tray:
+  css:
+    component:
+      css/settings-tray.css: {}
+      css/contextual-region.css: {}
+  js:
+    js/settings-tray.js: {}
+    js/contextual-region.js: {}
+  dependencies:
+    - core/jquery
+
+canvas-preview:
+  js:
+    js/canvas-preview.js: {}
+  css:
+    component:
+      css/canvas-preview.css: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.resizable

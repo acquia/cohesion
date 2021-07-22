@@ -1,0 +1,6 @@
+services:
+  dx8.commands:
+    class: \Drupal\cohesion\Commands\Dx8Commands
+    arguments: ['@string_translation']
+    tags:
+      - { name: drush.command }
