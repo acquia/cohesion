@@ -1,0 +1,10 @@
+id: cohesion_custom_style_type
+plugin_id: cohesion_custom_style_type
+granularity: resource
+configuration:
+  methods:
+    - GET
+  formats:
+    - json
+  authentication:
+    - cookie

@@ -1,0 +1,81 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\cohesion\Entity\CohesionSettingsInterface;
+use Drupal\Core\Url;
+use Symfony\Component\Yaml\Yaml;
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function cohesion_sync_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  if ($entity instanceof CohesionSettingsInterface) {
+    // Add "Export package to file." and "Lock entity" option to the actions dropdown on all Site Studio entity list builders.
+    if (Drupal::currentUser()->hasPermission('access cohesion sync') && $entity->get('status')) {
+      $url = Url::fromRoute('cohesion_sync.operation_export_single', [
+        'entity_type' => $entity->getEntityTypeId(),
+        'entity_uuid' => $entity->uuid(),
+      ]);
+
+      $url->setOption('query', [
+        'destination' => \Drupal::request()->getRequestUri(),
+      ]);
+
+      $operations['export_package_to_file'] = [
+        'title' => t('Export package to file'),
+        'url' => $url,
+        'weight' => 50,
+      ];
+
+      $operations['toggle_lock_for_sync'] = [
+        'title' => !$entity->isLocked() ? t('Lock entity') : t('Unlock entity'),
+        'url' => Url::fromRoute('cohesion_sync.entity_lock_toggle', [
+          'entity_type' => $entity->getEntityTypeId(),
+          'entity_uuid' => $entity->uuid(),
+        ]),
+        'weight' => 50,
+      ];
+
+    }
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function cohesion_sync_modules_installed($modules) {
+  foreach ($modules as $module) {
+    // Check to see if the config/dx8/packages.yml file exists.
+    $packages_yaml_file = drupal_get_path('module', $module) . "/config/dx8/packages.yml";
+    if (file_exists($packages_yaml_file)) {
+      // Decode the file.
+      $config = Yaml::parse(file_get_contents($packages_yaml_file));
+
+      if (is_array($config)) {
+        // Loop through the packages and deploy them.
+        foreach ($config as $path) {
+          // If it's a local path, patch in the path to the module.
+          if (file_exists(drupal_get_path('module', $module) . '/' . $path)) {
+            $path = drupal_get_path('module', $module) . '/' . $path;
+          }
+
+          // Attempt to deploy the package.
+          try {
+            $messages = \Drupal::service('cohesion_sync.drush_helpers')->import(TRUE, FALSE, $path);
+
+            // Tell dblog what happened.
+            Drupal::logger('cohesion')->notice($messages);
+          }
+          catch (\Exception $e) {
+            // Tell dblog what happened.
+            Drupal::logger('cohesion')->error($e->getMessage());
+          }
+        }
+      }
+    }
+  }
+}

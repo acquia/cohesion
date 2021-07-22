@@ -1,0 +1,13 @@
+uuid: f0745755-460f-41c6-a9f9-a67e82e788c4
+langcode: en
+status: true
+dependencies: {  }
+label: 'General components'
+id: cpt_cat_general_components
+json_values: '{}'
+json_mapper: '{}'
+last_entity_update: entityupdate_0005
+modified: false
+selectable: true
+class: category-3
+weight: -10

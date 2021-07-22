@@ -1,0 +1,21 @@
+services:
+  # Group of entities (website settings)
+  plugin.manager.cohesion_sync.processor:
+    class: Drupal\cohesion_sync\SyncPluginManager
+    parent: default_plugin_manager
+
+  cohesion_sync.packager:
+    class: Drupal\cohesion_sync\PackagerManager
+    arguments: ['@entity.repository', '@entity_type.manager', '@plugin.manager.cohesion_sync.processor', '@cohesion_usage.update_manager', '@file_system', '@logger.factory', '@config.storage']
+
+  cohesion_sync.drush_helpers:
+    class: \Drupal\cohesion_sync\Drush\CommandHelpers
+    arguments: ['@entity_type.manager', '@config.factory', '@cohesion_sync.packager', '@entity.repository', '@state', '@file_system']
+
+  cohesion_sync.config_import_subscriber.decorator:
+    class: Drupal\cohesion_sync\EventSubscriber\SyncConfigImportSubscriber
+    arguments: ['@theme_handler', '@extension.list.module']
+    decorates: config_import_subscriber
+    decoration_priority: 5
+    tags:
+      - { name: event_subscriber }

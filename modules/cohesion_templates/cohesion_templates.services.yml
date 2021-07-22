@@ -1,0 +1,10 @@
+services:
+
+  cohesion_templates.template_extension:
+    class: Drupal\cohesion_templates\TwigExtension\TwigExtension
+    arguments: ['@renderer','@token', '@theme.registry', '@twig', '@uuid', '@entity_type.manager', '@stream_wrapper_manager', '@file.mime_type.guesser.extension', '@theme.manager', '@cohesion.utils', '@logger.factory']
+    tags:
+      - { name: twig.extension }
+
+  cohesion_templates.cache_contexts:
+    class: Drupal\cohesion_templates\Plugin\CacheContexts

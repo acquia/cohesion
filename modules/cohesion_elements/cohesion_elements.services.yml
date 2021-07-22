@@ -1,0 +1,15 @@
+services:
+  custom.elements:
+    class: Drupal\cohesion_elements\CustomElementsService
+    arguments: ['@plugin.manager.custom_elements']
+    tags:
+      - { name: custom.elements, scheme: cohesion_elements }
+
+  plugin.manager.custom_elements:
+      class: Drupal\cohesion_elements\CustomElementPluginManager
+      parent: default_plugin_manager
+
+  cohesion_elements.category_relationships:
+    class: Drupal\cohesion_elements\CategoryRelationshipsManager
+    arguments: ['@entity_type.manager']
+
