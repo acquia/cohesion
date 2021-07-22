@@ -1,0 +1,11 @@
+cohesion_custom_style.add_page:
+  route_name: 'entity.cohesion_custom_style.add_page'
+  title: 'Add custom style'
+  appears_on:
+    - entity.cohesion_custom_style.collection
+    
+cohesion_custom_style.toggle_style_groups:
+  route_name: 'entity.cohesion_custom_style.collection'
+  title: 'Open all'
+  appears_on:
+    - entity.cohesion_custom_style.collection
