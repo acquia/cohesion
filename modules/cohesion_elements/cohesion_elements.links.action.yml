@@ -1,0 +1,47 @@
+entity.cohesion_component.add_form:
+  route_name: 'entity.cohesion_component.add_form'
+  title: 'Add component'
+  appears_on:
+    - entity.cohesion_component.collection
+
+entity.cohesion_component_category.add_form:
+  route_name: 'entity.cohesion_component_category.add_form'
+  title: 'Add component category'
+  appears_on:
+    - entity.cohesion_component_category.collection
+
+entity.cohesion_helper.add_form:
+  route_name: 'entity.cohesion_helper.add_form'
+  title: 'Add helper'
+  appears_on:
+    - entity.cohesion_helper.collection
+
+entity.cohesion_helper_category.add_form:
+  route_name: 'entity.cohesion_helper_category.add_form'
+  title: 'Add helper category'
+  appears_on:
+    - entity.cohesion_helper_category.collection
+
+entity.component_content.add_page:
+  route_name: 'cohesion_elements.component_content.add_page'
+  title: 'Add component content'
+  appears_on:
+    - entity.component_content.collection
+
+entity.component_content.toggle_component_content_groups:
+  route_name: 'cohesion_elements.component_content.add_page'
+  title: 'Open all'
+  appears_on:
+    - cohesion_elements.component_content.add_page
+
+entity.cohesion_component.toggle_components_groups:
+  route_name: 'entity.cohesion_component.collection'
+  title: 'Open all'
+  appears_on:
+    - entity.cohesion_component.collection
+
+entity.cohesion_helper.toggle_helpers_groups:
+  route_name: 'entity.cohesion_helper.collection'
+  title: 'Open all'
+  appears_on:
+    - entity.cohesion_helper.collection

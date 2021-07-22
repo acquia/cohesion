@@ -1,0 +1,13 @@
+uuid: 93a5f555-dc7c-4cfb-bff5-7562b2577037
+langcode: en
+status: true
+dependencies: {  }
+label: 'General helpers'
+id: hlp_cat_general_helpers
+json_values: '{}'
+json_mapper: '{}'
+last_entity_update: entityupdate_0005
+modified: false
+selectable: true
+class: category-3
+weight: -10

@@ -1,0 +1,14 @@
+sync-package-form:
+  css:
+    base:
+      css/package-form.css: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - cohesion/cohesion-admin-styles
+
+sync-chunked-file:
+  js:
+    file-js/chunked.js: {}
+  dependencies:
+    - core/drupal

@@ -1,0 +1,13 @@
+uuid: a58aa7af-aa5e-466b-acf2-df36074658ae
+langcode: en
+status: true
+dependencies: {  }
+label: 'Media components'
+id: cpt_cat_media_components
+json_values: '{}'
+json_mapper: '{}'
+last_entity_update: entityupdate_0005
+modified: false
+selectable: true
+class: category-4
+weight: -8
