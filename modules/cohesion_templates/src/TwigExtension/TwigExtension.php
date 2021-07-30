@@ -825,6 +825,7 @@ class TwigExtension extends \Twig_Extension {
         // In case we found more than one context:
         elseif (count($contexts) > 1) {
           $array_to_check_contexts = [];
+          $contexts_with_and = [];
 
           foreach ($contexts as $cn) {
             if ($condition == 'OR') {
@@ -835,7 +836,21 @@ class TwigExtension extends \Twig_Extension {
                 $array_to_check_contexts[] = FALSE;
               }
             }
+            elseif ($condition == "AND") {
+              if (in_array($cn, $active_contexts)) {
+                $contexts_with_and[] = TRUE;
+              }
+              else {
+                $contexts_with_and[] = FALSE;
+              }
+            }
           }
+
+          // Added "AND" validation
+          if (!empty($contexts_with_and) && in_array(FALSE, $contexts_with_and)) {
+            return FALSE;
+          }
+
           // This "empty" is to ignore the condition in case it was not met.
           if (in_array(TRUE, $array_to_check_contexts) || empty($array_to_check_contexts)) {
             return TRUE;
