@@ -1104,10 +1104,12 @@ class TwigExtension extends \Twig_Extension {
       $markup[$filter_identifier]['#attributes']['data-submit-button-id'] = $submit_button_id;
       $markup[$filter_identifier]['#attributes']['data-reset-button-id'] = $reset_button_id;
       $markup[$filter_identifier]['#attributes']['data-reload-on-change'] = ($reloadOnChange == '1') ? 'true' : 'false';
-      unset($markup[$filter_identifier]['#id']);
-      foreach ($markup[$filter_identifier] as &$attribute) {
-        if (is_array($attribute) && isset($attribute['#type']) && ($attribute['#type'] == 'checkbox' || $attribute['#type'] == 'radio') && isset($attribute['#id'])) {
-          $attribute['#id'] = 'coh-view-filter-' . $attribute['#id'];
+      if ($markup[$filter_identifier]['#type'] !== 'checkboxes') {
+        unset($markup[$filter_identifier]['#id']);
+        foreach ($markup[$filter_identifier] as &$attribute) {
+          if (is_array($attribute) && isset($attribute['#type']) && ($attribute['#type'] == 'checkbox' || $attribute['#type'] == 'radio') && isset($attribute['#id'])) {
+            $attribute['#id'] = 'coh-view-filter-' . $attribute['#id'];
+          }
         }
       }
     }
