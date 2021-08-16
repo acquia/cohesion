@@ -1,0 +1,84 @@
+/* Settings tray dialog styles */
+.dx8-settings-dialog #drupal-off-canvas {
+  overflow: auto;
+  padding: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Settings tray iframe styles */
+.dx8-settings-dialog #drupal-off-canvas iframe.dx8-contextual {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 1 !important;
+  transition: opacity 0.5s ease-out;
+  display: block;
+}
+.dx8-settings-dialog #drupal-off-canvas iframe.dx8-contextual.dx8-hidden {
+  opacity: 0 !important;
+  transition: opacity 0s;
+}
+
+.dx8-settings-dialog #drupal-off-canvas .dx8-context-loading:before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  border-radius: 50%;
+  border: 4px solid #d7d7d7;
+  border-left-color: #006cbc;
+  animation: rotate 0.75s infinite linear;
+  position: absolute;
+  top: 50%;
+  margin-top: -20px;
+  left: 50%;
+  margin-left: -20px;
+}
+
+
+@media(max-width: 1810px) {
+  body.dx8-contextual-tray-open .dialog-off-canvas-main-canvas {
+    padding-right: 0px !important;
+  }
+}
+
+@-moz-keyframes rotate {
+  0% {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg)
+  }
+  100% {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg)
+  }
+}
+
+@-webkit-keyframes rotate {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg)
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg)
+  }
+}
+
+@keyframes rotate {
+  0% {
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg)
+  }
+  100% {
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg)
+  }
+}
