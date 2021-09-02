@@ -12,3 +12,4 @@ dependencies:
   - settings_tray
   - rest
   - ckeditor
+  - drupal:config
