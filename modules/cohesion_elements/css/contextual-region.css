@@ -1,0 +1,39 @@
+.dx-contextual-region-mask {
+  outline: 1px dashed #28a9e0;
+  outline-offset: -1px;
+  pointer-events: none;
+  position: absolute;
+  display: none;
+  z-index: 201;
+}
+
+.dx-contextual-region.contextual-region {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 501;
+}
+
+.dx-contextual-region.contextual-region button.trigger {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiI+PGc+PHBhdGggZmlsbD0iI2ZmZmZmZiIgZD0iTTE0LjU0NSAzLjA0MmwtMS41ODYtMS41ODVjLS4zODktLjM4OS0xLjAyNS0uMzg5LTEuNDE0IDBsLTEuMjkzIDEuMjkzIDMgMyAxLjI5My0xLjI5M2MuMzg5LS4zODkuMzg5LTEuMDI2IDAtMS40MTV6Ii8+PHJlY3QgZmlsbD0iI2ZmZmZmZiIgeD0iNS4xMjkiIHk9IjMuOCIgdHJhbnNmb3JtPSJtYXRyaXgoLS43MDcgLS43MDcgLjcwNyAtLjcwNyA2LjE4OSAyMC4wNjQpIiB3aWR0aD0iNC4yNDMiIGhlaWdodD0iOS44OTkiLz48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNLjkwOCAxNC43NzVjLS4wODcuMjYyLjA1NS4zOTcuMzE2LjMxMmwyLjAwMS0uNjY3LTEuNjUtMS42NDYtLjY2NyAyLjAwMXoiLz48L2c+PC9zdmc+Cg==);
+  background-color: #28a9e0;
+  border: 0;
+  transition: background-color 200ms ease-in-out, border-radius 200ms ease-in-out;
+}
+
+.dx-contextual-region.contextual-region.focus {
+  outline: none;
+}
+
+.dx-contextual-region.contextual-region.focus button.trigger {
+  background-color: #036093;
+}
+
+.js-settings-tray-edit-mode .dx-contextual-region-mask.dx-show {
+  display: block;
+}
+
+.dialog-off-canvas-main-canvas.js-settings-tray-edit-mode .contextual-component  a,
+.dialog-off-canvas-main-canvas.js-settings-tray-edit-mode .contextual-component input {
+  pointer-events: inherit;
+}

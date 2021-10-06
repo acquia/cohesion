@@ -1,0 +1,18 @@
+# The content of the component.
+cohesion_component.configure:
+  title: 'Edit component'
+  route_name: 'cohesion_elements.components.settings_tray_iframe'
+  group: 'cohesion_elements'
+  class: '\Drupal\cohesion_elements\Plugin\Menu\ContextualLink\ComponentContextualLink'
+
+# Link to the component configuration entity edit form.
+cohesion_component_entity.configure:
+  title: 'Configure component'
+  route_name: 'entity.cohesion_component.edit_form'
+  group: 'cohesion_configuration'
+
+# Link to the component content entity edit form.
+component_content_entity.lalal:
+  title: 'Edit component content'
+  route_name: 'entity.component_content.edit_form'
+  group: 'cohesion_component_content_edit'
