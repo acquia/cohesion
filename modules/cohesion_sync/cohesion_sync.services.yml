@@ -41,3 +41,7 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@entity_type.manager', '@file_system', '@logger.factory']
+    
+  cohesion_sync.refresh_manager:
+    class: \Drupal\cohesion_sync\CohesionSyncRefreshManager
+    arguments: ['@entity_type.manager', '@plugin.manager.usage.processor', '@state']  

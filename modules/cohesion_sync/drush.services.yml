@@ -32,3 +32,9 @@ services:
     arguments: ['@entity_type.manager']
     tags:
       - { name: drush.command }
+      
+  cohesion_sync.refresh:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncRefreshCommands
+    tags:
+      - { name: drush.command }
+    arguments: ['@cohesion_sync.packager', '@entity.repository', '@entity_type.manager', '@plugin.manager.usage.processor', '@cohesion_sync.refresh_manager']    
