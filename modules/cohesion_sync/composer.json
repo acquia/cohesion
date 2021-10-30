@@ -2,5 +2,12 @@
     "name": "drupal/cohesion_sync",
     "type": "drupal-module",
     "description": "Share packages of dependent configuartion between sites.",
-    "license": "GPL-2.0-or-later"
+    "license": "GPL-2.0-or-later",
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^10"
+            }    
+        }    
+    }    
 }
