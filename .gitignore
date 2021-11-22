@@ -1,0 +1,4 @@
+.DS_Store
+ .idea/
+ .php_cache
+ vendor/
