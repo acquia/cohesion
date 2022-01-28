@@ -1,0 +1,13 @@
+uuid: 09067ec0-23ea-431b-8fba-136cf873464c
+langcode: en
+status: true
+dependencies: {  }
+label: 'Interactive helpers'
+id: hlp_cat_interactive_helpers
+json_values: '{}'
+json_mapper: '{}'
+last_entity_update: entityupdate_0005
+modified: false
+selectable: true
+class: category-7
+weight: -7
