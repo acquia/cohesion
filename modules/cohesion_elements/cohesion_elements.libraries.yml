@@ -1,0 +1,10 @@
+canvas-preview:
+  js:
+    js/canvas-preview.js: {}
+  css:
+    component:
+      css/canvas-preview.css: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.ui
+    - core/jquery.ui.resizable
