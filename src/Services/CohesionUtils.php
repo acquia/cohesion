@@ -7,6 +7,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -43,6 +44,13 @@ class CohesionUtils {
   protected $languageManager;
 
   /**
+   * The entity repository.
+   *
+   * @var Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * CohesionUtils constructor.
    *
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
@@ -50,11 +58,12 @@ class CohesionUtils {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
-  public function __construct(ThemeHandlerInterface $theme_handler, ThemeManagerInterface $theme_manager, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager) {
+  public function __construct(ThemeHandlerInterface $theme_handler, ThemeManagerInterface $theme_manager, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, EntityRepositoryInterface $entity_repository) {
     $this->themeHandler = $theme_handler;
     $this->themeManager = $theme_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->languageManager = $language_manager;
+    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -386,10 +395,10 @@ class CohesionUtils {
       switch ($entity_data[0]) {
         case 'view':
           $view_type = $this->entityTypeManager->getStorage('view');
-          if ($view_type && $entity_data[1] && $entity_data[2]) {
+          if ($entity_data[1] && $entity_data[2]) {
             $view_id = $entity_data[1];
             $display_id = $entity_data[2];
-            if ($view = $view_type->load($view_id)) {
+            if ($view = $this->loadEntity('view', $view_id)) {
               $executable = $view->getExecutable();
               $executable->initDisplay();
               foreach ($executable->displayHandlers as $view_display_id => $display) {
@@ -421,17 +430,13 @@ class CohesionUtils {
           if (isset($entity_data[1])) {
             $entity_type_id = $entity_data[0];
             $entity_id = $entity_data[1];
-            if ($entity_type = $this->entityTypeManager
-              ->getStorage($entity_type_id)) {
-              if ($entity = $entity_type->load($entity_id)) {
-                $language = $this->languageManager->getCurrentLanguage()->getId();
-                if ($entity->hasTranslation($language)) {
-                  $entity = $entity->getTranslation($language);
-                }
-                return $entity->toUrl()->toString();
+            if ($entity = $this->loadEntity($entity_type_id, $entity_id)) {
+              $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+              if ($entity->hasTranslation($language)) {
+                $entity = $entity->getTranslation($language);
               }
+              return $entity->toUrl()->toString();
             }
-
           }
           break;
       }
@@ -513,6 +518,33 @@ class CohesionUtils {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Load an Entity by either UUID or Node ID
+   */
+  public function loadEntity($entityTypeId, $id) {
+    $entityStorage = $this->entityTypeManager->getStorage($entityTypeId);
+
+    if (!isset($entityStorage)) {
+      // Unable to find a storage provider for the given entity type
+      return;
+    }
+
+    if (is_numeric($id)) {
+      // The entity ID is a Node ID, so we can do a standard lookup
+      $entity = $entityStorage->load($id);
+    } else {
+      // The ID is likely a UUID, so we will attempt to lookup using the entity repository
+      $entity = $this->entityRepository->loadEntityByUuid($entityTypeId, $id);
+    }
+
+    if (!isset($entity)) {
+      // Unable to find an entity with the given ID
+      return;
+    }
+
+    return $entity;
   }
 
 }

@@ -19,6 +19,7 @@ use Drupal\media_library\MediaLibraryState;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\cohesion\Services\CohesionUtils;
 
 /**
  * Class CohesionDrupalEndpointController.
@@ -61,6 +62,13 @@ class CohesionDrupalEndpointController extends ControllerBase {
   protected $loggerChannel;
 
   /**
+   * Cohesion Utils.
+   *
+   * @var Drupal\cohesion\Services\CohesionUtils
+   */
+  protected $cohesionUtils;
+
+  /**
    * CohesionDrupalEndpointController constructor.
    *
    * @param \Drupal\Core\Entity\EntityAutocompleteMatcher $matcher
@@ -68,13 +76,15 @@ class CohesionDrupalEndpointController extends ControllerBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerChannel
+   * @param \Drupal\cohesion\Services\CohesionUtils $cohesionUtils
    */
-  public function __construct(EntityAutocompleteMatcher $matcher, ThemeHandlerInterface $themeHandler, EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $moduleHandler, LoggerChannelFactoryInterface $loggerChannel) {
+  public function __construct(EntityAutocompleteMatcher $matcher, ThemeHandlerInterface $themeHandler, EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $moduleHandler, LoggerChannelFactoryInterface $loggerChannel, CohesionUtils $cohesionUtils) {
     $this->matcher = $matcher;
     $this->themeHandler = $themeHandler;
     $this->entityTypeManager = $entityTypeManager;
     $this->moduleHandler = $moduleHandler;
     $this->loggerChannel = $loggerChannel->get('cohesion');
+    $this->cohesionUtils = $cohesionUtils;
   }
 
   /**
@@ -91,7 +101,8 @@ class CohesionDrupalEndpointController extends ControllerBase {
       $container->get('theme_handler'),
       $container->get('entity_type.manager'),
       $container->get('module_handler'),
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('cohesion.utils')
     );
   }
 
@@ -385,8 +396,7 @@ class CohesionDrupalEndpointController extends ControllerBase {
       $query_split = explode('::', $typed_string);
       if (isset($query_split[0])) {
         if ($query_split[0] == 'view' && isset($query_split[1]) && isset($query_split[2])) {
-          if ($view_type = $this->entityTypeManager->getStorage('view')) {
-            $view = $view_type->load($query_split[1]);
+          if ($view = $this->cohesionUtils->loadEntity('view', $query_split[1])) {
             if ($view->access('view', \Drupal::currentUser())) {
               $executable = $view->getExecutable();
               $executable->initDisplay();
@@ -399,7 +409,7 @@ class CohesionDrupalEndpointController extends ControllerBase {
                   }
                   $grouped_data['views'][] = [
                     'name' => "{$view->label()} - {$this->t($display->display['display_title'])}  (/{$display->getPath()})",
-                    'id' => 'view::' . $view->id() . '::' . $display_id,
+                    'id' => 'view::' . $view->uuid() . '::' . $display_id,
                     'group' => $this->t('Views'),
                   ];
                 }
@@ -407,11 +417,9 @@ class CohesionDrupalEndpointController extends ControllerBase {
             }
           }
         }
-        elseif (isset($query_split[1]) && is_numeric($query_split[1])) {
-          $entity_type = $this->entityTypeManager->getStorage($query_split[0]);
-          if ($entity_type) {
-            /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-            $entity = $entity_type->load($query_split[1]);
+        elseif (isset($query_split[1])) {
+          /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+          if ($entity = $this->cohesionUtils->loadEntity($query_split[0], $query_split[1])) {
             if ($entity && $entity->access('view', \Drupal::currentUser()) && $entity->hasLinkTemplate('canonical')) {
               if (!isset($grouped_data[$entity->getEntityType()->id()])) {
                 $grouped_data[$entity->getEntityType()->id()] = [];
@@ -421,7 +429,7 @@ class CohesionDrupalEndpointController extends ControllerBase {
               }
               $grouped_data[$entity->getEntityType()->id()][] = [
                 'name' => $entity->label(),
-                'id' => $query_split[0] . '::' . $entity->id(),
+                'id' => $query_split[0] . '::' . $entity->uuid(),
                 'group' => $entity->getEntityType()->getLabel(),
               ];
             }
@@ -430,12 +438,10 @@ class CohesionDrupalEndpointController extends ControllerBase {
       }
 
       // Search via content entity ID.
-      if (!count($grouped_data) && is_numeric($typed_string) && $typed_string > 0) {
+      if (!count($grouped_data) && (is_numeric($typed_string) || Uuid::isValid($typed_string)) && $typed_string > 0) {
         foreach ($content_entity_types as $content_entity_type) {
-          $entity_type = $this->entityTypeManager->getStorage($content_entity_type->id());
-          if ($entity_type) {
-            /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-            $entity = $entity_type->load($typed_string);
+          /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+          if ($entity = $this->cohesionUtils->loadEntity($content_entity_type->id(), $typed_string)) {
             if ($entity && $entity->access('view', \Drupal::currentUser()) && $entity->hasLinkTemplate('canonical')) {
               if (!isset($grouped_data[$content_entity_type->id()])) {
                 $grouped_data[$content_entity_type->id()] = [];
@@ -445,7 +451,7 @@ class CohesionDrupalEndpointController extends ControllerBase {
               }
               $grouped_data[$content_entity_type->id()][] = [
                 'name' => $entity->label(),
-                'id' => $content_entity_type->id() . '::' . $entity->id(),
+                'id' => $content_entity_type->id() . '::' . $entity->uuid(),
                 'group' => $content_entity_type->getLabel(),
               ];
             }
@@ -472,14 +478,14 @@ class CohesionDrupalEndpointController extends ControllerBase {
                 preg_match('#.*\(([^)]+)\)#', $match['value'], $var);
 
                 /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-                $entity = $entity_type->load($var[1]);
+                $entity = $this->cohesionUtils->loadEntity($content_entity_type->id(), $var[1]);
                 if ($entity && $entity->access('view', \Drupal::currentUser()) && $entity->hasLinkTemplate('canonical')) {
                   if (!isset($grouped_data[$content_entity_type->id()])) {
                     $grouped_data[$content_entity_type->id()] = [];
                   }
                   $grouped_data[$content_entity_type->id()][] = [
                     'name' => $match['label'],
-                    'id' => $content_entity_type->id() . '::' . $entity->id(),
+                    'id' => $content_entity_type->id() . '::' . $entity->uuid(),
                     'group' => $content_entity_type->getLabel(),
                   ];
                 }
@@ -509,7 +515,7 @@ class CohesionDrupalEndpointController extends ControllerBase {
 
                   $grouped_data['views'][] = [
                     'name' => "{$view->label()} - {$this->t($display->display['display_title'])}  (/{$display->getPath()})",
-                    'id' => 'view::' . $view->id() . '::' . $display_id,
+                    'id' => 'view::' . $view->uuid() . '::' . $display_id,
                     'group' => 'Views',
                   ];
                 }

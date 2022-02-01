@@ -5,10 +5,12 @@ namespace Drupal\Tests\cohesion_style_guide\Unit\Services;
 use Drupal\cohesion\LayoutCanvas\Element;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use \Drupal\Tests\UnitTestCase;
+
 
 /**
  * Class XssComponentFieldValuesTest
@@ -29,12 +31,13 @@ class XssComponentFieldValuesTest extends UnitTestCase {
     $theme_handler = $this->createMock(ThemeHandlerInterface::class);
     $theme_manager = $this->createMock(ThemeManagerInterface::class);
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
+    $entity_repository = $this->createMock(EntityRepositoryInterface::class);
     $entity_type_manager->expects($this->any())
       ->method('getStorage')
       ->willReturn(FALSE);
     $language_manager = $this->createMock(LanguageManagerInterface::class);
 
-    $this->cohUtils = new \Drupal\cohesion\Services\CohesionUtils($theme_handler, $theme_manager, $entity_type_manager, $language_manager);
+    $this->cohUtils = new \Drupal\cohesion\Services\CohesionUtils($theme_handler, $theme_manager, $entity_type_manager, $language_manager, $entity_repository);
   }
 
   /**
