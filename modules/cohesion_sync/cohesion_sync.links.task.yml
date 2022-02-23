@@ -1,0 +1,29 @@
+cohesion_sync.packages:
+  route_name: entity.cohesion_sync_package.collection
+  title: 'Manage packages'
+  base_route: cohesion_sync.export_settings
+  weight: 23
+
+cohesion_sync.import:
+  route_name: cohesion_sync.import
+  title: 'Import packages'
+  base_route: cohesion_sync.export_settings
+  weight: 24
+
+cohesion_sync.import_file:
+  route_name: cohesion_sync.import
+  title: 'Import package from file'
+  parent_id: cohesion_sync.import
+  weight: 25
+
+cohesion_sync.export_all:
+  route_name: cohesion_sync.export_all
+  title: 'Export full package'
+  base_route: cohesion_sync.export_settings
+  weight: 28
+
+cohesion_sync.export_settings:
+  route_name: cohesion_sync.export_settings
+  base_route: cohesion_sync.export_settings
+  title: 'Full export settings'
+  weight: 29
