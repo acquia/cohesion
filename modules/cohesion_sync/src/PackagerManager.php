@@ -12,7 +12,7 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Entity\EntityRepository;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\File\FileSystem;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Site\Settings;
@@ -62,7 +62,7 @@ class PackagerManager {
   protected $usageUpdateManager;
 
   /**
-   * @var \Drupal\Core\File\FileSystem
+   * @var \Drupal\Core\File\FileSystemInterface
    */
   protected $fileSystem;
 
@@ -95,11 +95,11 @@ class PackagerManager {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    * @param \Drupal\cohesion_sync\SyncPluginManager $sync_plugin_manager
    * @param \Drupal\cohesion\UsageUpdateManager $usage_update_manager
-   * @param \Drupal\Core\File\FileSystem $file_system
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    * @param \Drupal\Core\Config\StorageInterface $config_storage
    */
-  public function __construct(EntityRepository $entityRepository, EntityTypeManagerInterface $entityTypeManager, SyncPluginManager $sync_plugin_manager, UsageUpdateManager $usage_update_manager, FileSystem $file_system, LoggerChannelFactoryInterface $logger_factory, StorageInterface $config_storage) {
+  public function __construct(EntityRepository $entityRepository, EntityTypeManagerInterface $entityTypeManager, SyncPluginManager $sync_plugin_manager, UsageUpdateManager $usage_update_manager, FileSystemInterface $file_system, LoggerChannelFactoryInterface $logger_factory, StorageInterface $config_storage) {
     $this->entityRepository = $entityRepository;
     $this->entityTypeManager = $entityTypeManager;
     $this->syncPluginManager = $sync_plugin_manager;
