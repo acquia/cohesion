@@ -1,0 +1,132 @@
+<?php
+
+/**
+ * @file
+ * Implements hook_page_attachments().
+ */
+
+use Drupal\Core\Url;
+use Drupal\entity_reference_revisions\EntityReferenceRevisionsFieldItemList;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\cohesion\Event\CohesionJsAppUrlsEvent;
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function sitestudio_page_builder_page_attachments_alter(array &$attachments) {
+
+  // If the user has contextual links enabled, attach the component settings
+  // tray overrides.
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  $route = \Drupal::routeMatch()->getRouteObject();
+  if (!\Drupal::service('router.admin_context')->isAdminRoute($route) && \Drupal::currentUser()->hasPermission('access visual page builder') && $route_name != 'cohesion_elements.component.preview') {
+    $attachments['#attached']['library'][] = 'sitestudio_page_builder/editor-loader';
+  }
+
+  // Attach add urls for sidebar browser.
+  $attachments['#attached']['drupalSettings']['cohesion']['urls']['component-add'] = Url::fromUserInput(\Drupal::entityTypeManager()->getDefinition('cohesion_component')->getLinkTemplate('add-form'))->toString();
+  $attachments['#attached']['drupalSettings']['cohesion']['urls']['helper-add'] = Url::fromUserInput(\Drupal::entityTypeManager()->getDefinition('cohesion_helper')->getLinkTemplate('add-form'))->toString();
+  $attachments['#attached']['drupalSettings']['cohesion']['urls']['component-content-add'] = Url::fromUserInput(\Drupal::entityTypeManager()->getDefinition('component_content')->getLinkTemplate('collection'))->toString();
+  $attachments['#attached']['drupalSettings']['cohesion']['permissions'] = \Drupal::service('settings.endpoint.utils')->dx8PermissionsList();
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function sitestudio_page_builder_toolbar() {
+  $items = [];
+
+  $admin_context = \Drupal::service('router.admin_context');
+
+  if ($admin_context->isAdminRoute()) {
+    return $items;
+  }
+
+  if (Drupal::service('current_user')->hasPermission('access visual page builder')) {
+    $items['sitestudio'] = [
+      '#type' => 'toolbar_item',
+      '#weight' => -100,
+      '#wrapper_attributes' => [
+        'id' => 'ssa-builder-toggle',
+        'class' => [
+          'hidden',
+          'ssa-builder-toggle',
+        ],
+      ],
+      'tab' => [
+        '#type' => 'html_tag',
+        '#tag' => 'button',
+        '#value' => t('Page builder'),
+        '#attributes' => [
+          'id' => 'coh-builder-btn',
+          'class' => [
+            'toolbar-icon'
+          ],
+          'style' => 'color:white;background: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 16 16\'%3E%3Cpath fill=\'%23FFF\' d=\'M7.58 0C7 2.41 1.23 3.4 1.23 9.07A7 7 0 008 16a6.91 6.91 0 006.76-6.93C14.77 3 8.4 2.49 7.58 0zm4.66 11.42a.4.4 0 01-.4.4H4.16a.4.4 0 01-.4-.4V6.53a.4.4 0 01.4-.4h7.68a.4.4 0 01.4.4v4.89zm-7-4.5a.49.49 0 10.48.49.49.49 0 00-.52-.49zm1.34 0a.49.49 0 10.42.49.49.49 0 00-.46-.49zm1.37 0a.49.49 0 000 1 .49.49 0 100-1z\'/%3E%3C/svg%3E") 8px 8px/22px no-repeat;'
+        ]
+      ],
+    ];
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sitestudio_page_builder_theme($existing, $type, $theme, $path) {
+  return [
+    'sitestudio_build' => [
+      'template' => 'sitestudio-build',
+      'base hook' => 'page',
+      'variables' => [
+        'build' => NULL
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_entity_display_build_alter().
+ */
+function sitestudio_page_builder_entity_display_build_alter(&$build, $context) {
+  $entity = NULL;
+  if (isset($context['entity']) && $context['entity'] instanceof ContentEntityInterface) {
+    $entity = $context['entity'];
+  }
+
+  // Add the page builder data attribute to the canvas element if the user has the right permission
+  if ($entity && $entity->access('update') && Drupal::service('current_user')->hasPermission('access visual page builder')) {
+    /** @var \Drupal\sitestudio_page_builder\Services\SitestudioPageBuilderManagerInterface $page_builder_manager */
+    $page_builder_manager = Drupal::service('sitestudio_page_builder.manager');
+    foreach ($build as &$element) {
+      if (isset($element['#field_type']) && $element['#field_type'] == 'cohesion_entity_reference_revisions' && $element['#items'] instanceof EntityReferenceRevisionsFieldItemList) {
+        foreach ($element['#items'] as &$item) {
+          /** @var \Drupal\cohesion_elements\Plugin\Field\FieldType\CohesionEntityReferenceRevisionsItem $item */
+          // Page builder is allowed only on page containing components only
+          if ($item->getFieldDefinition()->getSetting('access_elements') !== 1 && $page_builder_manager->shouldEnablePageBuilder()) {
+            $element['#attributes']['data-ssa-canvas'] = 'cohcanvas-' . $item->getValue()['target_id'];
+            $element['#cache']['contexts'][] = 'user.permissions';
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function sitestudio_page_builder_page_attachments(array &$attachments) {
+  $is_admin = \Drupal::service('cohesion.utils')->isAdminTheme();
+  if(!$is_admin) {
+    // Url collection for js app
+    $event = new CohesionJsAppUrlsEvent();
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $event_dispatcher->dispatch($event::FRONTEND_URL, $event);
+    $attachments['#attached']['drupalSettings']['cohesion']['urls'] = $event->getUrls();
+
+    // Image browser page attachments.
+    \Drupal::service('cohesion_image_browser.update_manager')->sharedPageAttachments($attachments['#attached'], 'content');
+  }
+}
