@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * Master template selectable property
+ */
+function cohesion_templates_update_8401(&$variables) {
+
+  $cohesion_master_templates = \Drupal::entityTypeManager()->getStorage('cohesion_master_templates')->loadMultiple();
+  foreach ($cohesion_master_templates as $cohesion_master_template){
+    if($cohesion_master_template->status()){
+      $cohesion_master_template->setSelectable();
+      $cohesion_master_template->save();
+    }
+  }
+}
+
+/**
+ * Menu template selectable property
+ */
+function cohesion_templates_update_8402(&$variables) {
+
+  $cohesion_menu_templates = \Drupal::entityTypeManager()->getStorage('cohesion_menu_templates')->loadMultiple();
+  foreach ($cohesion_menu_templates as $cohesion_menu_template){
+    if($cohesion_menu_template->status()){
+      $cohesion_menu_template->setSelectable();
+      $cohesion_menu_template->save();
+    }
+  }
+}
+
+/**
+ * Content template selectable property
+ */
+function cohesion_templates_update_8403(&$variables) {
+
+  $cohesion_content_templates = \Drupal::entityTypeManager()->getStorage('cohesion_content_templates')->loadMultiple();
+  foreach ($cohesion_content_templates as $cohesion_content_template){
+    if($cohesion_content_template->status()){
+      $cohesion_content_template->setSelectable();
+      $cohesion_content_template->save();
+    }
+  }
+}
+
+/**
+ * Master template default property
+ */
+function cohesion_templates_update_8404(&$variables) {
+
+  $cohesion_master_templates = \Drupal::entityTypeManager()->getStorage('cohesion_master_templates')->loadMultiple();
+  foreach ($cohesion_master_templates as $cohesion_master_template){
+    $cohesion_master_template->setDefault(FALSE);
+    $cohesion_master_template->save();
+  }
+}
+
+/**
+ * Update views using cohesion layout
+ */
+function cohesion_templates_update_8405(&$variables) {
+
+  $views = \Drupal::entityTypeManager()->getStorage('view')->loadMultiple();
+
+  foreach ($views as $view){
+    $to_update = false;
+    $executable = $view->getExecutable();
+    $displays = $view->get('display');
+    foreach ($displays as $display_id => &$display_data){
+      $executable->setDisplay($display_id);
+      $display = $executable->getDisplay();
+      $style = $display->getOption('style');
+      if(isset($style['type']) && $style['type'] == 'cohesion_layout'){
+        $row = [
+          'type'=> 'entity:node',
+          'options'=> [
+            'relationship' => 'node',
+            'view_mode' => 'default',
+          ],
+        ];
+
+        if(isset($display_data['display_options'])){
+          $to_update = true;
+          $display_data['display_options']['row'] = $row;
+        }
+      }
+    }
+    if($to_update){
+      $view->set('display', $displays);
+      $view->save();
+    }
+  }
+}
+
+/**
+* Fix tokens or token types missing name property on template selector fields.
+*/
+function cohesion_templates_update_8406() {
+
+  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $storage = $entity_type_manager->getStorage('field_storage_config');
+  $fields = $storage->loadByProperties(
+    [
+      'type' => 'cohesion_template_selector',
+      'status' => 1,
+    ]
+   );
+
+  if ($fields) {
+    foreach ($fields as $field) {
+      /** @var \Drupal\field\Entity\FieldStorageConfig $field */
+      $field_name = $field->getName();
+      $entity_type_id = $field->getTargetEntityTypeId();
+      $field_storage_definition = $entity_definition_update_manager->getFieldStorageDefinition($field_name, $entity_type_id);
+      $entity_definition_update_manager->updateFieldStorageDefinition($field_storage_definition);
+    }
+    return t("Success: @count selector template fields updated", ['@count' => count($fields),]);
+  } else {
+    return t("No template selector fields to be updated.");
+  }
+}

@@ -1,0 +1,41 @@
+# This file is used by Acquia Pipelines continuous integration. Upon success, an
+# artifact is deployed to the `sitetstudio` subscription on Acquia Cloud.
+version: 1.3.0
+services:
+  - composer:
+      version: 2
+  - php:
+      version: 7.4
+
+events:
+  build:
+    steps:
+      - setup:
+          type: script
+          script:
+            # Archive module
+            - composer archive --format zip --file cohesion-dev
+            # Use custom composer.json file to sidestep the module one.
+            - rm composer.json && mv .acquia/cloud/composer-project.json composer.json
+            - composer validate --no-check-all --ansi --no-interaction
+            # install dependencies
+            - composer install
+            # Unzip and move the Site Studio module
+            - unzip cohesion-dev.zip -d docroot/modules/contrib/cohesion
+            # Move cloud hooks into place
+            - mv .acquia/cloud/hooks .
+      - cleanup:
+          type: script
+          script:
+            - rm cohesion-dev.zip
+            # Prepare settings.php with the minimum required for Cloud.
+            - chmod -R +w docroot/sites/default
+            - cp docroot/sites/default/default.settings.php docroot/sites/default/settings.php
+            - echo "if (file_exists('/var/www/site-php')) {" >> docroot/sites/default/settings.php
+            - echo "  require '/var/www/site-php/' . \$_ENV['AH_SITE_GROUP'] . '/' . \$_ENV['AH_SITE_GROUP'] . '-settings.inc';" >> docroot/sites/default/settings.php
+            - echo "}" >> docroot/sites/default/settings.php
+            - echo "\$settings['dx8_editable_api_url'] = TRUE;" >> docroot/sites/default/settings.php
+variables:
+  global:
+    COMPOSER_AUTH:
+      secure: 2acv9P3eUuPNLF4Nq2W9yurvH2BF/i+pXyuvH39fWZ6fd2hxd5pzZMaLxLDfjB4XEdcjCPM9+BXqRkBJAhQaUctx/2etb9F6wBwso9XkO/h0DIdpKxsJ7GXm6wFBaQspiBY882xGR5aJBeVgAI7Dpakox+oBsqMTbxt/Q5Sp55IlQMK3N+6c6B6Ah5v5D46kXoj2wT+mXED5RFPZ7YWcpEkj8hrKrESDbuGscYCu6HdkhtxBQvnqEqe6yHWSgi3ALxZjPIAtHYWC2EgQcuOT0xIjdzmXu7mLoGIZF7zkWIndX2jh8mHXE/+hkRmPvb2QtstGqPqO9xodF+bw2F4Lolwg08z0YNwifuZiHjxWhv+ci01DtAQmxnHhKkGtHudT1aiV3rGNW5tjNzi7VTjGPvkTh6A95UmKG9aOGcWZPoBUsevgOObheNsZdj+SZXK6FVvo4Ix4YRhuvdhxqLn2p/oo2CTkahg3dFifkA8W6goTGAwMXl0fXhOnlhRQYyumK2r1xB07A/ntaJM0yRwlWjuS4BrsEKaw34jpcHXaiKL/++tCEjwAQyAX6xhGLwOUt4ySrnGgYQt4slMlC7dwd2jGCUPPFSscCGemzkUuJ2civVSdcF/7tWnbsxsWLLYogu/bgpWvkRmiZ33+WBqiSp+h46Mk/kiAK9qJIUabk+w1sI=gV0TDLnZWN6Uzvm0Z6gRiZyz1IvwzwP1Y7TClRH0fhsMrsbVqo3sowPC/v344UveXf/8cHFclb0ptOgjdibupg0yxmcX8qslQC7UyolNP+VJe1M+BUZ+itx4MCCBXqO+zisnhePMSPz5j54H/lgRFwow0OKN/XXrfFBgrk3HD6oYvX66z+cPveIpfa9/RXdtHVGEnpF+NpPwemYq/fqMLA==
