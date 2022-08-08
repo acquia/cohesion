@@ -110,10 +110,10 @@ function cohesion_elements_library_info_alter(&$libraries, $extension) {
         $library_id = 'custom-component-' . str_replace('_', '-', $id);
         // Build the library
         if (!empty($component['css'])) {
-          $libraries[$library_id]['css']['component'] = _component_build_library($component['css'], $component['subpath']);
+          $libraries[$library_id]['css']['component'] = _cohesion_elements_component_build_library($component['css'], $component['subpath']);
         }
         if (!empty($component['js'])) {
-          $libraries[$library_id]['js'] = _component_build_library($component['js'], $component['subpath']);
+          $libraries[$library_id]['js'] = _cohesion_elements_component_build_library($component['js'], $component['subpath']);
         }
         if ($component['dependencies']) {
           $libraries[$library_id]['dependencies'] = $component['dependencies'];
@@ -132,7 +132,7 @@ function cohesion_elements_library_info_alter(&$libraries, $extension) {
  *   The path to the component parent folder, relative to root. This is
  *   expected to have a forward slash at the beginning and end already.
  */
-function _component_build_library(array $assets, $subpath) {
+function _cohesion_elements_component_build_library(array $assets, $subpath) {
   $processed = [];
   foreach ($assets as $asset_file => $asset_data) {
     // Allow external assets to use absolute path.
