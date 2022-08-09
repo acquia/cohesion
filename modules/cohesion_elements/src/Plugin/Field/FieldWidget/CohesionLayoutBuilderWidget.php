@@ -210,8 +210,8 @@ class CohesionLayoutBuilderWidget extends WidgetBase implements ContainerFactory
     $element['target_id']['#canvas_name'] = $items->getName() . '_' . $delta;
 
     $element['target_id'] += [
-      '#json_values' => mb_strlen($layout_entity->json_values->value) ? $layout_entity->json_values->value : '{}',
-      '#styles' => mb_strlen($layout_entity->styles->value) ? $layout_entity->styles->value : '/* */',
+      '#json_values' => !empty($layout_entity->json_values->value) ? $layout_entity->json_values->value : '{}',
+      '#styles' => !empty($layout_entity->styles->value) ? $layout_entity->styles->value : '/* */',
       '#template' => $layout_entity->template->value,
       '#entity' => $layout_entity,
       '#cohFormGroup' => $cohFormGroupId,

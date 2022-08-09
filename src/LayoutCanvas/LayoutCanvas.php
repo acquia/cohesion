@@ -435,7 +435,7 @@ class LayoutCanvas implements LayoutCanvasElementInterface, \JsonSerializable {
   /**
    * @return array|\Drupal\cohesion\LayoutCanvas\Element[]|mixed
    */
-  public function jsonSerialize() {
+  public function jsonSerialize(): mixed {
     $canvas = ['canvas' => $this->canvasElements];
     if (!is_null($this->componentFormElements)) {
       $canvas['componentForm'] = $this->componentFormElements;
