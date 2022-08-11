@@ -1,0 +1,10 @@
+name: Js custom component
+category: cpt_cat_example
+js:
+  js_component.js: {}
+css:
+  js_component.css: {}
+dependencies:
+  - core/jquery
+form: form.json
+preview_image: preview.png
