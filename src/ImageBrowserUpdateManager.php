@@ -5,7 +5,7 @@ namespace Drupal\cohesion;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepository;
-use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\file\FileInterface;
 
 /**
@@ -25,7 +25,7 @@ class ImageBrowserUpdateManager {
   /**
    * Holds the module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandler
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -54,10 +54,10 @@ class ImageBrowserUpdateManager {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    * @param \Drupal\cohesion\ImageBrowserPluginManager $pluginManager
-   * @param \Drupal\Core\Extension\ModuleHandler $moduleHandler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    * @param \Drupal\Core\Entity\EntityRepository $entityRepository
    */
-  public function __construct(ConfigFactoryInterface $configFactory, ImageBrowserPluginManager $pluginManager, ModuleHandler $moduleHandler, EntityRepository $entityRepository) {
+  public function __construct(ConfigFactoryInterface $configFactory, ImageBrowserPluginManager $pluginManager, ModuleHandlerInterface $moduleHandler, EntityRepository $entityRepository) {
     $this->pluginManager = $pluginManager;
     $this->moduleHandler = $moduleHandler;
     $this->entityRepository = $entityRepository;
