@@ -1,0 +1,9 @@
+name: Custom component JS with template
+category: cpt_cat_hero_components
+js:
+  js-template.js: {}
+css:
+  js-template.css: {}
+form: form.json
+html: html-template.html
+preview_image: preview.png
