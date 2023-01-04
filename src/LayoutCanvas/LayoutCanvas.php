@@ -433,7 +433,7 @@ class LayoutCanvas implements LayoutCanvasElementInterface, \JsonSerializable {
   }
 
   /**
-   * @return array|\Drupal\cohesion\LayoutCanvas\Element[]|mixed
+   * #[\ReturnTypeWillChange]
    */
   public function jsonSerialize() {
     $canvas = ['canvas' => $this->canvasElements];
