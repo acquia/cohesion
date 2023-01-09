@@ -11,6 +11,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Sync batch import controller.
@@ -407,7 +408,9 @@ class BatchImportController extends ControllerBase {
         ->getStorage($entity_type)
         ->loadByProperties(['uuid' => $uuid]);
       $entity = reset($entities);
-      $usage_update_manager->buildRequires($entity);
+      if ($entity instanceof EntityInterface) {
+        $usage_update_manager->buildRequires($entity);
+      }
     }
 
   }
