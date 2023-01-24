@@ -739,7 +739,10 @@ class PackagerManager {
           // Loop through the results and add them to the dependencies.
           foreach ($typed_uuids as $type => $uuids) {
             $entity_type = $this->entityTypeManager->getDefinition($type);
-            $ids = $this->entityTypeManager->getStorage($type)->getQuery()->condition($entity_type->getKey('uuid'), $uuids, 'IN')->execute();
+            $ids = $this->entityTypeManager->getStorage($type)->getQuery()
+              ->accessCheck(TRUE)
+              ->condition($entity_type->getKey('uuid'), $uuids, 'IN')
+              ->execute();
 
             $entities = $this->entityTypeManager->getStorage($type)->loadMultiple($ids);
 
