@@ -1,0 +1,19 @@
+cohesion_elements.cohesion_helper.*:
+  type: cohesion_config_entity
+  label: 'Helper configuration'
+  mapping:
+    category:
+      type: string
+      label: 'Helper category'
+    preview_image:
+      type: string
+      label: 'Preview image'
+    entity_type_access:
+      type: sequence
+      label: 'Entity type access'
+    bundle_access:
+      type: sequence
+      label: 'Bundle access'
+    weight:
+      type: integer
+      label: 'Weight'
