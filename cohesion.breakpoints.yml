@@ -1,0 +1,95 @@
+dx8.styles.xs:
+  label: Mobile
+  mediaQuery: ''
+  weight: 0
+  multipliers:
+    - 1x
+  group: dx8.styles
+dx8.styles.ps:
+  label: Phablet
+  mediaQuery: '(min-width: 320px)'
+  weight: 1
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.styles
+dx8.styles.sm:
+  label: Tablet
+  mediaQuery: '(min-width: 560px)'
+  weight: 2
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.styles
+dx8.styles.md:
+  label: Laptop
+  mediaQuery: '(min-width: 768px)'
+  weight: 3
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.styles
+dx8.styles.lg:
+  label: Desktop
+  mediaQuery: '(min-width: 1024px)'
+  weight: 4
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.styles
+dx8.styles.xl:
+  label: Extra wide
+  mediaQuery: '(min-width: 1600px)'
+  weight: 5
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.styles
+  
+dx8.images.xs:
+  label: Mobile images
+  mediaQuery: ''
+  weight: 0
+  multipliers:
+    - 1x
+  group: dx8.images
+dx8.images.ps:
+  label: Phablet images
+  mediaQuery: '(min-width: 320px)'
+  weight: 1
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.images
+dx8.images.sm:
+  label: Tablet images
+  mediaQuery: '(min-width: 560px)'
+  weight: 2
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.images
+dx8.images.md:
+  label: Laptop images
+  mediaQuery: '(min-width: 768px)'
+  weight: 3
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.images
+dx8.images.lg:
+  label: Desktop images
+  mediaQuery: '(min-width: 1024px)'
+  weight: 4
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.images
+dx8.images.xl:
+  label: Extra wide images
+  mediaQuery: '(min-width: 1600px)'
+  weight: 5
+  multipliers:
+    - 1x
+    - 2x
+  group: dx8.images
