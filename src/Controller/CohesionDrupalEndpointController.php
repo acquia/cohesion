@@ -344,6 +344,10 @@ class CohesionDrupalEndpointController extends ControllerBase {
         else {
           // Get all bundles for this entity_type.
           $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($target_type));
+          // If we have only one bundle, use it as is and not as an array.
+          if (count($bundles) === 1) {
+            $bundles = reset($bundles);
+          }
         }
         $selection_handler = $request->attributes->get('selection_handler');
         $selection_settings = [
