@@ -1,0 +1,44 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - editor
+_core:
+  default_config_hash: '-B7eofOPg7bG6-7Mm9RCMXA9a5Lbi4DHnwHOPoGoPAQ'
+name: Site Studio
+format: cohesion
+weight: 0
+filters:
+  filter_html:
+    id: filter_html
+    provider: filter
+    status: false
+    weight: -10
+    settings:
+      allowed_html: '<a class href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type> <li> <dl> <dt> <dd> <h4 id> <h5 id> <h6 id> <img src alt data-entity-type data-entity-uuid> <h1 class="heading-2 heading-1"> <h2 id class="heading-3"> <span class="red-pill blue-pill"> <h3 id class="heading-4">'
+      filter_html_help: true
+      filter_html_nofollow: false
+  editor_file_reference:
+    id: editor_file_reference
+    provider: editor
+    status: true
+    weight: 0
+    settings: {  }
+  filter_align:
+    id: filter_align
+    provider: filter
+    status: true
+    weight: 0
+    settings: {  }
+  filter_caption:
+    id: filter_caption
+    provider: filter
+    status: true
+    weight: 0
+    settings: {  }
+  filter_htmlcorrector:
+    id: filter_htmlcorrector
+    provider: filter
+    status: true
+    weight: 10
+    settings: {  }
