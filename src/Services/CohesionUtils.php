@@ -386,7 +386,8 @@ class CohesionUtils {
   public function urlProcessor(string $url) {
     // Encode path to account for spaces in external and relative paths and
     // ignore parsing of "mailto" links.
-    if ((UrlHelper::isExternal($url) || strpos($url, '/') === 0) && strpos($url, 'mailto') !== 0) {
+    // ignore parsing of "tel" links.
+    if ((UrlHelper::isExternal($url) || strpos($url, '/') === 0) && strpos($url, 'mailto') !== 0 && strpos($url, 'tel') !== 0) {
       $parsedUrl = parse_url($url);
       $path = isset($parsedUrl['path']) ? UrlHelper::encodePath($parsedUrl['path']) : '';
       // Is there a query parameter?
@@ -414,7 +415,7 @@ class CohesionUtils {
     }
 
     // Check that the URL is valid
-    // accounts for node::1, mailto:, external & internal links.
+    // accounts for node::1, mailto:, tel:, external & internal links.
     if (!UrlHelper::isValid($url, $absolute)) {
       $url = '';
     }
