@@ -7,6 +7,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\file\FileRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -99,7 +100,7 @@ class FileUsage extends UsagePluginBase {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $stream_wrapper_manager, $connection);
 
     // Create the URI regex based off the available stream wrappers.
-    $this->wrappers = $stream_wrapper_manager->getWrappers();
+    $this->wrappers = $stream_wrapper_manager->getWrappers(StreamWrapperInterface::LOCAL);
 
     if (empty($this->wrappers)) {
       $this->wrappers = ['cohesion' => [], 'public' => []];
