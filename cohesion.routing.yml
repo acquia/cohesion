@@ -95,7 +95,7 @@ drupal_data_endpoint.validate_pmc:
   defaults:
     _controller: '\Drupal\cohesion\Controller\ValidatePMCEndpoint::index'
     _title: "Validate PMC"
-  methods:  [POST]
+  methods:  [POST,GET]
   requirements:
     _user_is_logged_in: 'TRUE'
     _content_type_format: json
@@ -457,7 +457,7 @@ drupal_data_endpoint.element_save:
   defaults:
     _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::elementSave'
     _title: "Save an element"
-  methods:  [POST]
+  methods:  [POST,GET]
   requirements:
     _permission: 'administer components+administer helpers'
     _content_type_format: json
