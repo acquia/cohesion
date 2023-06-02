@@ -564,7 +564,7 @@ function cohesion_templates_theme_suggestions_comment_alter(array &$suggestions,
  */
 function _cohesion_templates_generate_content_template_entities() {
   // Return early if Site Studio settings are not initialised.
-  if (\Drupal::getContainer()->has('cohesion.utils') && \Drupal::service('cohesion.utils')->usedx8Status() === FALSE) {
+  if (\Drupal::isConfigSyncing() || (\Drupal::getContainer()->has('cohesion.utils') && \Drupal::service('cohesion.utils')->usedx8Status() === FALSE)) {
     return;
   }
 
