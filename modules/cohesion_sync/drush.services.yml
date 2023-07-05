@@ -1,0 +1,43 @@
+services:
+  cohesion_sync.commands:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncCommands
+    arguments:
+      - '@cohesion_sync.drush_helpers'
+    tags:
+      - { name: drush.command }
+
+  cohesion_sync.commands.export:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncExportCommand
+    arguments:
+      - '@entity_type.manager'
+      - '@config.storage'
+      - '@cohesion_sync.full_package_storage'
+      - '@cohesion_sync.package_storage'
+      - '@config.manager'
+    tags:
+      - { name: drush.command }
+
+  cohesion_sync.commands.import:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncImportCommand
+    arguments:
+      - '@config.import.commands'
+      - '@config.storage'
+      - '@cohesion.rebuild_inuse_batch'
+      - '@event_dispatcher'
+      - '@cohesion_sync.sync_import'
+      - '@cohesion_usage.update_manager'
+    tags:
+      - { name: drush.command }
+
+  cohesion_sync.commands.multi_import:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncMultiImportCommand
+    arguments:
+      - '@cohesion_sync.package_import_handler'
+    tags:
+      - { name: drush.command }
+
+  cohesion_sync.package.commands:
+    class: \Drupal\cohesion_sync\Commands\CohesionSyncPackageCommands
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: drush.command }
