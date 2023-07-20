@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  web:
+    extends:
+      file: docker-compose.yml
+      service: web
+  database:
+    extends:
+      file: docker-compose.yml
+      service: database
+  scss-gateway:
+    extends:
+      file: docker-compose.yml
+      service: scss-gateway
+    volumes:
+      - ../../../cohesion-services/scss-gateway/node:/node
+  dx8-gateway:
+    extends:
+      file: docker-compose.yml
+      service: dx8-gateway
+    volumes:
+      - ../../../cohesion-services/dx8-gateway/node:/node
+      - ../../../cohesion-services/dx8-gateway/assets:/assets
+      - ../../../cohesion-services/dx8-gateway/php:/php
