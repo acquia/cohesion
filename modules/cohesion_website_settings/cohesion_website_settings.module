@@ -361,8 +361,11 @@ function _process_cohesion_layout_entity($entity, &$context, $verbose) {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::service('entity_type.manager')->getStorage('cohesion_layout');
     $latest_revision_id = $storage->getLatestRevisionId($entity->id());
-    $latest_entity = $storage->loadRevision($latest_revision_id)->getTranslation($entity->language()->getId());
-    _process_cohesion_layout_entity($latest_entity, $context, $verbose);
+    // Check if revision has translation.
+    if ($storage->loadRevision($latest_revision_id)->hasTranslation($entity->language()->getId())) {
+      $latest_entity = $storage->loadRevision($latest_revision_id)->getTranslation($entity->language()->getId());
+      _process_cohesion_layout_entity($latest_entity, $context, $verbose);
+    }
   }
 }
 
