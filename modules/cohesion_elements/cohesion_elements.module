@@ -629,7 +629,7 @@ function cohesion_elements_user_cancel($edit, $account, $method) {
 
       // Unpublish component contents (current revisions).
       \Drupal::moduleHandler()
-        ->loadInclude('inc', 'cohesion_elements', 'cohesion_elements.admin');
+        ->loadInclude('cohesion_elements', 'inc', 'cohesion_elements.admin');
       $component_content = \Drupal::entityQuery('component_content')
         ->accessCheck(TRUE)
         ->condition('uid', $account->id())
@@ -643,7 +643,7 @@ function cohesion_elements_user_cancel($edit, $account, $method) {
 
       // Anonymize component content (current revisions).
       \Drupal::moduleHandler()
-        ->loadInclude('inc', 'cohesion_elements', 'cohesion_elements.admin');
+        ->loadInclude('cohesion_elements', 'inc', 'cohesion_elements.admin');
       $component_content = \Drupal::entityQuery('component_content')
         ->accessCheck(TRUE)
         ->condition('uid', $account->id())
