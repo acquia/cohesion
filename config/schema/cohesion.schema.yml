@@ -1,3 +1,16 @@
+condition.plugin.cohesion_master_template:
+  type: condition.plugin
+  label: 'Site Studio visibility settings'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    using_master_template:
+      type: integer
+      label: 'Using master template'
+    negate:
+      type: boolean
+      label: 'Negate'
 cohesion_config_entity:
   type: config_entity
   label: 'Site Studio configuration entity base'
@@ -96,6 +109,12 @@ cohesion.settings:
           mapping:
             type:
               type: string
+            cohesion_media_lib_types:
+              type: sequence
+              label: 'Media library types'
+              sequence:
+                type: string
+                label: 'Type'
     stylesheet_json_storage_keyvalue:
       type: boolean
       label: 'Use key/value storage for stylesheet json'
