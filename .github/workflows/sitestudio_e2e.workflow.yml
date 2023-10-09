@@ -1,0 +1,105 @@
+name: "Site Studio CI"
+
+# We want to run the Cypress tests whenever we push on any branch/PR
+on: [push]
+
+# We allow one running workflow. The workflow will get cancelled if a new push is made.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testing:
+    name: D ${{ matrix.drupal-core }}, PHP ${{ matrix.php-versions }} - ${{ matrix.cypress-suites }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        drupal-core: ['9.5']
+        php-versions: ['8.1']
+        cypress-suites: ['setup', 'base', 'components', 'generic1', 'generic2', 'cic', 'templates']
+        # For future reference: Drupal 10 doesn't work with php 8.0
+        # exclude:
+        #   - drupal-core: '10'
+        #     php-versions: '8.0'
+
+    steps:
+      # Checkout the repository
+      - uses: actions/checkout@v3
+      # Install node 16
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'yarn'
+      # Build our front end application
+      - name: Build the React app
+        run: |
+          cd apps && yarn && yarn production
+
+      # Revert back to docker compose v2.18
+      - name: Log Docker Compose version
+        run: docker compose version
+      - name: Ensure Docker CLI plugins directory exists
+        run: mkdir -pv "${HOME}"/.docker/cli-plugins
+      - name: Download working version of Docker Compose
+        run: wget -nv -O "${HOME}"/.docker/cli-plugins/docker-compose "${DOCKER_COMPOSE_URL}"
+        env:
+          DOCKER_COMPOSE_URL: https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-linux-x86_64
+      - name: Make Docker Compose binary executable
+        run: chmod -v +x "${HOME}"/.docker/cli-plugins/docker-compose
+      - name: Assert that the version of Docker Compose is as expected
+        run: set -o pipefail && docker compose version | tee /dev/stderr | grep -q 'v2\.18\.1$'
+
+      # Build our containers using a docker-compose file
+      - name: Build containers using docker compose
+        run: |
+          cd .github/workflows/ci
+          docker compose up -d --build --wait
+          docker compose exec -T dx8-gateway yarn && docker compose restart dx8-gateway
+          docker compose exec -T scss-gateway yarn && docker compose restart scss-gateway
+        env:
+          PHP_VERSION: ${{ matrix.php-versions }}
+          DRUPAL_VERSION: ${{ matrix.drupal-core }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          COH_API_URL: http://dx8-gateway:3000
+          MYSQL_DATABASE: drupal
+          MARIADB_ROOT_PASSWORD: ${{ secrets.MARIADB_ROOT_PASSWORD }}
+          DRUPAL_USER: admin
+          DRUPAL_PWD: admin
+          BUILD_ID: ${{ github.run_id }}
+          BUILD_NUMBER: ${{ github.run_attempt }}
+          PIPELINE_ENV: github
+
+      # Install Drupal with cohesion and dependencies
+      - name: Install Drupal
+        run: |
+          cd .github/workflows/ci
+          docker compose exec -T web bash ./run.sh
+
+      # And now we are good to run the Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: ./e2e-tests
+          spec: cypress/e2e/${{ matrix.cypress-suites }}
+          browser: chrome
+        env:
+          CYPRESS_BASE_URL: http://localhost:8008
+          strategy: 'host'
+          containerName: 'ci-web-1'
+          COH_API_URL: "http://dx8-gateway:3000"
+          apiURL: "http://dx8-gateway:3000"
+          drupalDBUser: 'root'
+          drupalDBPassword: ${{ secrets.MARIADB_ROOT_PASSWORD }}
+          drupalDBName: 'drupal'
+          drupalDBHost: 'database'
+          testSitePath: '/opt/drupal/web'
+
+      # In case of a cypress failure, we want to look at the screenshots
+      - name: Cypress screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots-${{ matrix.cypress-suites }}
+          path: ./e2e-tests/cypress/screenshots
