@@ -2097,7 +2097,7 @@ class TwigExtension extends AbstractExtension {
         foreach ($component_model as $model) {
           foreach ($model->getValues() as $model_key => $model_value) {
             // Check the key & field UUID passed in match.
-            if ($model_key === $value && is_string($model_value)) {
+            if ($model_key === $value && !is_null($model_value) && is_string($model_value)) {
               // Check that the model value matches a field value.
               if (preg_match('/(\(|\[)((field).)(([0-9a-f]{7,8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(([\s\S]*?)\/([\s\S]*?)\/([\s\S]*?)))(\)|\])/', $model_value, $matches)) {
                 // Return the match of the UUID from the field value.
