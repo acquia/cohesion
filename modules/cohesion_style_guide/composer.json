@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_style_guide",
+    "type": "drupal-module",
+    "description": "Defines a set of configuration that can be applied per theme.",
+    "license": "GPL-2.0-or-later"
+}
