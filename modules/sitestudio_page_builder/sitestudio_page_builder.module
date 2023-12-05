@@ -46,7 +46,9 @@ function sitestudio_page_builder_page_attachments_alter(array &$attachments) {
     if (isset($text_editor_attachments['drupalSettings']['editor']['formats'])) {
       foreach ($text_editor_attachments['drupalSettings']['editor']['formats'] as $key => $settings) {
         $format = FilterFormat::load($key);
-        $text_editor_attachments['drupalSettings']['editor']['formats'][$key]['label'] = $format->label();
+        if (isset($format)) {
+          $text_editor_attachments['drupalSettings']['editor']['formats'][$key]['label'] = $format->label();
+        }
       }
     }
 
