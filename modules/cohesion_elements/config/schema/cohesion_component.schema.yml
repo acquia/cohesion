@@ -1,0 +1,43 @@
+cohesion_entity_reference_revisions.default.handler_settings:
+  type: entity_reference_revisions.default.handler_settings
+
+field.storage_settings.cohesion_entity_reference_revisions:
+  type: field.storage_settings.entity_reference_revisions
+
+field.field_settings.cohesion_entity_reference_revisions:
+  type: field.field_settings.entity_reference_revisions
+  mapping:
+    access_elements:
+      type: string
+
+cohesion_elements.cohesion_component.*:
+  type: cohesion_config_entity
+  label: 'Component configuration'
+  mapping:
+    category:
+      type: string
+      label: 'Component category'
+    preview_image:
+      type: string
+      label: 'Preview image'
+    has_quick_edit:
+      type: boolean
+      label: 'Has quick edit'
+    entity_type_access:
+      type: sequence
+      label: 'Entity type access'
+      sequence:
+        type: string
+    bundle_access:
+      type: sequence
+      label: 'Bundle access'
+      sequence:
+        type: sequence
+        sequence:
+          type: string
+    twig_template:
+      type: path
+      label: 'Twig template filename'
+    weight:
+      type: integer
+      label: 'Weight'
