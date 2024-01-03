@@ -168,7 +168,7 @@ class SiteStudioSyncFilesSubscriber implements EventSubscriberInterface {
       }
       $existing_file->setFilename($incoming_file['filename']);
       $existing_file->setMimeType($incoming_file['filemime']);
-      $existing_file->setChangedTime(time());
+      $existing_file->setChangedTime($incoming_file['changed']);
       $existing_file->save();
       $this->updatedFiles++;
     }
@@ -198,6 +198,7 @@ class SiteStudioSyncFilesSubscriber implements EventSubscriberInterface {
       $changed = $changed ?: $existing_file->getFilename() !== $incoming_file['filename'];
       $changed = $changed ?: $existing_file->getMimeType() !== $incoming_file['filemime'];
       $changed = $changed ?: $existing_file->getSize() !== (int) $incoming_file['filesize'];
+      $changed = $changed ?: $existing_file->getChangedTime() !== $incoming_file['changed'];
     }
 
     return $changed;
