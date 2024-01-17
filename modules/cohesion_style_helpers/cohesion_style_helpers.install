@@ -1,0 +1,12 @@
+<?php
+/**
+* Style helpers selectable property
+*/
+function cohesion_style_helpers_update_8401(&$variables) {
+
+  $style_helpers = \Drupal::entityTypeManager()->getStorage('cohesion_style_helper')->loadMultiple();
+  foreach ($style_helpers as $style_helper){
+    $style_helper->setSelectable();
+    $style_helper->save();
+  }
+}

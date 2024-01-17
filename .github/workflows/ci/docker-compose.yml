@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: drupal
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        DRUPAL_VERSION: ${DRUPAL_VERSION}
+        GH_TOKEN: ${GH_TOKEN}
+    ports:
+      - "8008:80"
+    volumes:
+      - ../../../:/opt/drupal/web/modules/contrib/cohesion
+    links:
+      - database
+      - dx8-gateway
+    environment:
+      - COH_API_URL
+      - MYSQL_DATABASE
+      - MARIADB_ROOT_PASSWORD
+      - DRUPAL_USER
+      - DRUPAL_PWD
+      - PIPELINE_ENV
+      - PHP_VERSION
+      - DRUPAL_VERSION
+      - BUILD_ID
+      - BUILD_NUMBER
+      - GH_TOKEN
+  database:
+    image: mariadb:10.7
+    restart: on-failure
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE
+      - MARIADB_ROOT_PASSWORD
+  scss-gateway:
+    user: root
+    build:
+      context: ../../../cohesion-services/scss-gateway
+    ports:
+      - '3001:3000'
+  dx8-gateway:
+    user: root
+    build:
+      context: ../../../cohesion-services/dx8-gateway
+      target: development
+    environment:
+      - SASS_SERVICE_URL=http://scss-gateway:3000
+    ports:
+      - '3002:3000'
+    depends_on:
+      - scss-gateway
