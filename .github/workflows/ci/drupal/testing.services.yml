@@ -1,0 +1,3 @@
+services:
+  cohesion.template_storage:
+    alias: cohesion.template_storage.key_value
