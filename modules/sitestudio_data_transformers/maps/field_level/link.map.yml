@@ -1,0 +1,38 @@
+type:
+  _property: TRUE,
+  type: 'form-element'
+  path:
+    - 'type'
+id:
+  _property: TRUE,
+  type: 'form-element'
+  path:
+    - 'uuid'
+machine_name:
+  _property: TRUE,
+  type: 'form-model'
+  path:
+    - 'settings'
+    - 'machineName'
+data:
+  uid:
+    _property: TRUE,
+    type: 'form-element'
+    path:
+      - 'uid'
+  title:
+    _property: TRUE,
+    type: 'form-model'
+    path:
+      - 'settings'
+      - 'title'
+  value:
+    _dynamic_property: TRUE,
+    _process_token: TRUE,
+    type: 'component-model'
+    path:
+      id:
+        _property: TRUE,
+        type: 'form-element'
+        path:
+          - 'uuid'
