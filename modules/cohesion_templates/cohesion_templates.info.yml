@@ -1,0 +1,7 @@
+name: Site Studio templates
+type: module
+description: 'Defines the template configuration entities for creating Site Studio templates.'
+core_version_requirement: ^9 || ^10
+package: Site Studio
+dependencies:
+  - cohesion

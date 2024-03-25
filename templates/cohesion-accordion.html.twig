@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Default theme implementation for cohesion_accordion.
+ *
+ * Available variables:
+ * - element: Element that will be rendered.
+ * - element['label'] : The label.
+ *
+ * @ingroup themeable
+ */
+#}
+<div class="cohesion-accordion {{ element['#attributes']['class']|join(' ') }}">
+    <div class="coh-accordion-panel panel {{ element['#open'] }}">
+        <div class="panel-heading" tabindex="0">
+            <div class="panel-heading-inner">
+                <h2 class="panel-title coh-accordion-title coh-icon-caret-right">{{ element['#title'] }}</h2>
+                {% if element['#help_link'] %}
+                    <ul class="coh-accordion-actions">
+                        <li class="coh-accordion-help"><a aria-label="Open support article in new window" class="coh-icon-question-circle" href="{{ element['#help_link'] }}" target="_blank"></a></li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+        <div class="panel-collapse">
+            <div class="panel-body coh-accordion-panel-body coh-accordion-panel-body--light">
+              {% for key, child in element %}
+                {% if key|first != '#' %}
+                  {{ child }}
+                {% endif %}
+              {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

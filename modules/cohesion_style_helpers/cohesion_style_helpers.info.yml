@@ -1,0 +1,7 @@
+name: Site Studio style helpers
+type: module
+description: 'Defines the style helper configuration entities for creating reusable style configurations in Site Studio.'
+core_version_requirement: ^9 || ^10
+package: Site Studio
+dependencies:
+  - cohesion

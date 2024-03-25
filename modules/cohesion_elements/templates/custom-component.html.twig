@@ -1,0 +1,6 @@
+<div {{ attributes }}>
+    {% for id, dropzone in dropzones %}
+        <template data-dropzone-id="{{ id }}">{{ dropzone }}</template>
+    {% endfor %}
+    {{ html_template | raw }}
+</div>
