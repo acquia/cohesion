@@ -1,0 +1,2103 @@
+<?php
+
+use Drupal\Core\Database\Database;
+use Drupal\Component\Serialization\Yaml as Yml;
+use Drupal\cohesion_custom_styles\Entity\CustomStyleType;
+use Drupal\cohesion_website_settings\Entity\WebsiteSettings;
+use Drupal\cohesion_website_settings\Entity\Color;
+use Drupal\cohesion_website_settings\Entity\IconLibrary;
+use Drupal\cohesion_website_settings\Entity\FontLibrary;
+use Drupal\cohesion_website_settings\Entity\FontStack;
+use Drupal\Component\Serialization\Json;
+use Drupal\cohesion\Entity\CohesionSettingsInterface;
+use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Installer\InstallerKernel;
+use Drupal\filter\Plugin\Filter\FilterHtml;
+
+/**
+ * Implements hook_requirements().
+ */
+function cohesion_requirements($phase) {
+
+  $requirements = [];
+  $moduleHandler = \Drupal::moduleHandler();
+
+  if (!$moduleHandler->moduleExists('node_revision_delete')) {
+    $settings = [
+      '@module_link' => 'https://www.drupal.org/project/node_revision_delete',
+      '@docs_link' => 'https://sitestudiodocs.acquia.com/user-guide/managing-revisions'
+    ];
+    $requirements['cohesion_node_delete'] = [
+      'title' => t('Site Studio'),
+      'value' => t('It is recommended that the node revision delete module is installed to help manage revisions and keep your database to a reasonable size.'),
+      'description' => t('Please download and configure <a href="@module_link">node revision delete</a>. Find out more about <a href="@docs_link">managing revisions</a> in Site Studio.', $settings),
+      'severity' => REQUIREMENT_WARNING,
+    ];
+  }
+
+  $submodule_installed = $moduleHandler->moduleExists('sitestudio_contenthub_publisher') || $moduleHandler->moduleExists('sitestudio_contenthub_subscriber');
+  if ($moduleHandler->moduleExists('acquia_contenthub') && !$submodule_installed) {
+    $settings = ['@link' => 'https://github.com/acquia/sitestudio_contenthub'];
+    $requirements['cohesion_contenthub'] =[
+      'title' => t('Site Studio'),
+      'description' => t('The Acquia Content Hub integration with Site Studio has changed, please download and configure <a href="@link">sitestudio_contenthub</a>', $settings),
+      'severity' => REQUIREMENT_WARNING,
+    ];
+  }
+
+  if (!$moduleHandler->moduleExists('ckeditor5') && $phase == 'runtime') {
+    $settings = ['@link' => '/admin/modules', '@text_format' => '/admin/config/content/formats'];
+    $requirements['cohesion_ckeditor5'] = [
+      'title' => t('Site Studio'),
+      'description' => t('The CKEditor 5 module is a requirement of Site Studio version 7.x, please ensure this <a href="@link">module is enabled</a> and at least one CKEditor 5 <a href="@text_format">text format</a> is created', $settings),
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_install().
+ */
+function cohesion_install() {
+  // Remove/create cohesion base directory.
+  _cohesion_create_directory(COHESION_FILESYSTEM_URI, 'Site Studio directory created');
+}
+
+/**
+ * Update the database.
+ */
+function cohesion_update_8101(&$sandbox) {
+
+  $spec = [
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => FALSE,
+    'default' => '',
+    'description' => 'Form element element type.',
+  ];
+
+  $schema = Database::getConnection()->schema();
+  $schema->addField('coh_element_schema_info', 'element_element', $spec);
+}
+
+/**
+ * Implements hook_schema().
+ *
+ * Create cohesion database tables.
+ */
+function cohesion_schema() {
+  return [
+    'coh_element_schema_info' => [
+      'description' => 'Definition and settings for Site Studio assets retrieved from the API.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique schema ID.',
+        ],
+        'element_id' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Unique ID of form element.',
+        ],
+        'element_label' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Friendly label for the element.',
+        ],
+        'element_group' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Group to which the element belongs.',
+        ],
+        'element_weight' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+          'default' => 0,
+          'description' => 'Weight of the item on the display.',
+        ],
+        'element_element' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => FALSE,
+          'default' => '',
+          'description' => 'Form element element type.',
+        ],
+        'feature_id' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Form element feature ID.',
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'element_group' => ['element_group'],
+        'element_id' => ['element_id'],
+        'feature_id' => ['feature_id'],
+      ],
+      'unique_keys' => ['element_group', 'element_id'],
+    ],
+    'coh_usage' => [
+      'description' => 'Site Studio usage tracking.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique schema ID.',
+        ],
+        'source_uuid' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'UUID of the source entity.',
+        ],
+        'source_type' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Type of the source entity',
+        ],
+        'requires_uuid' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'UUID of the required entity.',
+        ],
+        'requires_type' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Type of the required entity',
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'id' => ['id'],
+        'source_uuid' => ['source_uuid']
+      ],
+      'unique_keys' => ['id'],
+    ],
+  ];
+}
+
+/**
+ * Alter Site Studio layout field schema 'type' property from 'varchar' to
+ * 'Text'(Affected columns: 'json_schema', 'json_values', 'json_mapper') Update
+ * the database.
+ */
+function cohesion_update_8102(&$sandbox) {
+
+  //  Get cohesion layout fields
+  $schema = Database::getConnection()->schema();
+  $spec = ['type' => 'text', 'size' => 'big', 'not null' => FALSE];
+
+  $alterColumn = function (Drupal\Core\Database\Schema $schema, $table_name, $columns, $spec) {
+    if ($columns && $table_name) {
+      foreach ($columns as $column) {
+        if ($schema->fieldExists($table_name, $column)) {
+          $schema->changeField($table_name, $column, $column, $spec);
+        }
+      }
+    }
+  };
+
+  foreach (\Drupal::entityTypeManager()
+             ->getStorage('field_storage_config')
+             ->loadMultiple() as $bundle_field) {
+    if ($bundle_field instanceof Drupal\field\Entity\FieldStorageConfig && 'cohesion_layout' == $bundle_field->get('type')) {
+      $profile_config_target_parts = explode('.', $bundle_field->getConfigTarget());
+      $column_prefix = end($profile_config_target_parts);
+      $table_name = str_replace('.', '__', $bundle_field->getConfigTarget());
+      $revision_table_name = $bundle_field->isRevisionable() ? str_replace('.', '_revision__', $bundle_field->getConfigTarget()) : FALSE;
+
+      $column_names = [
+        $column_prefix . '_json_schema',
+        $column_prefix . '_json_values',
+        $column_prefix . '_json_mapper',
+      ];
+
+      $alterColumn($schema, $table_name, $column_names, $spec);
+      $alterColumn($schema, $revision_table_name, $column_names, $spec);
+    }
+  }
+}
+
+/**
+ * Update cohesion admin views page for cohesion_components_admin,
+ * cohesion_helpers_admin, cohesion_master_templates_list, custom_styles and
+ * view_templates_list.
+ */
+function cohesion_update_8103(&$variables) {
+  _update_cohesion_admin_list_views();
+}
+
+/**
+ * Update cohesion admin views page for cohesion_master_templates_list and
+ * view_templates_list.
+ */
+function cohesion_update_8104(&$variables) {
+
+  $path = \Drupal::service('module_handler')->getModule('cohesion')->getPath();
+
+  $views_list = array_filter(\Drupal::service('config.factory')
+    ->listAll('views.'), function ($value) {
+    return (in_array(
+      $value, [
+        'views.view.cohesion_master_templates_list',
+        'views.view.view_templates_list',
+      ]
+    ));
+  });
+
+  foreach ($views_list as $profile_config_id) {
+    $profile_config = \Drupal::service('config.factory')
+      ->getEditable($profile_config_id);
+    if (file_exists(DRUPAL_ROOT . '/' . $path)) {
+      $files = [];
+      $dir = DRUPAL_ROOT . '/' . $path;
+      try {
+        if (is_dir($dir)) {
+          $files = \Drupal::service('file_system')->scanDirectory($dir, "/{$profile_config_id}.yml$/", ['recurse' => TRUE]);
+        }
+      }
+      catch (FileException $e) {
+        // Ignore and return empty array for BC.
+      }
+      $file = reset($files);
+      $data = Yml::decode(file_get_contents($file->uri));
+      $profile_config->merge($data);
+      if ($profile_config->save()) {
+        \Drupal::messenger()->addMessage(t("Success: @config updated", ['@config' => $profile_config->getName(),]));
+      }
+    }
+  }
+}
+
+/**
+ * Alter Site Studio layout field schema to add the 'styles' and 'template' fields.
+ * Update the database.
+ */
+function cohesion_update_8113(&$sandbox) {
+
+  //  Get cohesion layout fields
+  $schema = Database::getConnection()->schema();
+  $spec = ['type' => 'text', 'size' => 'big', 'not null' => FALSE];
+
+  $addColumn = function (Drupal\Core\Database\Schema $schema, $table_name, $column_prefix, $spec) {
+    if ($table_name) {
+      // Add styles field.
+      if (!$schema->fieldExists($table_name, $column_prefix . '_styles')) {
+        $schema->addField($table_name, $column_prefix . '_styles', $spec);
+      }
+
+      // Add template field.
+      if (!$schema->fieldExists($table_name, $column_prefix . '_template')) {
+        $schema->addField($table_name, $column_prefix . '_template', $spec);
+      }
+    }
+  };
+
+  // Loop through layout_fields and add subfields using the $addColumn() function above.
+  foreach (\Drupal::entityTypeManager()
+             ->getStorage('field_storage_config')
+             ->loadMultiple() as $bundle_field) {
+
+    if ($bundle_field instanceof Drupal\field\Entity\FieldStorageConfig && 'cohesion_layout' == $bundle_field->get('type')) {
+      $profile_config_target_parts = explode('.', $bundle_field->getConfigTarget());
+      $column_prefix = end($profile_config_target_parts);
+
+      $table_name = str_replace('.', '__', $bundle_field->getConfigTarget());
+      $revision_table_name = $bundle_field->isRevisionable() ? str_replace('.', '_revision__', $bundle_field->getConfigTarget()) : FALSE;
+
+      $addColumn($schema, $table_name, $column_prefix, $spec);
+      $addColumn($schema, $revision_table_name, $column_prefix, $spec);
+    }
+  }
+}
+
+/**
+ * Update cohesion admin views page for cohesion_components_admin,
+ * cohesion_helpers_admin, cohesion_master_templates_list, custom_styles and
+ * view_templates_list.
+ */
+function cohesion_update_8114(&$variables) {
+  _update_cohesion_admin_list_views();
+}
+
+/**
+ * Remove/create dx8asset base directory.
+ */
+function cohesion_update_8118(&$variables) {
+  //
+}
+
+/**
+ *
+ * Remove citation
+ */
+function cohesion_update_8119(&$variables) {
+
+  //Delete custom style citation
+  try {
+    \Drupal::service('cohesion.element.storage')->cohDelete('citation', 'custom_styles');
+    $entity = \Drupal::entityTypeManager()
+      ->getStorage('custom_style_type')
+      ->load('citation');
+    if ($entity instanceof \Drupal\Core\Config\Entity\ConfigEntityInterface) {
+      $entity->delete();
+    }
+
+    //Delete base style citation
+    \Drupal::service('cohesion.element.storage')->cohDelete('citation', 'base_styles');
+    $entity = \Drupal::entityTypeManager()
+      ->getStorage('cohesion_base_styles')
+      ->load('citation');
+    if ($entity instanceof \Drupal\Core\Config\Entity\ConfigEntityInterface) {
+      $entity->delete();
+    }
+  } catch (\Exception $e) {
+
+  }
+}
+
+/**
+ *
+ * Update cohesion admin views page for cohesion_components_admin,
+ * cohesion_helpers_admin, cohesion_master_templates_list, custom_styles and
+ * view_templates_list.
+ */
+function cohesion_update_8120(&$variables) {
+  _update_cohesion_admin_list_views();
+}
+
+/**
+ *
+ * Update cohesion admin views page for cohesion_components_admin,
+ * cohesion_helpers_admin, cohesion_master_templates_list, custom_styles and
+ * view_templates_list.
+ */
+function cohesion_update_8122(&$variables) {
+  _update_cohesion_admin_list_views();
+}
+
+/**
+ * Import custom styles and default forms
+ */
+function cohesion_update_8123(&$variables) {
+  $groups = [
+    ['element_group' => 'custom_styles'],
+    ['element_group' => 'form_defaults'],
+  ];
+  $context = [];
+  foreach ($groups as $group) {
+    \Drupal::service('settings.endpoint.utils')->importAsset($group, $context);
+  }
+}
+
+/**
+ * Create custom style types
+ */
+function cohesion_update_8124(&$variables) {
+  if (($elements = \Drupal::service('cohesion.element.storage')->getByGroup('custom_styles'))) {
+    CustomStyleType::importCustomStyleTypeEntities($elements);
+  }
+}
+
+/**
+ * Merge existing headings(h1...h6) into new heading custom type
+ */
+function cohesion_update_8125(&$variables) {
+  // Reset all convert heading elements to new format
+  $legacy_headings = [
+    'heading_1',
+    'heading_2',
+    'heading_3',
+    'heading_4',
+    'heading_5',
+    'heading_6',
+  ];
+
+  // Merge existing headings(h1...h6) into heading
+  $entities = \Drupal::service('entity_type.manager')
+    ->getStorage('cohesion_custom_style')
+    ->loadMultiple();
+  foreach ($entities as $entity) {
+    if (in_array($entity->getCustomStyleType(), $legacy_headings)) {
+      // convert existing headings to new format
+      $entity->set('custom_style_type', 'heading');
+      $entity->save();
+    }
+  }
+}
+
+/**
+ * Remove reference to unused custom style groups from keyValue storage and Site Studio
+ * storage
+ */
+function cohesion_update_8126(&$variables) {
+  $legacy_headings = [
+    'heading_1',
+    'heading_2',
+    'heading_3',
+    'heading_4',
+    'heading_5',
+    'heading_6',
+  ];
+  // Remove from keyValue storage
+  \Drupal::keyValue('cohesion.assets.custom_styles')
+    ->deleteMultiple($legacy_headings);
+
+  // Remove from Site Studio storage
+  foreach ($legacy_headings as $legacy_heading) {
+    \Drupal::service('cohesion.element.storage')->cohDelete($legacy_heading, 'custom_styles');
+  }
+}
+
+/**
+ * Remove unused custom style groups from list
+ */
+function cohesion_update_8127(&$variables) {
+  $legacy_headings = [
+    'heading_1',
+    'heading_2',
+    'heading_3',
+    'heading_4',
+    'heading_5',
+    'heading_6',
+  ];
+  $custom_style_types = Drupal::entityTypeManager()
+    ->getStorage('custom_style_type')
+    ->loadMultiple();
+  foreach ($custom_style_types as $entity) {
+    if (
+      in_array($entity->id(), $legacy_headings) &&
+      ($entity instanceof \Drupal\cohesion_custom_styles\Entity\CustomStyleType)
+    ) {
+      $entity->delete();
+    }
+  }
+}
+
+/**
+ *
+ * Delete cohesion views
+ */
+function cohesion_update_8128(&$variables) {
+  $views_list = array_filter(\Drupal::service('config.factory')
+    ->listAll('views.'), function ($value) {
+    return (in_array(
+      $value, [
+        'views.view.cohesion_components_admin',
+        'views.view.cohesion_helpers_admin',
+        'views.view.cohesion_master_templates_list',
+        'views.view.custom_styles',
+        'views.view.view_templates_list',
+      ]
+    ));
+  });
+
+  foreach ($views_list as $view) {
+    \Drupal::service('config.factory')->getEditable($view)->delete();
+  }
+}
+
+/**
+ * Merge existing headings(h1...h6) into new heading for style helpers
+ */
+function cohesion_update_8129(&$variables) {
+  // Reset all convert heading elements to new format
+  $legacy_headings = [
+    'heading_1',
+    'heading_2',
+    'heading_3',
+    'heading_4',
+    'heading_5',
+    'heading_6',
+  ];
+
+  // Merge existing headings(h1...h6) into heading
+  $entities = \Drupal::service('entity_type.manager')
+    ->getStorage('cohesion_style_helper')
+    ->loadMultiple();
+  foreach ($entities as $entity) {
+    if (in_array($entity->getCustomStyleType(), $legacy_headings)) {
+      // convert existing headings to new format
+      $entity->set('custom_style_type', 'heading');
+      $entity->save();
+    }
+  }
+}
+
+/**
+ * Remove reference to unused custom style groups from keyValue storage and Site Studio
+ * storage
+ */
+function cohesion_update_8130(&$variables) {
+  $legacy_icons = [
+    'icon',
+  ];
+  // Remove from keyValue storage
+  \Drupal::keyValue('cohesion.assets.custom_styles')
+    ->deleteMultiple($legacy_icons);
+
+  // Remove from Site Studio storage
+  foreach ($legacy_icons as $legacy_icon) {
+    \Drupal::service('cohesion.element.storage')->cohDelete($legacy_icon, 'custom_styles');
+  }
+}
+
+/**
+ * Remove unused custom style groups from list
+ */
+function cohesion_update_8131(&$variables) {
+  $legacy_icons = [
+    'icon',
+  ];
+  $custom_style_types = Drupal::entityTypeManager()
+    ->getStorage('custom_style_type')
+    ->loadMultiple();
+  foreach ($custom_style_types as $entity) {
+    if (
+      in_array($entity->id(), $legacy_icons) &&
+      ($entity instanceof \Drupal\cohesion_custom_styles\Entity\CustomStyleType)
+    ) {
+      $entity->delete();
+    }
+  }
+}
+
+/**
+ * Remove custom element from sidebar list.
+ */
+function cohesion_update_8501(&$variables) {
+  // Element.
+  $legacy_element = [
+    'custom',
+  ];
+  // Remove from keyValue storage
+  \Drupal::keyValue('cohesion.assets.elements')
+    ->deleteMultiple($legacy_element);
+
+  // Remove from Site Studio storage
+  foreach ($legacy_element as $legacy_icon) {
+    \Drupal::service('cohesion.element.storage')->cohDelete($legacy_element, 'elements');
+  }
+
+  // Element form data.
+  $legacy_element = [
+    'custom_dynamic',
+    'custom_element',
+    'custom_settings',
+  ];
+
+  foreach ($legacy_element as $legacy_item) {
+    \Drupal::service('cohesion.element.storage')->cohDelete($legacy_item, 'element_properties');
+  }
+
+  // Remove from keyValue storage
+  $allData = \Drupal::keyValue('cohesion.assets.element_categories')->getAll();
+  unset($allData['drupal-core-elements']['elements'][6]);
+  \Drupal::keyValue('cohesion.assets.element_categories')
+    ->set('drupal-core-elements', $allData['drupal-core-elements']);
+}
+
+/**
+ * Create the usage tracking table. Convert website settings to single entities.
+ */
+function cohesion_update_8502(&$variables) {
+
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  /**
+   * Delete existing in-use config items and create new usage table.
+   */
+  Database::getConnection()->schema()->dropTable('coh_usage');
+
+  $inuse_config = array_filter(\Drupal::service('config.factory')
+    ->listAll(), function ($value) {
+    return strstr($value, '.inuse.');
+  });
+
+  foreach ($inuse_config as $item) {
+    \Drupal::service('config.factory')->getEditable($item)->delete();
+  }
+
+  Database::getConnection()->schema()->createTable('coh_usage', cohesion_schema()['coh_usage']);
+
+  // Callback to remove existing file usage for the following entities.
+  $remove_file_usage = function($entities) {
+    $regex = '/((cohesion):\/\/(.*?))([:"*?<>|\\\])/m';
+    foreach ($entities as $entity) {
+      $uris = [];
+      $json = str_replace('\\/', '/', $entity->getJsonValues());  // Patch the JSON.
+      preg_match_all($regex, $json, $matches, PREG_SET_ORDER, 0);
+
+      foreach ($matches as $match) {
+        // Found a matching color.
+        $uris[] = $match[1];
+      }
+
+      foreach ($uris as $uri) {
+        if ($file_entity = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $uri])) {
+          $file_entity = reset($file_entity);
+          \Drupal::service('file.usage')->delete($file_entity, 'cohesion', 'cohesion_website_settings', $entity->id(), 0);
+        }
+      }
+    }
+
+  };
+
+  /**
+   * Convert icon_libraries to single entities.
+   */
+  if ($entities_to_delete = \Drupal::entityTypeManager()->getStorage('cohesion_icon_library')->loadMultiple()) {
+    \Drupal::entityTypeManager()->getStorage('cohesion_icon_library')->delete($entities_to_delete);
+  }
+
+  /** @var WebsiteSettings $entity */
+  if ($wsentity = \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->load('icon_libraries')) {
+
+    // Create new entities from existing WS entity.
+    foreach ($wsentity->getDecodedJsonValues()['uploadIconFonts'] as $icon) {
+      if (isset($icon['library']['name'])) {
+
+        if ($existing_entity = \Drupal::entityTypeManager()->getStorage('cohesion_icon_library')->load($icon['library']['fontFamilyName'])) {
+          \Drupal::entityTypeManager()->getStorage('cohesion_icon_library')->delete([$existing_entity]);
+        }
+
+        $entity = IconLibrary::create([
+          'id' => $icon['library']['fontFamilyName'],
+          'label' => $icon['library']['name'],
+        ]);
+        $entity->setDefaultValues();
+        $entity->setJsonValue(Json::encode($icon['library']));
+        $entity->setSource('uploadIconFonts');
+        $entity->save();
+      }
+    }
+
+    // Create new entities from existing WS entity.
+    foreach ($wsentity->getDecodedJsonValues()['iconLibraries'] as $icon) {
+      if (isset($icon['library']['name'])) {
+
+        if ($existing_entity = \Drupal::entityTypeManager()->getStorage('cohesion_icon_library')->load($icon['library']['fontFamilyName'])) {
+          \Drupal::entityTypeManager()->getStorage('cohesion_icon_library')->delete([$existing_entity]);
+        }
+
+        $entity = IconLibrary::create([
+          'id' => $icon['library']['fontFamilyName'],
+          'label' => $icon['library']['name'],
+        ]);
+        $entity->setDefaultValues();
+        $entity->setJsonValue(Json::encode($icon['library']));
+        $entity->setSource('webIconFonts');
+        $entity->save();
+      }
+    }
+
+    // Delete the old WS color palette entity.
+    if ($entities_to_delete = \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->loadMultiple(['icon_libraries'])) {
+      $remove_file_usage($entities_to_delete);
+      \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->delete($entities_to_delete);
+    }
+  }
+
+  /**
+   * Convert font_libraries and font_stacks to single entities.
+   */
+  if ($entities_to_delete = \Drupal::entityTypeManager()->getStorage('cohesion_font_library')->loadMultiple()) {
+    \Drupal::entityTypeManager()->getStorage('cohesion_font_library')->delete($entities_to_delete);
+  }
+
+  if ($entities_to_delete = \Drupal::entityTypeManager()->getStorage('cohesion_font_stack')->loadMultiple()) {
+    \Drupal::entityTypeManager()->getStorage('cohesion_font_stack')->delete($entities_to_delete);
+  }
+
+  /** @var WebsiteSettings $entity */
+  if ($wsentity = \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->load('font_libraries')) {
+
+    // Create new FontLibrary entities from existing WS entity.
+    foreach ($wsentity->getDecodedJsonValues()['uploadFonts'] as $font) {
+      $hash = hash('md5', Json::encode($font['library']));
+
+      $entity = FontLibrary::create([
+        'id' => $hash,
+        'label' => $font['library']['name'],
+      ]);
+
+      $font['library']['uid'] = $hash;
+
+      $entity->setDefaultValues();
+      $entity->setJsonValue(Json::encode($font['library']));
+      $entity->setSource('uploadFonts');
+      $entity->save();
+    }
+
+    // Create new FontLibrary entities from existing WS entity.
+    foreach ($wsentity->getDecodedJsonValues()['webFonts'] as $font) {
+      $hash = hash('md5', Json::encode($font));
+
+      $font['uid'] = $hash;
+
+      $entity = FontLibrary::create([
+        'id' => $hash,
+        'label' => $font['name'],
+      ]);
+
+      $entity->setDefaultValues();
+      $entity->setJsonValue(Json::encode($font));
+      $entity->setSource('webFonts');
+      $entity->save();
+    }
+
+    // Create new FontStack entities from existing WS entity.
+    foreach ($wsentity->getDecodedJsonValues()['fontStacks'] as $stack) {
+      $entity = FontStack::create([
+        'id' => $stack['stack']['uid'],
+        'label' => $stack['stack']['name'],
+      ]);
+      $entity->setDefaultValues();
+      $entity->setJsonValue(Json::encode($stack['stack']));
+      $entity->save();
+    }
+
+    // Delete the old WS font entity.
+    if ($entities_to_delete = \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->loadMultiple(['font_libraries'])) {
+      $remove_file_usage($entities_to_delete);
+      \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->delete($entities_to_delete);
+    }
+  }
+
+  /**
+   * Convert colors to single entities.
+   */
+  // drupal_flush_all_caches();  // This is required for new sites to see the color entity.
+  if ($entities_to_delete = \Drupal::entityTypeManager()->getStorage('cohesion_color')->loadMultiple()) {
+    \Drupal::entityTypeManager()->getStorage('cohesion_color')->delete($entities_to_delete);
+  }
+
+  /** @var WebsiteSettings $entity */
+  if ($entity = \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->load('color_palette')) {
+    $c = 0;
+
+    // Create new entities from existing WS entity.
+    foreach ($entity->getDecodedJsonValues()['colors'] as $color) {
+      $entity = Color::create([
+        'id' => $color['uid'],
+        'label' => $color['name'],
+      ]);
+      $entity->setDefaultValues();
+      $entity->setJsonValue(Json::encode($color));
+      $entity->setWeight($c++);
+      $entity->save();
+    }
+
+    // Delete the old WS color palette entity.
+    if ($entities_to_delete = \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->loadMultiple(['color_palette'])) {
+      \Drupal::entityTypeManager()->getStorage('cohesion_website_settings')->delete($entities_to_delete);
+    }
+  }
+}
+
+/**
+ * Split model model and mapper from configs
+ */
+function cohesion_update_8503(){
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  $configs = [
+    'cohesion_component',
+    'cohesion_helper',
+    'cohesion_content_templates',
+    'cohesion_view_templates',
+    'cohesion_master_templates',
+    'cohesion_menu_templates',
+  ];
+
+  foreach ($configs as $entity_type_name) {
+    try {
+      $entity_list = \Drupal::entityTypeManager()
+        ->getStorage($entity_type_name)
+        ->loadMultiple();
+
+      foreach ($entity_list as $entity) {
+        if($entity->get('modified')){
+          split_model_mapper_entity($entity);
+        }
+      }
+    } catch (\Exception $e) {
+
+    }
+  }
+}
+
+/**
+ * Split model model and mapper from layout canvas
+ */
+function cohesion_update_8504(){
+
+  try {
+    $query = \Drupal::entityQuery('cohesion_layout')->accessCheck(FALSE);
+    $entity_ids_all = $query->execute();
+
+    $entity_data = \Drupal::service('entity_type.manager')->getStorage('cohesion_layout');
+
+    foreach (array_chunk($entity_ids_all, 25) as $entity_ids){
+      if ($entity_data && ($entities = $entity_data->loadMultiple($entity_ids))) {
+        /** @var \Drupal\cohesion_elements\Entity\CohesionLayout $entity */
+        foreach ($entities as $entity) {
+            // Re-save the entity.
+            if ($entity instanceof \Drupal\Tests\Core\Entity\RevisionableEntity && $entity->getRevisionId()) {
+              $entity->setNewRevision(FALSE);
+            }
+            split_model_mapper_entity($entity);
+        }
+      }
+    }
+  } catch (\Exception $e) {
+
+  }
+}
+
+/**
+ * Split model model and mapper from translated layout canvas
+ */
+function cohesion_update_8505(){
+
+  try {
+    $query = \Drupal::entityQuery('cohesion_layout')->accessCheck(FALSE);
+    $entity_ids_all = $query->execute();
+
+    $entity_data = \Drupal::service('entity_type.manager')->getStorage('cohesion_layout');
+
+    foreach (array_chunk($entity_ids_all, 25) as $entity_ids){
+
+      if ($entity_data && ($entities = $entity_data->loadMultiple($entity_ids))) {
+        /** @var \Drupal\cohesion_elements\Entity\CohesionLayout $entity */
+        foreach ($entities as $entity) {
+          $languages = $entity->getTranslationLanguages(FALSE);
+          foreach ($languages as $lang_code => $language) {
+            $translated_entity = $entity->getTranslation($lang_code);
+            // Re-save the entity.
+            if ($translated_entity instanceof \Drupal\Tests\Core\Entity\RevisionableEntity && $translated_entity->getRevisionId()) {
+              $translated_entity->setNewRevision(FALSE);
+            }
+            split_model_mapper_entity($translated_entity);
+          }
+        }
+      }
+    }
+  } catch (\Exception $e) {
+
+  }
+}
+
+/**
+ * Split model model and mapper from layout canvas revisions
+ */
+function cohesion_update_8506(){
+
+  try {
+    $connection = \Drupal::service('database');
+    $offset = 0;
+    $limit = 25;
+    while (true){
+      $query = $connection->query("SELECT id, json_values FROM cohesion_layout_field_revision LIMIT :limit OFFSET :offset", [':limit' => $limit, ':offset' => $offset]);
+      $revisions = $query->fetchAll();
+      if(!empty($revisions)){
+        foreach ($revisions as $revision){
+          $json_values = json_decode($revision->json_values);
+          process_json_values_split($json_values);
+          $update = $connection->update('cohesion_layout_field_revision')
+              ->fields([
+                'json_values' => json_encode($json_values),
+              ])
+            ->condition('id', $revision->id, '=')
+            ->execute();
+        }
+        $offset += $limit;
+      }else{
+        break;
+      }
+    }
+  } catch (\Exception $e) {
+
+  }
+}
+
+/**
+ * Remove legacy hash key from Site Studio config entities.
+ */
+function cohesion_update_8507() {
+  $config_factory = \Drupal::configFactory();
+
+  foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type => $definition) {
+    if ($definition->entityClassImplements(CohesionSettingsInterface::class)) {
+      foreach ($config_factory->listAll($definition->getConfigPrefix()) as $config_name) {
+        $config = $config_factory->getEditable($config_name);
+        $config->clear('hash');
+        $config->save(TRUE);
+      }
+
+    }
+  }
+}
+
+/**
+ * Update model for entity reference element
+ */
+function cohesion_update_8508(){
+  update_layout_canvas_model_element('update_entity_reference_model_by_json_values');
+}
+
+/**
+ * Convert all basic elements to standard elements for flex.
+ */
+function cohesion_update_8509() {
+  // Convert layout_canvas entities.
+  update_all_canvases('convert_elements_for_flex');
+}
+
+/**
+ * Remove gradient picker form element
+ */
+function cohesion_update_8510() {
+  \Drupal::service('cohesion.element.storage')->cohDelete('form-gradientpicker', 'form_elements');
+}
+
+/**
+ * Install the elements preview image style.
+ */
+function cohesion_update_8511() {
+  \Drupal::service('config.installer')->installDefaultConfig('module', 'cohesion_elements');
+}
+
+/**
+ * Set targetContainer to outer for row for columns elements
+ */
+function cohesion_update_8512 () {
+  // Convert layout_canvas entities.
+  update_all_canvases('row_for_columns_attributes');
+}
+
+  /**
+ * Update 'form-input', 'form-textarea', 'form-checkbox-toggle', 'form-select' to have escape turned off
+ */
+function cohesion_update_8513() {
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  if($components = \Drupal\cohesion_elements\Entity\Component::loadMultiple()){
+    foreach ($components as $component){
+      $json_values = json_decode($component->getJsonValues());
+      $json_values = escaping_component_fields($json_values);
+      $component->setJsonValue(json_encode($json_values));
+      $component->save();
+    }
+  }
+}
+
+
+/**
+ * Update component form toggle values
+ */
+function cohesion_update_8514() {
+  // Convert layout_canvas entities.
+  update_all_canvases('update_toggle_component_fields');
+}
+
+/**
+ * Remove gradient picker form element
+ */
+function cohesion_update_8515() {
+  \Drupal::service('cohesion.element.storage')
+    ->cohDelete('form-gradientpicker', 'form_elements');
+}
+
+/**
+ * Patch component empty values
+ */
+function cohesion_update_8516() {
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  if($components = \Drupal\cohesion_elements\Entity\Component::loadMultiple()){
+    foreach ($components as $component){
+      $json_values = $component->getDecodedJsonValues(TRUE);
+      if(property_exists($json_values, 'componentForm') && property_exists($json_values, 'model')){
+        foreach ($json_values->model as $uuid => $model){
+          if(is_object($model) && property_exists($model, 'settings') && property_exists($model->settings, 'type') && $model->settings->type == 'cohSelect' && property_exists($model->settings, 'options') && is_array($model->settings->options)){
+            foreach ($model->settings->options as &$option){
+              if(!property_exists($option, 'value')){
+                $option->value = '';
+              }
+            }
+          }
+        }
+      }
+      $component->setJsonValue(json_encode($json_values));
+      $component->save();
+    }
+  }
+}
+
+/** Merge font libraries*/
+function cohesion_update_8517() {
+  /** @var FontLibrary[] $font_libaries */
+  $font_libaries = FontLibrary::loadMultiple();
+  foreach ($font_libaries as $font_libary){
+
+    $source = $font_libary->get('source');
+    $json_values = $font_libary->getDecodedJsonValues(TRUE);
+
+    if($source == 'uploadFonts'){
+      $json_values->type = 'upload';
+    }elseif('webFonts'){
+      $json_values->type = 'import';
+    }
+
+    $font_libary->setJsonValue(json_encode($json_values));
+    $font_libary->save();
+
+  }
+
+  $config_factory = \Drupal::configFactory();
+  $cohesion_font_libraries = $config_factory->listAll('cohesion_website_settings.cohesion_font_library');
+  foreach ($cohesion_font_libraries as $cohesion_font_library){
+    $cohesion_font_library_editable = $config_factory->getEditable($cohesion_font_library);
+    $cohesion_font_library_editable->clear('source');
+    $cohesion_font_library_editable->save(TRUE);
+  }
+}
+
+/**
+ * Merge icon libraries
+ */
+function cohesion_update_8518() {
+  $icon_libaries = IconLibrary::loadMultiple();
+  foreach ($icon_libaries as $icon_libary) {
+
+    $source = $icon_libary->get('source');
+    if ($source == 'uploadIconFonts' || $source == 'webIconFonts') {
+
+      $json_values = $icon_libary->getDecodedJsonValues(TRUE);
+
+      $json_values->provider = $json_values->type;
+
+      if ($source == 'uploadIconFonts') {
+        if ($json_values->type == 'custom') {
+          $json_values->key = 'uploadCustom';
+        }
+        elseif ($json_values->type == 'icomoon') {
+          $json_values->key = 'uploadIcomoon';
+        }
+        elseif ($json_values->type == 'fontello') {
+          $json_values->key = 'uploadFontello';
+        }
+        $json_values->type = 'upload';
+      }
+      elseif ($source == 'webIconFonts') {
+        if ($json_values->type == 'custom') {
+          $json_values->key = 'importCustom';
+        }
+        elseif ($json_values->type == 'icomoon') {
+          $json_values->key = 'importIcomoon';
+        }
+        elseif ($json_values->type == 'fontello') {
+          $json_values->key = 'importFontello';
+        }
+        $json_values->type = 'import';
+      }
+
+      $icon_libary->setJsonValue(json_encode($json_values));
+      $icon_libary->save();
+    }
+
+  }
+
+  // Make sure the source is removed
+  $config_factory = \Drupal::configFactory();
+  $cohesion_icon_libraries = $config_factory->listAll('cohesion_website_settings.cohesion_icon_library');
+  foreach ($cohesion_icon_libraries as $cohesion_icon_library) {
+    $cohesion_icon_library_editable = $config_factory->getEditable($cohesion_icon_library);
+    $cohesion_icon_library_editable->clear('source');
+    $cohesion_icon_library_editable->save(TRUE);
+  }
+}
+
+/**
+ * Set IMCE as selected image browser in System settings configuration.
+ */
+function cohesion_update_8519() {
+  $config = \Drupal::service('config.factory')->getEditable('cohesion.settings');
+  $config->set('image_browser', [
+    'config' => [
+      'type' => 'imce_imagebrowser',
+      'dx8_imce_stream_wrapper' => 'public'
+    ],
+    'content' => [
+      'type' => 'imce_imagebrowser',
+      'dx8_imce_stream_wrapper' => 'public'
+    ]
+  ]);
+
+  $config->save();
+  \Drupal::service('cache.render')->invalidateAll();
+}
+
+/**
+ * Convert file references to media tokens.
+ */
+function cohesion_update_8520() {
+  update_all_canvases('update_file_references_to_media_tokens');
+}
+
+/**
+ * Update padding - margin model
+ */
+function cohesion_update_8521() {
+  // Convert layout_canvas entities.
+  update_all_canvases('update_padding_margin_models');
+  update_all_canvases('update_padding_margin_models', 'json_mapper');
+}
+
+/**
+ * Set component content to published
+ */
+function cohesion_update_8522() {
+  /** @var \Drupal\cohesion_elements\Entity\ComponentContent[] $component_contents */
+  $component_contents = \Drupal\cohesion_elements\Entity\ComponentContent::loadMultiple();
+  foreach ($component_contents as $component_content){
+    $component_content->setPublished(TRUE);
+    $component_content->setNewRevision(FALSE);
+    $component_content->isDefaultRevision(TRUE);
+    $component_content->save();
+  }
+}
+
+/**
+ * Unset dx8_enabled_theme as a setting
+ */
+function cohesion_update_8700() {
+  $config = \Drupal::service('config.factory')->getEditable('cohesion.settings');
+  $config->clear('dx8_enabled_theme');
+
+  $config->save();
+}
+
+/**
+ * Implement style guide manager
+ */
+function cohesion_update_8702() {
+  \Drupal::keyValue('cohesion.library.module')->deleteAll();
+}
+
+/**
+ * Contenthub integration for Personalization
+ */
+function cohesion_update_8703() {
+  if (\Drupal::moduleHandler()->moduleExists('acquia_lift')) {
+    $settings = ['@link' => 'https://github.com/acquia/sitestudio_contenthub'];
+    return t("Manual Action Required: the ContentHub integration required for Personalization & Site Studio has changed - please download and configure @link (composer require acquia/sitestudio_contenthub)", $settings);
+  }
+}
+
+/**
+ * Update cohesion_sync_package schema.
+ */
+function cohesion_update_8704() {
+  $packages = \Drupal::service('config.factory')->listAll('cohesion_sync.package');
+  foreach ($packages as $package) {
+    $name = explode('.', $package);
+    $name[1] = 'cohesion_sync_package';
+    $updated_package = implode('.', $name);
+    \Drupal::database()->update('config')
+      ->expression('name', 'replace(name, :old, :new)', array(
+        ':old' => $package,
+        ':new' =>  $updated_package,
+      ))
+      ->execute();
+  }
+
+  $entityDefinitionUpdateManager = \Drupal::entityDefinitionUpdateManager();
+  $definition = $entityDefinitionUpdateManager->getEntityType('cohesion_sync_package');
+  $definition->set('config_prefix', 'cohesion_sync_package');
+  $entityDefinitionUpdateManager->updateEntityType($definition);
+}
+
+/**
+ * Re-save all cohesion config to recalculate dependencies.
+ */
+function cohesion_update_8705() {
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+  $cohesion_sync_lock = &drupal_static('running_dx8_batch');
+  $cohesion_sync_lock = TRUE;
+
+  $ignore_list = [
+    'cohesion.settings',
+    'cohesion.settings',
+    'cohesion.sync.settings',
+    'cohesion_amp.settings',
+    'cohesion_devel.settings',
+    'cohesion_theme.settings',
+    'cohesion.frontend.settings',
+  ];
+
+  $configFactory = \Drupal::service('config.factory');
+  foreach($configFactory->listAll('cohesion') as $name) {
+    if (in_array($name, $ignore_list)) {
+      continue;
+    }
+    $name_array = explode('.', $name);
+    if (isset($name_array[1]) && isset($name_array[2])) {
+      if ($name_array[1] == 'cohesion_custom_style_type') {
+        $entity = \Drupal::entityTypeManager()->getStorage('custom_style_type')->load($name_array[2]);
+      }
+      else {
+        $entity = \Drupal::entityTypeManager()->getStorage($name_array[1])->load($name_array[2]);
+      }
+      $entity->save();
+    }
+  }
+}
+
+/**
+ * Removes site studio classes from the filter html filter on all text formats
+ * This is to allow CKEditor 5 Styles plugin to be able to define them,
+ * otherwise there is a clash between the two.
+ *
+ * @return void
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function cohesion_update_9000() {
+  $filter_formats = filter_formats();
+
+  foreach ($filter_formats as $filter_format) {
+    $filter_html = $filter_format->filters('filter_html');
+
+    if ($filter_html instanceof FilterHtml) {
+      $configuration = $filter_html->getConfiguration();
+      if (isset($configuration['settings']['allowed_html'])) {
+        $configuration['settings']['allowed_html'] = preg_replace("/coh-[a-z0-9-]*\s?/", '', $configuration['settings']['allowed_html'] );
+        $filter_format->setFilterConfig('filter_html', $configuration);
+        $filter_format->save();
+      }
+    }
+
+  }
+}
+/**
+ * Installs contrib version of stable theme.
+ *
+ * @return void
+ */
+function cohesion_update_9001() {
+  \Drupal::service('theme_installer')->install(['stable']);
+}
+
+/**
+ * Set global libraries to true and on by default.
+ *
+ */
+function cohesion_update_9002() {
+  $config = \Drupal::service('config.factory')->getEditable('cohesion.frontend.globaljs_settings');
+  $config->set('matchHeight', 1)->save();
+  $config->set('cohMatchHeights', 1)->save();
+  $config->set('parallax_scrolling', 1)->save();
+}
+
+/**
+ * Add primary/unique key to coh_usage table and update indexes.
+ */
+function cohesion_update_9003() {
+  $schema = \Drupal::database()->schema();
+  $schema->addField('coh_usage', 'id', [
+    'type' => 'serial',
+    'not null' => TRUE,
+    'description' => 'Unique record ID.',
+  ],
+  [
+    'primary key' => ['id'],
+  ]);
+
+  $spec = [
+    'fields' => [
+      'source_uuid' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'UUID of the source entity.',
+      ]
+    ],
+    'indexes' => [
+      'source_uuid' => ['source_uuid'],
+    ],
+  ];
+
+  $schema->addIndex('coh_usage', 'source_uuid', ['source_uuid'], $spec);
+}
+
+/**
+ * Update image browser cohesion_media_lib_types default values.
+ */
+function cohesion_update_9004() {
+  $cohesionSettings = \Drupal::service('config.factory')->getEditable('cohesion.settings');
+
+  $types = [
+    'content',
+    'config',
+  ];
+
+  foreach ($types as $type) {
+    $config = $cohesionSettings->get('image_browser.' . $type . '.cohesion_media_lib_types');
+    if (is_iterable($config)) {
+      foreach ($config as $key => $mediaType) {
+        if ($mediaType == 0) {
+          $cohesionSettings->set('image_browser.' . $type . '.cohesion_media_lib_types' . '.' . $key, "0")->save();
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Update cohesion.frontend.globaljs_settings config to
+ * cohesion.frontend.settings & remove old config.
+ */
+function cohesion_update_9005() {
+  $oldConfig = \Drupal::service('config.factory')->getEditable('cohesion.frontend.globaljs_settings');
+  $newConfig = \Drupal::service('config.factory')->getEditable('cohesion.frontend.settings');
+
+  $jsSettings = [
+    'matchHeight',
+    'parallax_scrolling',
+    'cohMatchHeights',
+  ];
+
+  foreach ($jsSettings as $jsSetting) {
+     $newConfig->set('js.' . $jsSetting, $oldConfig->get($jsSetting))->save();
+  }
+
+  // Delete old config.
+  $oldConfig->delete();
+}
+
+/**
+ * Update callback.
+ *
+ * @param $json_values
+ * @param $entity_type
+ * @return mixed
+ */
+function update_file_references_to_media_tokens($json_values, $entity_type = FALSE) {
+  // Ignore certain entity types.
+  if ($entity_type &&
+    ($entity_type->id() == 'cohesion_color' ||
+    $entity_type->id() == 'cohesion_website_settings' ||
+    $entity_type->id() == 'cohesion_font_library' ||
+    $entity_type->id() == 'cohesion_font_stack' ||
+    $entity_type->id() == 'cohesion_icon_library')) {
+    return $json_values;
+  }
+
+  // Build the URI regex.
+  $wrappers = \Drupal::service('stream_wrapper_manager')->getWrappers();
+  if (empty($wrappers)) {
+    $wrappers = ['cohesion' => [], 'public' => []];
+  }
+  foreach ($wrappers as $key => $wrapper) {
+    $wrappers[$key]['instance'] = \Drupal::service('stream_wrapper_manager')->getViaUri($key . '://');
+  }
+  $uriRegex = '/((' . implode('|', array_keys($wrappers)) . '):\/\/(.*?))([:"*?<>|]|$)/m';
+
+  // Recurse through the json and convert Uris tt tokens.
+  update_file_references_to_media_token($json_values, $uriRegex);
+
+  return $json_values;
+}
+
+/**
+ * See update_file_references_to_media_tokens().
+ *
+ * @param $object
+ * @param $uriRegex
+ */
+function update_file_references_to_media_token(&$object, $uriRegex) {
+  if (is_array($object) || is_object($object)) {
+    foreach ($object as &$value) {
+      update_file_references_to_media_token($value, $uriRegex);
+    }
+  }
+  else {
+    // Find matches and convert to [media-reference:file:entity_id]
+    preg_match_all($uriRegex, $object, $matches, PREG_SET_ORDER, 0);
+    foreach ($matches as $match) {
+      try {
+        $files = \Drupal::entityTypeManager()
+          ->getStorage('file')
+          ->loadByProperties(['uri' => $match[1]]);
+      }
+      catch (\Exception $e) {
+        continue;
+      }
+
+      $file = reset($files);
+      if ($file instanceof \Drupal\file\Entity\File) {
+        $object = str_replace($match[1], '[media-reference:file:' . $file->uuid() . ']', $object);
+      }
+    }
+  }
+
+}
+
+/**
+ * Update callback.
+ *
+ * @param $json_values
+ *
+ * @return mixed
+ */
+function update_padding_margin_models($json_values){
+  update_padding_margin_model($json_values);
+  return $json_values;
+}
+
+/**
+ * Update callback.
+ *
+ * @param $object
+ */
+function update_padding_margin_model(&$object){
+  if(is_array($object) || is_object($object)){
+    if(is_object($object) && property_exists($object, 'styles') && is_object($object->styles)){
+      foreach ($object->styles as $bp => $properties){
+        if(is_object($properties)){
+
+          replace_padding_margin($object->styles->{$bp},'padding', 'padding-equal', 'padding');
+          replace_padding_margin($object->styles->{$bp},'padding-top', 'padding-top', 'padding');
+          replace_padding_margin($object->styles->{$bp},'padding-bottom', 'padding-bottom', 'padding');
+          replace_padding_margin($object->styles->{$bp},'padding-left', 'padding-left', 'padding');
+          replace_padding_margin($object->styles->{$bp},'padding-right', 'padding-right', 'padding');
+
+          replace_padding_margin($object->styles->{$bp},'margin', 'margin-equal', 'margin');
+          replace_padding_margin($object->styles->{$bp},'margin-top', 'margin-top', 'margin');
+          replace_padding_margin($object->styles->{$bp},'margin-bottom', 'margin-bottom', 'margin');
+          replace_padding_margin($object->styles->{$bp},'margin-left', 'margin-left', 'margin');
+          replace_padding_margin($object->styles->{$bp},'margin-right', 'margin-right',  'margin');
+        }
+      }
+    }elseif(is_object($object) && property_exists($object, 'activeFields') && is_array($object->activeFields)){
+      foreach($object->activeFields as $index => $activeField){
+        if(is_object($activeField) && property_exists($activeField, 'name')){
+          if($activeField->name == 'padding'){
+            $object->activeFields[$index]->name = 'padding-equal';
+          }elseif($activeField->name == 'margin'){
+            $object->activeFields[$index]->name = 'margin-equal';
+          }
+        }
+
+      }
+    }
+
+    foreach ($object as $key => $value){
+      update_padding_margin_model($value);
+    }
+
+  }
+}
+
+function replace_padding_margin(&$object, $old_property_name, $property_name, $group){
+  if(property_exists($object, $old_property_name)){
+    $values = $object->{$old_property_name};
+    unset($object->{$old_property_name});
+    if(!property_exists($object, $group) || $old_property_name == $group){
+      $object->{$group} = [];
+    }
+    $object->{$group}[$property_name] = $values;
+  }
+}
+
+/**
+ * Update callback.
+ *
+ * @param $json_values
+ *
+ * @return mixed
+ */
+function update_toggle_component_fields($json_values, $entity_type = FALSE) {
+  if (property_exists($json_values, 'canvas') && property_exists($json_values, 'model')){
+    update_toogle_component_field($json_values->canvas, $json_values->model);
+  }
+  return $json_values;
+}
+
+/**
+ * Update callback.
+ *
+ * @param $object
+ * @param $model
+ */
+function update_toogle_component_field($object, &$model){
+  if(is_array($object)){
+    foreach ($object as $key => $value){
+      update_toogle_component_field($value, $model);
+    }
+  }elseif(is_object($object)){
+    if(property_exists($object, 'children') ){
+      update_toogle_component_field($object->children,$model);
+    }
+
+    // If it's a component with values
+    if(property_exists($object, 'type') && $object->type == 'component' && property_exists($object, 'componentId') && property_exists($object, 'uuid') && property_exists($model, $object->uuid)){
+      if($component = \Drupal\cohesion_elements\Entity\Component::load($object->componentId)){
+        $component_json = $component->getDecodedJsonValues(TRUE);
+        if(property_exists($component_json, 'model')){
+          foreach ($component_json->model as $uuid => $element_model){
+            if(is_object($element_model) && property_exists($element_model, 'settings') && is_object($element_model->settings) && property_exists($element_model->settings, 'type') && $element_model->settings->type == 'checkboxToggle' && ($element_model->settings->toggleType == 'string' || $element_model->settings->toggleType == 'number') && is_object($model->{$object->uuid}) && property_exists($model->{$object->uuid}, $uuid)){
+              if($model->{$object->uuid}->{$uuid} == $element_model->settings->trueValue){
+                $model->{$object->uuid}->{$uuid} = TRUE;
+              }elseif($model->{$object->uuid}->{$uuid} == $element_model->settings->falseValue){
+                $model->{$object->uuid}->{$uuid} = FALSE;
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+}
+
+/**
+ * Update callback.
+ *
+ * @param $json_values
+ *
+ * @return mixed
+ */
+function escaping_component_fields($json_values){
+  if(property_exists($json_values, 'componentForm') && property_exists($json_values, 'model')){
+    escape_component_field($json_values->componentForm, $json_values->model);
+  }
+  return $json_values;
+}
+
+/**
+ * See escaping_component_fields().
+ *
+ * @param $object
+ * @param $model
+ */
+function escape_component_field($object, &$model) {
+  if (is_array($object)) {
+    foreach ($object as $key => &$value) {
+      escape_component_field($value, $model);
+    }
+  }
+  elseif (is_object($object)) {
+    if (property_exists($object, 'children')) {
+      escape_component_field($object->children, $model);
+    }
+
+    // Update 'form-input', 'form-textarea' to have escape turned off
+    if (property_exists($object, 'uid') && property_exists($object, 'uuid')  && property_exists($model, $object->uuid)) {
+      if($object->uid == 'form-input' && $model->{$object->uuid}->settings->schema->type == 'string' || $object->uid == 'form-textarea'){
+        $model->{$object->uuid}->settings->schema->escape = FALSE;
+      }
+    }
+  }
+}
+
+/**
+ * @param $json_values
+ * @param $entity_type
+ *
+ * @return mixed
+ */
+function convert_elements_for_flex($json_values, $entity_type = FALSE) {
+  if ($json_values->canvas) {
+    $replace = [
+      'matchHeightRow":{"targetElement":"columnBasic"}' => 'matchHeightRow":{"targetElement":"none"}',
+      'matchHeightRow":{"targetElement":"column"}' => 'matchHeightRow":{"targetElement":"none"}',
+      '"container-basic"' => '"container"',
+      '"Basic container"' => '"Container"',
+      '"Advanced container"' => '"Container"',
+      'coh-container-basic' => 'coh-container',
+      '"container-basic-settings"' => '"container-settings"',
+      '"container-basic-style"' => '"container-style"',
+      '"basicContainer"' => '"container"',
+      '"slide-basic"' => '"slide"',
+      '"Basic slide"' => '"Slide"',
+      '"Advanced slide"' => '"Slide"',
+      '"column-basic"' => '"column"',
+      '"Basic column"' => '"Column"',
+      '"Advanced column"' => '"Column"',
+      'coh-column-basic' => 'coh-column',
+    ];
+
+    $json_values = json_decode(str_replace(array_keys($replace), array_values($replace), json_encode($json_values)));
+  }
+
+  return $json_values;
+}
+
+/**
+ * Update callback.
+ *
+ * @param $json_values
+ * @param $entity_type
+ *
+ * @return mixed
+ */
+function row_for_columns_attributes($json_values, $entity_type = FALSE) {
+  if(property_exists($json_values, 'canvas') && property_exists($json_values, 'model') && property_exists($json_values, 'mapper')){
+    row_for_columns_attributes_element($json_values->canvas, $json_values->model, $json_values->mapper);
+  }
+
+  return $json_values;
+}
+
+/**
+ * See row_for_columns_attributes().
+ *
+ * @param $json_values
+ * @param $model
+ * @param $mapper
+ *
+ * @return mixed
+ */
+function row_for_columns_attributes_element($json_values, &$model, &$mapper) {
+  if(is_object($json_values)){
+    if(property_exists($json_values, 'children') ){
+      row_for_columns_attributes_element($json_values->children, $model, $mapper);
+    }
+
+    if(property_exists($json_values, 'uid') && $json_values->uid == 'row-for-columns' && property_exists($json_values, 'uuid')){
+      if(property_exists($model, $json_values->uuid)) {
+        $model->{$json_values->uuid}->settings->targetContainer = 'outer';
+      }
+      if(property_exists($mapper, $json_values->uuid) && property_exists($mapper->{$json_values->uuid}, 'settings')) {
+        $has_stye_markup_target = FALSE;
+        foreach ($mapper->{$json_values->uuid}->settings->topLevel->formDefinition[0]->children as $child){
+          if($child->formKey == 'row-for-columns-markup-style-target'){
+            $has_stye_markup_target = TRUE;
+          }
+        }
+        if(!$has_stye_markup_target){
+          $mapper->{$json_values->uuid}->settings->topLevel->formDefinition[0]->children[] = [
+            'activeFields' => [
+              [
+                'active' => true,
+                'name' => 'targetContainer',
+              ],
+            ],
+            'breakpoints' => [],
+            'formKey' => 'row-for-columns-markup-style-target',
+          ];
+        }
+      }
+    }
+  }elseif(is_array($json_values)){
+    foreach ($json_values as $element){
+      row_for_columns_attributes_element($element, $model, $mapper);
+    }
+  }
+
+  return $json_values;
+}
+
+/**
+ * Performs a sitewide update to all JSON canavses.
+ * Updates all config entity layout canvas JSON fields and calls
+ * update_layout_canvas_model_element() to update the cohesion_layout entities
+ * on all content entities.
+ *
+ * @param $update_function
+ * @param $type
+ */
+function update_all_canvases($update_function, $type = 'json_values') {
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  // Update all config entities (templates, etc).
+  // Convert CohesionConfigEntityBase entities.
+  foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type => $definition) {
+    if ($definition->entityClassImplements(CohesionSettingsInterface::class)) {
+      if ($entities = \Drupal::service('entity_type.manager')->getStorage($entity_type)->loadMultiple()) {
+        foreach ($entities as $entity) {
+          try {
+            switch ($type){
+              case 'json_mapper':
+                $json_mapper = json_decode($entity->getJsonMapper());
+                if ($json_mapper = call_user_func($update_function, $json_mapper, $definition)) {
+                  $entity->setJsonMapper(json_encode($json_mapper));
+                  $entity->save();
+                }
+                break;
+              default:
+                $json_values = json_decode($entity->getJsonValues());
+                if ($json_values = call_user_func($update_function, $json_values, $definition)) {
+                  $entity->setJsonValue(json_encode($json_values));
+                  $entity->save();
+                }
+                break;
+
+            }
+          }
+          catch (\Exception $e) {
+            continue;
+          }
+        }
+      }
+    }
+  }
+
+
+  // Update all content entities.
+  update_layout_canvas_model_element($update_function, $type);
+}
+
+/**
+ * For all content entities, update the canvas of their cohesion_layout field.
+ *
+ * @param $update_function
+ * @param $type
+ */
+function update_layout_canvas_model_element($update_function, $type = 'json_values'){
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  try {
+    $query = \Drupal::entityQuery('cohesion_layout')->accessCheck(FALSE);
+    $entity_ids_all = $query->execute();
+
+    $entity_data = \Drupal::service('entity_type.manager')->getStorage('cohesion_layout');
+
+    foreach (array_chunk($entity_ids_all, 25) as $entity_ids){
+      if ($entity_data && ($entities = $entity_data->loadMultiple($entity_ids))) {
+        /** @var \Drupal\cohesion_elements\Entity\CohesionLayout $entity */
+        foreach ($entities as $entity) {
+          // Re-save the entity.
+          if ($entity instanceof \Drupal\Tests\Core\Entity\RevisionableEntity && $entity->getRevisionId()) {
+            $entity->setNewRevision(FALSE);
+          }
+          update_element_model_by_entity($entity, $update_function, $type);
+
+          // Update translations
+          $languages = $entity->getTranslationLanguages(FALSE);
+          foreach ($languages as $lang_code => $language) {
+            $translated_entity = $entity->getTranslation($lang_code);
+            // Re-save the entity.
+            if ($translated_entity instanceof \Drupal\Tests\Core\Entity\RevisionableEntity && $translated_entity->getRevisionId()) {
+              $translated_entity->setNewRevision(FALSE);
+            }
+            update_element_model_by_entity($translated_entity, $update_function, $type);
+          }
+        }
+      }
+    }
+
+    // Update revisions
+    $connection = \Drupal::service('database');
+    $offset = 0;
+    $limit = 25;
+    while (true){
+      $query = $connection->query("SELECT id, json_values FROM cohesion_layout_field_revision LIMIT :limit OFFSET :offset", [':limit' => $limit, ':offset' => $offset]);
+      $revisions = $query->fetchAll();
+      if(!empty($revisions)){
+        foreach ($revisions as $revision){
+          switch ($type) {
+            case 'json_mapper':
+              $json_mapper = json_decode($revision->json_mapper);
+              $json_mapper = call_user_func($update_function, $json_mapper);
+              $update = $connection->update('cohesion_layout_field_revision')
+                ->fields([
+                  'json_mapper' => json_encode($json_mapper),
+                ])
+                ->condition('id', $revision->id, '=')
+                ->execute();
+              break;
+            default:
+              $json_values = json_decode($revision->json_values);
+              $json_values = call_user_func($update_function, $json_values);
+              $update = $connection->update('cohesion_layout_field_revision')
+                ->fields([
+                  'json_values' => json_encode($json_values),
+                ])
+                ->condition('id', $revision->id, '=')
+                ->execute();
+              break;
+          }
+        }
+        $offset += $limit;
+      }else{
+        break;
+      }
+    }
+
+  } catch (\Exception $e) {
+
+  }
+}
+
+/**
+ * Update model for by function element
+ *
+ * @param $entity \Drupal\cohesion_elements\Entity\CohesionLayout
+ * @param $update_function
+ * @param $type $type of json json_values | json_mapper
+ */
+function update_element_model_by_entity($entity, $update_function, $type = 'json_values'){
+  switch ($type){
+    case 'json_mapper':
+      $json_mapper = json_decode($entity->getJsonMapper());
+      if ($json_mapper = call_user_func($update_function, $json_mapper)) {
+        $entity->setJsonMapper(json_encode($json_mapper));
+        $entity->save();
+      }
+      break;
+    default:
+      $json_values = $entity->getDecodedJsonValues(TRUE);
+      if(property_exists($json_values, 'canvas') && property_exists($json_values, 'model')){
+        if ($json_values = call_user_func($update_function, $json_values)) {
+          $entity->setJsonValue(json_encode($json_values));
+          $entity->save();
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Update callback.
+ *
+ * @param $json_values
+ *
+ * @return mixed
+ */
+function update_entity_reference_model_by_json_values($json_values){
+  if(property_exists($json_values, 'canvas') && property_exists($json_values, 'model')){
+    $model_ids = get_model_ids_by_element_type($json_values->canvas, $json_values->model, 'entity-reference');
+
+    foreach ($model_ids as $model_id){
+      if(is_object($json_values->model->{$model_id}) && property_exists($json_values->model->{$model_id}, 'settings')){
+
+        if(property_exists($json_values->model->{$model_id}->settings, 'entity_type')){
+          $json_values->model->{$model_id}->settings->entityReference['entity_type'] = $json_values->model->{$model_id}->settings->entity_type;
+          unset($json_values->model->{$model_id}->settings->entity_type);
+        }
+
+        if(property_exists($json_values->model->{$model_id}->settings, 'view_mode')){
+          $json_values->model->{$model_id}->settings->entityReference['view_mode'] = $json_values->model->{$model_id}->settings->view_mode;
+          unset($json_values->model->{$model_id}->settings->view_mode);
+        }
+
+        if(property_exists($json_values->model->{$model_id}->settings, 'entity')){
+          $json_values->model->{$model_id}->settings->entityReference['entity'] = $json_values->model->{$model_id}->settings->entity;
+          unset($json_values->model->{$model_id}->settings->entity);
+        }
+      }
+    }
+  }
+  return $json_values;
+}
+
+/**
+ * See update_entity_reference_model_by_json_values().
+ *
+ * @param $json_values
+ * @param $model
+ * @param $element_type
+ *
+ * @return array
+ */
+function get_model_ids_by_element_type($json_values, $model, $element_type){
+  $model_ids = [];
+  if(is_array($json_values)){
+    foreach ($json_values as $key => $value){
+      $model_ids = array_merge($model_ids, get_model_ids_by_element_type($value, $model, $element_type)) ;
+    }
+  }elseif(is_object($json_values)){
+    if(property_exists($json_values, 'children') ){
+      $model_ids = array_merge($model_ids, get_model_ids_by_element_type($json_values->children, $model, $element_type)) ;
+    }
+
+    if(property_exists($json_values, 'uid') && property_exists($json_values, 'uuid') && $json_values->uid == $element_type && property_exists($model, $json_values->uuid)){
+      $model_ids[] = $json_values->uuid;
+    }
+  }
+
+  return $model_ids;
+}
+
+
+/**
+ * Split model model and mapper from layout canvas
+ */
+function split_model_mapper_entity($entity){
+  $json_values = $entity->getDecodedJsonValues(TRUE);
+  process_json_values_split($json_values);
+
+  $entity->setJsonValue(json_encode($json_values));
+  $entity->save();
+}
+
+/**
+ * @param $json_values
+ *
+ * @return mixed
+ */
+function process_json_values_split(&$json_values){
+  if(is_array($json_values)){
+
+    foreach ($json_values as $key => $value){
+      if(property_exists($json_values[$key], 'canvas') && !empty($json_values[$key]->canvas) && !property_exists($json_values[$key], 'model')){
+        $models = [];
+        $mappers = [];
+
+        walk_json($json_values[$key]->canvas, $models, $mappers);
+
+        $json_values[$key]->model = (object)$models;
+        $json_values[$key]->mapper = (object) $mappers;
+      }
+    }
+  }else{
+    $models = [];
+    $mappers = [];
+
+    if(property_exists($json_values, 'canvas') && !empty($json_values->canvas) && !property_exists($json_values, 'model')){
+      walk_json($json_values->canvas, $models, $mappers);
+    }
+
+    if(property_exists($json_values, 'componentForm') && !empty($json_values->componentForm) && !property_exists($json_values, 'model')){
+      walk_json($json_values->componentForm, $models, $mappers, TRUE);
+    }
+
+    if(!empty($models)){
+      $json_values->model = (object) $models;
+    }
+    if(!empty($mappers)){
+      $json_values->mapper = (object) $mappers;
+    }
+  }
+
+  return $json_values;
+}
+
+/**
+ * Helper.
+ *
+ * @param $elements
+ * @param $models
+ * @param $mappers
+ * @param bool $isComponentForm
+ */
+function walk_json(&$elements, &$models, &$mappers, $isComponentForm = FALSE ){
+  foreach ($elements as &$value){
+    if(property_exists($value, 'uuid')){
+
+      if(property_exists($value, 'model')){
+        $models[$value->uuid] = $value->model;
+        unset($value->model);
+      }
+
+      if(property_exists($value, 'mapper')){
+        // Remove mappers from componentForm
+        if(!$isComponentForm){
+          $mappers[$value->uuid] = $value->mapper;
+        }
+        unset($value->mapper);
+      }
+
+      if(property_exists($value, 'children') && is_array($value->children)){
+        walk_json($value->children, $models, $mappers, $isComponentForm);
+      }
+    }
+  }
+}
+
+/**
+ * Used in various updates.
+ */
+function _update_cohesion_admin_list_views() {
+  $path = \Drupal::service('module_handler')->getModule('cohesion')->getPath();
+  $views_list = array_filter(\Drupal::service('config.factory')
+    ->listAll('views.'), function ($value) {
+    return (in_array(
+      $value, [
+        'views.view.cohesion_components_admin',
+        'views.view.cohesion_helpers_admin',
+        'views.view.cohesion_master_templates_list',
+        'views.view.custom_styles',
+        'views.view.view_templates_list',
+      ]
+    ));
+  });
+
+  foreach ($views_list as $profile_config_id) {
+    $profile_config = \Drupal::service('config.factory')
+      ->getEditable($profile_config_id);
+    if (file_exists(DRUPAL_ROOT . '/' . $path)) {
+      $files = [];
+      $dir = DRUPAL_ROOT . '/' . $path;
+      try {
+        if (is_dir($dir)) {
+          $files = \Drupal::service('file_system')->scanDirectory($dir, "/{$profile_config_id}.yml$/", ['recurse' => TRUE]);
+        }
+      }
+      catch (FileException $e) {
+      }
+
+      $file = reset($files);
+      $data = Yml::decode(file_get_contents($file->uri));
+      if ($data) {
+        $profile_config->merge($data);
+        if ($profile_config->save()) {
+          \Drupal::messenger()->addMessage(t("Success: @config updated", ['@config' => $profile_config->getName(),]));
+        }
+      }
+    }
+  }
+}
+
+/**
+ * See cohesion_install().
+ * @param string stream wrapper $path
+ * @param string $message
+ */
+function _cohesion_create_directory($path, $message = '') {
+  // Clean the Site Studio  directory if this is a reinstall.
+  if (is_dir($path)) {
+    \Drupal::service('file_system')->deleteRecursive($path);
+  }
+
+  // Create the Site Studio  directory.
+  if (\Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY)) {
+    // Skip the message about directory being created if the
+    // module was installed in the Drupal installation process.
+    if (InstallerKernel::installationAttempted()) {
+      return;
+    }
+    \Drupal::messenger()->addMessage(t(":message", [':message' => $message,]));
+  }
+}
