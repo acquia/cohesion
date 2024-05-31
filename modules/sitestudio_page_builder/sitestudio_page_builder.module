@@ -46,7 +46,13 @@ function sitestudio_page_builder_page_attachments_alter(array &$attachments) {
     if (isset($text_editor_attachments['drupalSettings']['editor']['formats'])) {
       foreach ($text_editor_attachments['drupalSettings']['editor']['formats'] as $key => $settings) {
         $format = FilterFormat::load($key);
-        $text_editor_attachments['drupalSettings']['editor']['formats'][$key]['label'] = $format->label();
+
+        // ensure the format isn't null before attaching. Without this, webforms webform_default "private" text format causes fatal error.
+        // Cause by how webforms js_settings alter is called in https://api.drupal.org/api/drupal/core%21modules%21editor%21src%21Plugin%21EditorManager.php/function/EditorManager%3A%3AgetAttachments/10
+        // See https://www.drupal.org/project/webform/issues/3331164
+        if (!is_null($format)) {
+          $text_editor_attachments['drupalSettings']['editor']['formats'][$key]['label'] = $format->label();
+        }
       }
     }
 
