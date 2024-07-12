@@ -1,0 +1,12 @@
+name: Js custom component with custom select
+category: cpt_cat_example
+weight: 1
+js:
+  js_component_with_select.js: {}
+css:
+  js_component_with_select.css: {}
+dependencies:
+  - core/jquery
+  - core/once
+form: form.json
+preview_image: preview.png

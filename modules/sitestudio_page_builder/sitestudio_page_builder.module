@@ -1,0 +1,214 @@
+<?php
+
+/**
+ * @file
+ * Implements hook_page_attachments().
+ */
+
+use Drupal\Component\Utility\Environment;
+use Drupal\entity_reference_revisions\EntityReferenceRevisionsFieldItemList;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\cohesion\Event\CohesionJsAppUrlsEvent;
+use Drupal\filter\Entity\FilterFormat;
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function sitestudio_page_builder_page_attachments_alter(array &$attachments) {
+
+  // If the user has contextual links enabled, attach the component settings
+  // tray overrides.
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  $route = \Drupal::routeMatch()->getRouteObject();
+  $user = \Drupal::currentUser();
+  if (!\Drupal::service('router.admin_context')->isAdminRoute($route) && $user->hasPermission('access visual page builder') && $route_name != 'cohesion_elements.component.preview') {
+    $attachments['#attached']['library'][] = 'sitestudio_page_builder/editor-loader';
+
+    $user_format_ids = array_keys(filter_formats($user));
+    $manager = \Drupal::service('plugin.manager.editor');
+    $definitions = $manager->getDefinitions();
+
+    // Filter the current user's formats to those that support inline editing.
+    $formats = [];
+    foreach ($user_format_ids as $format_id) {
+      if ($editor = editor_load($format_id)) {
+        $editor_id = $editor->getEditor();
+        if (isset($definitions[$editor_id]['supports_inline_editing']) && $definitions[$editor_id]['supports_inline_editing'] === TRUE) {
+          $formats[] = $format_id;
+        }
+      }
+    }
+
+    // Get the attachments for all text editors that the user might use.
+    $text_editor_attachments = $manager->getAttachments($formats);
+
+    // Patch the text format labels ("Full HTML") into the Drupal settings.
+    if (isset($text_editor_attachments['drupalSettings']['editor']['formats'])) {
+      foreach ($text_editor_attachments['drupalSettings']['editor']['formats'] as $key => $settings) {
+        $format = FilterFormat::load($key);
+        $text_editor_attachments['drupalSettings']['editor']['formats'][$key]['label'] = $format->label();
+      }
+    }
+
+    $attachments['#attached'] = array_merge_recursive($attachments['#attached'], $text_editor_attachments);
+
+    // Add the max file size.
+    $attachments['#attached']['drupalSettings']['cohesion']['upload_max_filesize'] = Environment::getUploadMaxSize();
+
+    // Set 'cohesion' to be used as default editor.
+    $attachments['#attached']['drupalSettings']['editor']['default'] = NULL;
+    if (isset($attachments['#attached']['drupalSettings']['editor']['formats']['cohesion'])) {
+      $attachments['#attached']['drupalSettings']['editor']['default'] = 'cohesion';
+    }
+    elseif (isset($attachments['#attached']['drupalSettings']['editor']['formats']) && is_array($attachments['#attached']['drupalSettings']['editor']['formats'])) {
+      $last_format = end($attachments['#attached']['drupalSettings']['editor']['formats']);
+      if ($last_format && isset($last_format['format'])) {
+        $attachments['#attached']['drupalSettings']['editor']['default'] = $last_format['format'];
+      }
+    }
+
+    // Load icon library for admin pages if it has been generated.
+    $icon_lib_path = COHESION_CSS_PATH . '/cohesion-icon-libraries.css';
+    if (file_exists($icon_lib_path)) {
+      $attachments['#attached']['library'][] = 'cohesion/admin-icon-libraries';
+    }
+    // Add the token browser.
+    if (isset($attachments['#token_browser'])) {
+      // Build the token tree (token.module).
+      // Check if it's an array of "allowed" tokens if not put into an array.
+      if (!is_array($token_browser = $attachments['#token_browser'])) {
+        $token_browser = [$attachments['#token_browser']];
+      }
+
+      $token_tree = [
+        '#theme' => 'token_tree_link',
+        '#token_types' => ($attachments['#token_browser'] == 'all') ? 'all' : $token_browser,
+      ];
+
+      // Render it using the service.
+      \Drupal::service('renderer')->render($token_tree);
+      // Attach the bootstrap fix to the form element.
+      $attachments['#attached']['library'][] = 'cohesion/cohesion_token';
+    }
+
+    // Always attach match heights & parallax scrolling for VPB.
+    $attachments['#attached']['library'][] = 'cohesion/global_libraries.matchHeight';
+    $attachments['#attached']['library'][] = 'cohesion/global_libraries.cohMatchHeights';
+    $attachments['#attached']['library'][] = 'cohesion/global_libraries.parallax_scrolling';
+
+  }
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function sitestudio_page_builder_toolbar() {
+  $items = [];
+
+  $admin_context = \Drupal::service('router.admin_context');
+
+  if ($admin_context->isAdminRoute()) {
+    return $items;
+  }
+
+  if (Drupal::service('current_user')->hasPermission('access visual page builder')) {
+    $items['sitestudio'] = [
+      '#type' => 'toolbar_item',
+      '#weight' => -100,
+      '#wrapper_attributes' => [
+        'id' => 'ssa-builder-toggle',
+        'class' => [
+          'hidden',
+          'ssa-builder-toggle',
+        ],
+      ],
+      'tab' => [
+        '#type' => 'html_tag',
+        '#tag' => 'button',
+        '#value' => t('Page builder'),
+        '#attributes' => [
+          'id' => 'coh-builder-btn',
+          'class' => [
+            'toolbar-icon',
+          ],
+        ],
+      ],
+    ];
+  }
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sitestudio_page_builder_theme($existing, $type, $theme, $path) {
+  return [
+    'sitestudio_build' => [
+      'template' => 'sitestudio-build',
+      'base hook' => 'page',
+      'variables' => [
+        'build' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_entity_display_build_alter().
+ */
+function sitestudio_page_builder_entity_display_build_alter(&$build, $context) {
+  $entity = NULL;
+  if (isset($context['entity']) && $context['entity'] instanceof ContentEntityInterface) {
+    $entity = $context['entity'];
+  }
+
+  // Add the page builder data attribute to the canvas element if the user has
+  // the right permission
+  if ($entity && $entity->access('update') && Drupal::service('current_user')->hasPermission('access visual page builder')) {
+    /** @var \Drupal\sitestudio_page_builder\Services\SitestudioPageBuilderManagerInterface $page_builder_manager */
+    $page_builder_manager = Drupal::service('sitestudio_page_builder.manager');
+    foreach ($build as &$element) {
+      if (isset($element['#field_type']) && $element['#field_type'] == 'cohesion_entity_reference_revisions' && $element['#items'] instanceof EntityReferenceRevisionsFieldItemList) {
+        foreach ($element['#items'] as &$item) {
+          /** @var \Drupal\cohesion_elements\Plugin\Field\FieldType\CohesionEntityReferenceRevisionsItem $item */
+          // Page builder is allowed only on page containing components only.
+          // Only add attributes if the entity returned is the current entity.
+          if ($item->getFieldDefinition()->getSetting('access_elements') !== 1 && $page_builder_manager->shouldEnablePageBuilder() === $entity) {
+            $element['#attributes']['data-ssa-canvas'] = 'cohcanvas-' . $item->getValue()['target_id'];
+            $element['#cache']['contexts'][] = 'user.permissions';
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function sitestudio_page_builder_page_attachments(array &$attachments) {
+  $is_admin = \Drupal::service('cohesion.utils')->isAdminTheme();
+  if (!$is_admin && \Drupal::currentUser()->hasPermission('access visual page builder')) {
+    // Url collection for js app
+    $event = new CohesionJsAppUrlsEvent();
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $event_dispatcher->dispatch($event, $event::FRONTEND_URL);
+    $attachments['#attached']['drupalSettings']['cohesion']['urls'] = $event->getUrls();
+
+    // Image browser page attachments.
+    \Drupal::service('cohesion_image_browser.update_manager')->sharedPageAttachments($attachments['#attached'], 'content');
+
+    $attachments['#attached']['drupalSettings']['cohesion']['permissions'] = \Drupal::service('settings.endpoint.utils')->dx8PermissionsList();
+
+    // Get the apiUrls
+    $apiUrls = \Drupal::keyValue('cohesion.assets.static_assets')
+      ->get('api-urls');
+
+    // Patch the custom element data in.
+    $apiUrls = \Drupal::service('custom.elements')->patchApiUrls($apiUrls);
+
+    // And attach.
+    $attachments['#attached']['drupalSettings']['cohesion']['api_urls'] = $apiUrls;
+  }
+}
