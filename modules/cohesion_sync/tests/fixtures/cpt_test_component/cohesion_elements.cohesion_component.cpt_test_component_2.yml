@@ -1,0 +1,168 @@
+uuid: e80ac43d-de3c-44d9-81a5-1ba4318f3270
+langcode: en
+status: true
+dependencies:
+  config:
+    - cohesion_elements.cohesion_component.cpt_test_component
+    - cohesion_elements.cohesion_component_category.cpt_cat_test
+label: 'Test Component 2'
+id: cpt_test_component_2
+json_values: |
+  {
+      "canvas": [
+          {
+              "uid": "cpt_test_component",
+              "type": "component",
+              "title": "Test Component",
+              "enabled": true,
+              "category": "category-5",
+              "componentId": "cpt_test_component",
+              "componentType": "image",
+              "uuid": "7e776203-1db6-4982-b037-9cdb7b251ebb",
+              "parentUid": "root",
+              "status": {},
+              "children": []
+          },
+          {
+              "type": "item",
+              "uid": "drupal-menu",
+              "title": "Menu",
+              "status": {
+                  "collapsed": true
+              },
+              "uuid": "cb39fb90-f0e4-4f3d-87f9-4f13d80b743d",
+              "parentUid": "root",
+              "children": []
+          },
+          {
+              "type": "item",
+              "uid": "entity-reference",
+              "title": "Entity reference",
+              "status": {
+                  "collapsed": true
+              },
+              "uuid": "c5c913c2-2a9b-495e-9fb6-ea3344f2ade0",
+              "parentUid": "root",
+              "children": []
+          },
+          {
+              "type": "item",
+              "uid": "entity-browser",
+              "title": "Entity browser",
+              "status": {
+                  "collapsed": true
+              },
+              "uuid": "6a25a842-8285-4c9a-b0a8-3aa524151b70",
+              "parentUid": "root",
+              "children": []
+          }
+      ],
+      "componentForm": [],
+      "mapper": {
+          "6a25a842-8285-4c9a-b0a8-3aa524151b70": {},
+          "c5c913c2-2a9b-495e-9fb6-ea3344f2ade0": {},
+          "cb39fb90-f0e4-4f3d-87f9-4f13d80b743d": {}
+      },
+      "model": {
+          "7e776203-1db6-4982-b037-9cdb7b251ebb": {},
+          "cb39fb90-f0e4-4f3d-87f9-4f13d80b743d": {
+              "settings": {
+                  "title": "Menu",
+                  "settings": {
+                      "settings": {
+                          "menu": {
+                              "id": "",
+                              "template": ""
+                          }
+                      },
+                      "menu": {
+                          "id": "main",
+                          "template": ""
+                      }
+                  }
+              },
+              "contextVisibility": {
+                  "condition": "ALL"
+              },
+              "styles": {
+                  "settings": {
+                      "element": "drupal-menu"
+                  }
+              }
+          },
+          "c5c913c2-2a9b-495e-9fb6-ea3344f2ade0": {
+              "settings": {
+                  "title": "Entity reference",
+                  "entityReference": {
+                      "entity_type": "node",
+                      "view_mode": "full",
+                      "entity": "e11b292a-d596-4fad-adf7-f4564974d9a1"
+                  }
+              },
+              "context-visibility": {
+                  "contextVisibility": {
+                      "condition": "ALL"
+                  }
+              },
+              "styles": {
+                  "settings": {
+                      "element": "entity-reference"
+                  }
+              }
+          },
+          "6a25a842-8285-4c9a-b0a8-3aa524151b70": {
+              "settings": {
+                  "title": "Entity browser",
+                  "entity": {
+                      "entityBrowserType": "typeahead",
+                      "entityType": "node",
+                      "entity": {
+                          "entityType": "node",
+                          "entityId": "e11b292a-d596-4fad-adf7-f4564974d9a1"
+                      },
+                      "bundles": {
+                          "page": true
+                      }
+                  },
+                  "entityViewMode": "node.full"
+              },
+              "context-visibility": {
+                  "contextVisibility": {
+                      "condition": "ALL"
+                  }
+              },
+              "styles": {
+                  "settings": {
+                      "element": "entity-browser"
+                  }
+              }
+          }
+      },
+      "previewModel": {
+          "6a25a842-8285-4c9a-b0a8-3aa524151b70": {},
+          "c5c913c2-2a9b-495e-9fb6-ea3344f2ade0": {},
+          "cb39fb90-f0e4-4f3d-87f9-4f13d80b743d": {}
+      },
+      "variableFields": {
+          "6a25a842-8285-4c9a-b0a8-3aa524151b70": [],
+          "c5c913c2-2a9b-495e-9fb6-ea3344f2ade0": [],
+          "cb39fb90-f0e4-4f3d-87f9-4f13d80b743d": []
+      },
+      "disabledNodes": [],
+      "meta": {
+          "lastModifiedEl": "7e776203-1db6-4982-b037-9cdb7b251ebb",
+          "fieldHistory": []
+      }
+  }
+json_mapper: '{}'
+last_entity_update: entityupdate_0035
+locked: false
+modified: true
+selectable: true
+category: cpt_cat_test
+preview_image: ''
+has_quick_edit: null
+entity_type_access: {  }
+bundle_access: {  }
+twig_template: component--cohesion-cpt-test-component-2
+weight: 0

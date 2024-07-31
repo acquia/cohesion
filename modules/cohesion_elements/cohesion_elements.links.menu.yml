@@ -1,0 +1,87 @@
+# Components
+cohesion.settings.components:
+  title: 'Components'
+  description: 'Manage your components and categories.'
+  route_name: cohesion.settings.components
+  parent: cohesion.settings
+  weight: 51
+
+entity.cohesion_component.collection:
+  title: 'Components'
+  description: 'Manage your components.'
+  route_name: entity.cohesion_component.collection
+  parent: cohesion.settings.components
+  weight: 0
+
+entity.cohesion_component.collection.add_page:
+  title: 'Add component'
+  description: 'Add a new component.'
+  route_name: entity.cohesion_component.add_form
+  parent: entity.cohesion_component.collection
+  weight: 0
+
+entity.component_content.collection:
+  title: 'Component content'
+  description: 'Manage your component content.'
+  route_name: entity.component_content.collection
+  parent: cohesion.settings.components
+  weight: 1
+
+entity.component_content.add_page:
+  title: 'Add component content'
+  description: 'Add a new component content.'
+  route_name: cohesion_elements.component_content.add_page
+  parent: entity.component_content.collection
+  weight: 2
+
+entity.cohesion_component_category.collection:
+  title: 'Categories'
+  description: 'Manage your component categories.'
+  route_name: entity.cohesion_component_category.collection
+  parent: cohesion.settings.components
+  weight: 2
+
+# Helpers.
+cohesion.settings.helpers:
+  title: 'Helpers'
+  description: 'Manage your helpers and categories.'
+  route_name: cohesion.settings.helpers
+  parent: cohesion.settings
+  weight: 52
+
+entity.cohesion_helper.collection:
+  title: 'Helpers'
+  description: 'Manage your helpers.'
+  route_name: entity.cohesion_helper.collection
+  parent: cohesion.settings.helpers
+  weight: 0
+
+entity.cohesion_helper.collection.add_page:
+  title: 'Add helper'
+  description: 'Add a new helper'
+  route_name: entity.cohesion_helper.add_form
+  parent: entity.cohesion_helper.collection
+  weight: 0
+
+entity.cohesion_helper_category.collection:
+  title: 'Categories'
+  description: 'Manage your helper categories.'
+  route_name: entity.cohesion_helper_category.collection
+  parent: cohesion.settings.helpers
+  weight: 2
+
+# Custom components form builder
+cohesion_elements.custom_component.form_builder:
+  title: 'Custom component builder'
+  description: 'Builder UI for custom components.'
+  route_name: cohesion_elements.custom_component.builder
+  parent: cohesion.settings.components
+  weight: 3
+
+# Toggle default elements.
+cohesion_elements.configuration.elements_toggle_settings:
+  title: 'Element toggle settings'
+  description: 'Manage enabling and disabling of elements'
+  route_name: cohesion_elements.configuration.elements_toggle_settings
+  parent: cohesion.configuration.elements_settings
+  weight: 2
