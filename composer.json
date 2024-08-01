@@ -1,0 +1,45 @@
+{
+    "name": "acquia/cohesion",
+    "description": "Site Studio",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Acquia Engineering",
+            "homepage": "https://www.acquia.com",
+            "role": "Maintainer"
+        }
+    ],
+    "type": "drupal-module",
+    "require": {
+        "ext-json": "*",
+        "cweagans/composer-patches": "^1.7",
+        "drupal/entity_reference_revisions": "^1.11",
+        "drupal/imce": "^3.1",
+        "drupal/token": "^1.14",
+        "drupal/jquery_ui": "^1.7",
+        "drupal/stable": "^2.0 || ^2.1",
+        "drush/drush": "^11.6 || ^12 || ^13"
+    },
+    "require-dev": {
+        "drupal/core-dev": "^10 || ^11",
+        "acquia/coding-standards": "^3.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "e0ipso/shaper": "^1.2"
+    },
+    "suggest": {
+        "drupal/admin_toolbar": "Provides a better UX for the standard admin toolbar",
+        "drupal/context": "Provides a UI for contexts.",
+        "drupal/google_analytics": "Provides integration with Google Analytics",
+        "drupal/menu_item_extras": "Make the Menu Link Content entity fully fieldable.",
+        "drupal/menu_link_attributes": "This module allows you to add attributes to your menu links or their wrapping <li> elements.",
+        "drupal/request_data_conditions": "Defines a set of conditions via the Drupal 8 Conditions Plugin API for use with the context module",
+        "drupal/search_api": "Provides a framework for easily creating searches on any entity known to Drupal, using any kind of search engine.",
+        "drupal/views_infinite_scroll": "Provides infinite scroll functionality to Views",
+        "drupal/webform": "This module allows you to use webforms.",
+        "drupal/node_revision_delete": "Provides tools to help manage node revisions and keep your database to a reasonable size."
+    },
+    "extra": {
+        "enable-patching": true
+    },
+    "minimum-stability": "dev"
+}
