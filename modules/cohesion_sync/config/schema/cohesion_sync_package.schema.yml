@@ -1,0 +1,38 @@
+cohesion_sync.package.*:
+  type: config_entity
+  label: 'Sync package config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Name'
+    description:
+      type: label
+      label: 'Description'
+    excluded_entity_types:
+      type: string
+      label: 'List of entity type ids (JSON)'
+    settings:
+      type: string
+      label: 'List of entity requirements (JSON)'
+cohesion_sync.cohesion_sync_package.*:
+  type: config_entity
+  label: 'Sync package config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Name'
+    description:
+      type: label
+      label: 'Description'
+    excluded_entity_types:
+      type: string
+      label: 'List of entity type ids (JSON)'
+    settings:
+      type: string
+      label: 'List of entity requirements (JSON)'
