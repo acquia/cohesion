@@ -7,6 +7,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\user\Entity\Role;
 
 /**
  *
@@ -702,9 +703,16 @@ class SettingsEndpointUtils {
    * @return array
    */
   private function dx8PermissionsByRole($role) {
-    // User 1 is always administrator.
-    if (\Drupal::currentUser()->id() == 1) {
-      $role = 'administrator';
+    $roles = Role::loadMultiple();
+    $admin_role = '';
+
+    // @todo how to handle if there is no designated "administrator_role".
+    foreach ($roles as $user_role) {
+      // Check if the role is an admin role.
+      if ($user_role->isAdmin()) {
+        $admin_role = $user_role->id();
+        break;
+      }
     }
 
     $cache_key = __FUNCTION__ . $role;
@@ -737,7 +745,7 @@ class SettingsEndpointUtils {
           }
         }
 
-        $dx8_permissions = $role == 'administrator' ? $dx8_permissions : array_values(array_intersect($results, $dx8_permissions));
+        $dx8_permissions = $role == $admin_role ? $dx8_permissions : array_values(array_intersect($results, $dx8_permissions));
 
         // Store these results in the cache. Invalidate this cache when the role
         // changes permissions.
