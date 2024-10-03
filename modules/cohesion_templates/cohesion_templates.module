@@ -235,6 +235,8 @@ function cohesion_templates_views_pre_view(ViewExecutable $view, $display_id, ar
  * @return array Ids of candidates
  */
 function _cohesion_templates_get_template_candidate(ContentEntityInterface $entity, $view_mode) {
+  $cached_candidates = &drupal_static(__FUNCTION__, []);
+
   $bundle = $entity->bundle();
   // Get the template set as default if no template selector has been added to
   // the bundle.
@@ -256,6 +258,11 @@ function _cohesion_templates_get_template_candidate(ContentEntityInterface $enti
     ->condition('view_mode', $view_mode)
     ->condition('status', TRUE)
     ->condition('modified', TRUE);
+  $cid = [
+    $entity->getEntityTypeId(),
+    $bundle,
+    $view_mode,
+  ];
 
   $query_condition = \Drupal::service('entity_type.manager')->getStorage('cohesion_content_templates')->getQuery()
     ->orConditionGroup()
@@ -263,16 +270,22 @@ function _cohesion_templates_get_template_candidate(ContentEntityInterface $enti
 
   if ($chosen_template !== FALSE && $chosen_template !== '__default__') {
     $query_condition->condition('id', $chosen_template);
+    $cid[] = $chosen_template;
   }
 
-  // Execute the query to select the correct template.
-  // Non default template first, if applicable, and limit to one template.
-  $candidate_template_ids = $candidate_template_query->condition($query_condition)
-  // Global view-mode templates should be last.
-    ->sort('default', 'DESC')
-  // We only need to find the first template, as we know they all exist.
-    ->sort('bundle', 'DESC')
-    ->execute();
+  // Only execute the entity query if we don't have the results cached.
+  $cid = implode(':', $cid);
+  if (!isset($cached_candidates[$cid])) {
+    // Execute the query to select the correct template.
+    // Non default template first, if applicable, and limit to one template.
+    $cached_candidates[$cid] = $candidate_template_query->condition($query_condition)
+      // Global view-mode templates should be last.
+      ->sort('default', 'DESC')
+      // We only need to find the first template, as we know they all exist.
+      ->sort('bundle', 'DESC')
+      ->execute();
+  }
+  $candidate_template_ids = $cached_candidates[$cid];
 
   return [
     'chosen_template' => $chosen_template,
