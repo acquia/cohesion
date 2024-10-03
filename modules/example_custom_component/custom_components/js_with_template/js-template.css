@@ -1,0 +1,23 @@
+.js-with-template {
+    width: 30%;
+    padding: 10px;
+    margin: 5px;
+    background-color: #F2F2F2;
+    line-height: normal;
+}
+
+.js-with-template h2 {
+    font-size: 30px;
+}
+
+.js-with-template .js-title {
+    width: 100%;
+    font-size: 25px;
+    background-color: #E1E1E1;
+    padding: 10px;
+}
+
+.js-with-template .js-dropzone {
+    background-color: #E1E1E1;
+    padding: 10px;
+}

@@ -1,0 +1,102 @@
+<?php
+
+use Drupal\cohesion_website_settings\Entity\WebsiteSettings;
+use Drupal\Core\File\FileSystemInterface;
+
+/**
+ * Remove legacy scss_variables website settings entity.
+ */
+function cohesion_website_settings_update_8501(&$sandbox) {
+  // If the legacy entity exists.
+  if ($entity = WebsiteSettings::load('scss_variables')) {
+    // Remove it.
+    $entity->delete();
+  }
+
+}
+
+/**
+ * Move uploaded fonts to the cohesion folder
+ */
+function cohesion_website_settings_update_8800(&$sandbox) {
+
+  /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+  $file_system = \Drupal::service('file_system');
+  $cohesion_dir = COHESION_FILESYSTEM_URI;
+
+  if ($file_system->prepareDirectory($cohesion_dir, FileSystemInterface::CREATE_DIRECTORY)) {
+    $font_libraries = \Drupal\cohesion_website_settings\Entity\FontLibrary::loadMultiple();
+    foreach ($font_libraries as $font_library) {
+      $json_values = $font_library->getDecodedJsonValues();
+
+      if (isset($json_values['fontFiles']) && is_array($json_values['fontFiles'])) {
+        foreach ($json_values['fontFiles'] as $fontFile) {
+          if (is_array($fontFile) && isset($fontFile['uri']) && file_exists($fontFile['uri'])) {
+
+            $file_name = $file_system->basename($fontFile['uri']);
+
+            if ($file_system->getDestinationFilename(COHESION_FILESYSTEM_URI . $file_name, FileSystemInterface::EXISTS_ERROR)) {
+              try {
+
+                $new_uri = $file_system->copy($fontFile['uri'], COHESION_FILESYSTEM_URI . $file_name, FileSystemInterface::EXISTS_ERROR);
+
+                $files = \Drupal::entityTypeManager()
+                  ->getStorage('file')
+                  ->loadByProperties(['uri' => $fontFile['uri']]);
+                if ($file = reset($files)) {
+                  /** @var \Drupal\file\Entity\File $file */
+                  $file->setFileUri($new_uri);
+                  $file->save();
+                }
+              } catch (\Drupal\Core\File\Exception\FileExistsException $e) {
+              }
+            }
+          }
+        }
+      }
+    }
+
+    $icon_libraries = \Drupal\cohesion_website_settings\Entity\IconLibrary::loadMultiple();
+    foreach ($icon_libraries as $icon_library) {
+      $json_values = $icon_library->getDecodedJsonValues();
+
+      if (isset($json_values['fontFiles']) && is_array($json_values['fontFiles'])) {
+        foreach ($json_values['fontFiles'] as $fontFile) {
+          if (is_array($fontFile) && isset($fontFile['uri']) && file_exists($fontFile['uri'])) {
+            $file_name = $file_system->basename($fontFile['uri']);
+
+            if ($file_system->getDestinationFilename(COHESION_FILESYSTEM_URI . $file_name, FileSystemInterface::EXISTS_ERROR)) {
+              try {
+                $new_uri = $file_system->copy($fontFile['uri'], COHESION_FILESYSTEM_URI . $file_name, FileSystemInterface::EXISTS_ERROR);
+
+                $files = \Drupal::entityTypeManager()
+                  ->getStorage('file')
+                  ->loadByProperties(['uri' => $fontFile['uri']]);
+                if ($file = reset($files)) {
+                  /** @var \Drupal\file\Entity\File $file */
+                  $file->setFileUri($new_uri);
+                  $file->save();
+                }
+              } catch (\Drupal\Core\File\Exception\FileExistsException $e) {
+              }
+            }
+          }
+        }
+      }
+
+      if (isset($json_values['iconJSON']['json']) && file_exists($json_values['iconJSON']['json'])) {
+        $file_name = $file_system->basename($json_values['iconJSON']['json']);
+        if ($file_system->getDestinationFilename(COHESION_FILESYSTEM_URI . $file_name, FileSystemInterface::EXISTS_ERROR)) {
+          try {
+            $file_system->copy($json_values['iconJSON']['json'], COHESION_FILESYSTEM_URI . $file_name, FileSystemInterface::EXISTS_ERROR);
+          } catch (\Drupal\Core\File\Exception\FileExistsException $e) {
+          }
+        }
+      }
+    }
+  }
+  else {
+    throw new \Drupal\Core\File\Exception\DirectoryNotReadyException("The cohesion directory ('$cohesion_dir') cannot be created or is not writable. This may be caused by a problem with file or directory permissions.");
+  }
+
+}
