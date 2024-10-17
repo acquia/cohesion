@@ -1,0 +1,13 @@
+name: Custom component JS with template
+category: cpt_cat_hero_components
+weight: 2
+js:
+  js-template.js: {}
+css:
+  js-template.css: {}
+dependencies:
+  - core/jquery
+  - core/once
+form: form.json
+html: html-template.html
+preview_image: preview.png

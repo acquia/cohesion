@@ -1,0 +1,554 @@
+cohesion.settings:
+  path: '/admin/cohesion'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionController::index'
+    _title: 'Site Studio'
+  requirements:
+    _permission: 'administer cohesion'
+
+cohesion.developer:
+  path: '/admin/cohesion/developer'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\AdministrationController::index'
+    _title: 'Developer tool'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.settings.styles:
+  path: '/admin/cohesion/styles'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionController::index'
+    _title: 'Styles'
+  requirements:
+    _permission: 'administer base styles+administer custom styles+administer style helpers'
+
+cohesion.configuration:
+  path: '/admin/cohesion/configuration'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\AdministrationController::index'
+    _title: 'Configuration'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.batch:
+  path: '/admin/cohesion/configuration/batch'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\AdministrationController::batchAction'
+    _title: 'Site Studio assets import and create entities'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.account_settings:
+  path: '/admin/cohesion/configuration/account-settings'
+  defaults:
+    _form: '\Drupal\cohesion\Form\AccountSettingsForm'
+    _title: 'Account settings'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.google_map_api_key:
+  path: '/admin/cohesion/configuration/google-map-api-key'
+  defaults:
+    _form: '\Drupal\cohesion\Form\GoogleMapApiKeyForm'
+    _title: 'Google Maps API key'
+  requirements:
+    _custom_access: 'Drupal\cohesion\Form\GoogleMapApiKeyForm::access'
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.elements_settings:
+  path: '/admin/cohesion/configuration/elements-settings'
+  defaults:
+    _title: 'Elements settings'
+    _controller: '\Drupal\cohesion\Controller\AdministrationController::index'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.elements_permission_settings:
+  path: '/admin/cohesion/configuration/element-permission-settings'
+  defaults:
+    _form: '\Drupal\cohesion\Form\ElementsSettingsForm'
+    _title: 'Element permission settings'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.system_settings:
+  path: '/admin/cohesion/configuration/system-settings'
+  defaults:
+    _form: '\Drupal\cohesion\Form\SystemSettingsForm'
+    _title: 'System settings configuration'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.rebuild:
+  path: '/admin/cohesion/developer/rebuild'
+  defaults:
+    _form: '\Drupal\cohesion\Form\CohesionResetStylesheetForm'
+    _title: 'Rebuild'
+  requirements:
+    _permission: 'administer cohesion settings'
+
+cohesion.configuration.frontend_settings:
+  path: '/admin/cohesion/developer/front-end-settings'
+  defaults:
+    _form: '\Drupal\cohesion\Form\FrontEndSettingsForm'
+    _title: 'Front-end settings configuration'
+  requirements:
+    _permission: 'administer front end settings'
+
+# Data endpoints
+cohesion.error_logger:
+  path: '/cohesionapi/logger/jserrors'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionController::errorLogger'
+  methods:  [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Validate a pseudo, modifier, class name via the API.
+drupal_data_endpoint.validate_pmc:
+  path: '/cohesionapi/validate_pmc'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\ValidatePMCEndpoint::index'
+    _title: "Validate PMC"
+  methods:  [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Offload some expensive processing to the API.
+drupal_data_endpoint.parse_json:
+  path: '/cohesionapi/parse/{command}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\ParseJsonEndpoint::index'
+    _title: "Parse Json"
+  methods:  [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Build style preview css via the API.
+drupal_data_endpoint.preview_style:
+  path: '/cohesionapi/build-style/{entity_type_id}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\PreviewStyleEndpoint::index'
+    _title: "Build preview CSS"
+  methods:  [POST]
+  requirements:
+    _permission: 'administer base styles+administer custom styles+administer style helpers'
+    _content_type_format: json
+
+#
+# Drupal related cohesion endpoints
+#
+
+# Regions
+drupal_data_endpoint.regions:
+  path: '/cohesionapi/regions/{theme}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getThemeRegions'
+    _title: "Theme regions list"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    theme: ^[a-zA-Z0-9_]+
+
+# Themes
+drupal_data_endpoint.themes:
+  path: '/cohesionapi/themes'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getThemes'
+    _title: "Themes list"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+# Contexts
+drupal_data_endpoint.contexts:
+  path: '/cohesionapi/contexts'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getContexts'
+    _title: "Context list endpoint"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+# Blocks
+drupal_data_endpoint.blocks:
+  path: '/cohesionapi/blocks/{theme}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getBlocks'
+    _title: "Blocks"
+    theme: 'all'
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+# Blocks
+drupal_data_endpoint.entity_type:
+  path: '/cohesionapi/entity_types'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getEntityTypes'
+    _title: "Entity type"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+# Autocomplete
+drupal_data_endpoint.autocomplete:
+  path: '/cohesionapi/autocomplete/{entity_type}/{selection_handler}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::runAutoComplete'
+    _title: "Context list endpoint"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+drupal_data_endpoint.link_entity_types:
+  path: '/cohesionapi/link-entity-types'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::linkEntityTypes'
+    _title: "Link entity types for autocomplete"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _access: 'TRUE'
+    _content_type_format: json
+
+drupal_data_endpoint.link_autocomplete:
+  path: '/cohesionapi/link-autocomplete'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::linkAutoComplete'
+    _title: "Link to entity autocomplete"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Menus
+drupal_data_endpoint.menus:
+  path: '/cohesionapi/menus'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getMenus'
+    _title: "Menus"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Image styles
+drupal_data_endpoint.image_styles:
+  path: '/cohesionapi/image_styles'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getImageStyles'
+    _title: "Image styles"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Entity browser
+drupal_data_endpoint.entity_browsers:
+  path: '/cohesionapi/entity_browsers'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getEntityBrowsers'
+    _title: "Entity Browsers"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Entity types bundles
+drupal_data_endpoint.entity_type_bundles:
+  path: '/cohesionapi/entity_types/{entity_type}/bundles'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getEntityTypesBundles'
+    _title: "Entity Types Bundles"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Entity browser url
+drupal_data_endpoint.entity_browser_url:
+  path: '/cohesionapi/entity_browser_url'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalEndpointController::getEntityBrowserUrl'
+    _title: "Entity Browser URL"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#
+# Drupal views related cohesion endpoints
+#
+
+#  View modes
+drupal_data_endpoint.view_modes_entity_type:
+  path: '/cohesionapi/view-modes/{entity_type}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getEntityViewModes'
+    _title: "Entity view modes"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  View modes all
+drupal_data_endpoint.view_modes:
+  path: '/cohesionapi/view-modes'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getViewModes'
+    _title: "view modes"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  View modes
+drupal_data_endpoint.view_bundles:
+  path: '/cohesionapi/view_bundles/{entity_type}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getEntityViewBundles'
+    _title: "Entity bundles for views"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  Get Views
+drupal_data_endpoint.views:
+  path: '/cohesionapi/views'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getViews'
+    _title: "Views"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  Get Views displays
+drupal_data_endpoint.views_displays:
+  path: '/cohesionapi/views/displays/{view}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getViewsData'
+    _title: "Views displays"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  Get View exposed filters
+drupal_data_endpoint.views_exposed_filters:
+  path: '/cohesionapi/views/exposed_filters/{view}/{display}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getViewsData'
+    _title: "Views filters"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  Get View exposed filters options
+drupal_data_endpoint.views_exposed_filter_options:
+  path: '/cohesionapi/views/exposed_filters/{view}/{display}/{filter}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getViewsData'
+    _title: "Views filter options"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  Get View pager
+drupal_data_endpoint.views_pager:
+  path: '/cohesionapi/views/pager/{view}/{display}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionDrupalViewEndpointController::getViewPager'
+    _title: "Views pager"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+
+#
+# Site Studio endpoints
+#
+ajax_machine_name.transliterate:
+  path: '/ajax_machine_name/transliterate'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\MachineNameController::transliterate'
+  requirements:
+    _permission: 'access content'
+
+#  Columns
+drupal_data_endpoint.columns:
+  path: '/cohesionapi/columns'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getBreakPointColumns'
+    _title: "Columns"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+drupal_data_endpoint.columns_push_pull_offset:
+  path: '/cohesionapi/columns/push_pull_offset'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getBreakPointColumns'
+    _title: "Columns"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+#  Element group info
+drupal_data_endpoint.element_group_info:
+  path: '/cohesionapi/element-group-info'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getElementGroupInfo'
+    _title: "Element group info"
+    entity_type: 'cohesion_helper'
+    entity_type_access: 'all'
+    bundle_access: 'all'
+    element_id: ''
+    componentPath: ''
+    access_elements: ''
+  methods:  [GET]
+  requirements:
+    _custom_access: '\Drupal\cohesion\Controller\CohesionEndpointController::getElementGroupInfoAccess'
+    entity_type: ^[a-zA-Z0-9_]+
+    entity_type_access: ^[a-zA-Z0-9_]+
+    bundle_access: ^[a-zA-Z0-9_]+
+    _content_type_format: json
+
+
+
+#  Components model
+drupal_data_endpoint.component_model:
+  path: '/cohesionapi/cohesion-component/{uid}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getComponent'
+    _title: "Component model"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+#  Components form model - used for in-place editing
+drupal_data_endpoint.component_field_form_model:
+  path: '/cohesionapi/cohesion-component/{uid}/{fieldUuid}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getComponentFieldFormModel'
+    _title: "Component model"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+#  Helper model
+drupal_data_endpoint.helper_model:
+  path: '/cohesionapi/cohesion-helper-updated/{uid}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getCanvasUpdateHelper'
+    _title: "Helper model"
+    uid: ''
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+#  Components model
+drupal_data_endpoint.component_models:
+  path: '/cohesionapi/cohesion-components'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getComponents'
+    _title: "Component models"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+#  Entity field
+cohesion.entity_fields:
+  path: '/cohesionapi/entity-field/{entity_type}/{entity_bundle}'
+  defaults:
+      _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getEntityFields'
+  requirements:
+    _permission: 'administer cohesion'
+  _format: json
+
+# Save helpers and components
+drupal_data_endpoint.element_save:
+  path: '/cohesionapi/element-save'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::elementSave'
+    _title: "Save an element"
+  methods:  [POST]
+  requirements:
+    _permission: 'administer components+administer helpers'
+    _content_type_format: json
+
+#  Site Studio style/layout builder select options
+drupal_data_endpoint.select_options:
+  path: '/cohesionapi/select-options'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getSelectOptions'
+    _title: "Site Studio style/layout builder select options"
+  methods:  [GET,POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Get an entity preview URI from an entity/field reference string.
+drupal_data_endpoint.entity-preview:
+  path: '/cohesionapi/entity-preview/{reference}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getEntityPreviewPath'
+    _title: "Get preview URI from Entity."
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Get an entity reference string AND preview URI from an entity/field reference string.
+drupal_data_endpoint.uri-to-entity-reference:
+  path: '/cohesionapi/uri-to-entity-reference'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getUriToEntityReference'
+    _title: "Get entity reference string AND preview URI from Entity."
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Get components or helpers categories
+cohesion_elements.categories:
+  path: '/cohesionapi/element_categories/{element_type}'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getCategories'
+    _title: "Get list of categories for save modal."
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+# Get unique list of color tags.
+cohesion_website_settings.color_tags:
+  path: '/cohesionapi/colors/tags'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\CohesionEndpointController::getColorTags'
+    _title: "Get unique list of color tags."
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+sitestudio-page-builder.layout_canvas.frontend_edit_component:
+  path: '/admin/cohesion/components/sidebar-edit'
+  defaults:
+    _form: '\Drupal\cohesion\Form\CohesionSidebarEditForm'
+    _title: 'Edit cohesion layout'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    no_cache: 'TRUE'

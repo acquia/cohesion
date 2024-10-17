@@ -1,0 +1,12 @@
+uuid: 86c23159-49b5-4156-8fd8-a180e7a3cd84
+langcode: en
+status: true
+dependencies: {  }
+id: default_font_settings
+label: 'Default font settings'
+json_values: '{}'
+json_mapper: '{}'
+last_entity_update: entityupdate_0033
+locked: false
+modified: false
+selectable: true

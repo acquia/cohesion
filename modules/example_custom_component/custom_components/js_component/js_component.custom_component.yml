@@ -1,0 +1,12 @@
+name: Js custom component
+category: cpt_cat_example
+weight: 1
+js:
+  js_component.js: {}
+css:
+  js_component.css: {}
+dependencies:
+  - core/jquery
+  - core/once
+form: form.json
+preview_image: preview.png

@@ -1,0 +1,8 @@
+name: Site Studio Legacy CKEditor
+type: module
+description: 'Provides support for deprecated CKEditor 4 module, if contrib or core module for CKEditor 4 is installed. Recommended as a temporary solution only.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion
+  - ckeditor:ckeditor

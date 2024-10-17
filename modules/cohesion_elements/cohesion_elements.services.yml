@@ -1,0 +1,63 @@
+services:
+  custom.elements:
+    class: Drupal\cohesion_elements\CustomElementsService
+    arguments: ['@plugin.manager.custom_elements']
+    tags:
+      - { name: custom.elements, scheme: cohesion_elements }
+
+  plugin.manager.custom_elements:
+      class: Drupal\cohesion_elements\CustomElementPluginManager
+      parent: default_plugin_manager
+
+  custom.components:
+    class: Drupal\cohesion_elements\CustomComponentsService
+    arguments:
+      - '@entity_type.manager'
+      - '@cohesion_elements.custom_component.discovery'
+      - '@cohesion_elements.category_relationships'
+      - '@cache.default'
+      - '@renderer'
+    tags:
+      - { name: custom.components, scheme: cohesion_elements }
+
+  cohesion_elements.category_relationships:
+    class: Drupal\cohesion_elements\CategoryRelationshipsManager
+    arguments: ['@entity_type.manager']
+
+  cohesion_elements.eventsubscriber.frontend_url:
+    class: '\Drupal\cohesion_elements\EventSubscriber\CohesionElementsEventSubscriber'
+    arguments:
+      - '@current_user'
+      - '@current_route_match'
+      - '@entity_field.manager'
+    tags:
+      - { name: 'event_subscriber' }
+
+  logger.channel.custom_component:
+    parent: logger.channel_base
+    arguments: ['custom_component']
+
+  cohesion_elements.custom_component.discovery:
+    class: \Drupal\cohesion_elements\CustomComponentDiscovery
+    arguments:
+      - '%app.root%'
+      - '@module_handler'
+      - '@theme_handler'
+      - '@logger.channel.custom_component'
+    tags:
+      - { name: plugin_manager_cache_clear }
+
+  cohesion_element_usage.manager:
+    class: Drupal\cohesion_elements\ElementUsageManager
+    arguments: [
+      '@database',
+      '@entity.repository',
+      '@entity_type.manager',
+      '@logger.factory',
+      '@renderer',
+      '@datetime.time',
+      '@queue',
+      '@config.factory',
+      '@settings.endpoint.utils',
+      '@keyvalue'
+    ]

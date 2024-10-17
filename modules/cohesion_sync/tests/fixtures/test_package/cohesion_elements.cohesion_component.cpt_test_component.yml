@@ -1,0 +1,168 @@
+uuid: f56182e6-4c55-417f-8acf-b436ff755ac2
+langcode: en
+status: true
+dependencies:
+  config:
+    - cohesion_elements.cohesion_component_category.cpt_cat_test_category
+  content:
+    - 'file:file:f912fea9-fd41-4f12-bee2-90f6a27219bf'
+id: cpt_test_component
+label: 'Test Component'
+json_values: |
+  {
+      "canvas": [
+          {
+              "type": "item",
+              "uid": "image",
+              "title": "Image",
+              "status": {
+                  "collapsed": true
+              },
+              "uuid": "e2793948-802a-4bdc-a60c-9671c7adaddf",
+              "parentUid": "root",
+              "isContainer": false,
+              "children": []
+          }
+      ],
+      "componentForm": [],
+      "mapper": {
+          "e2793948-802a-4bdc-a60c-9671c7adaddf": {
+              "settings": {
+                  "formDefinition": [
+                      {
+                          "formKey": "image-settings",
+                          "children": [
+                              {
+                                  "formKey": "image-image",
+                                  "breakpoints": [],
+                                  "activeFields": [
+                                      {
+                                          "name": "image",
+                                          "active": true
+                                      },
+                                      {
+                                          "name": "title",
+                                          "active": true
+                                      },
+                                      {
+                                          "name": "alt",
+                                          "active": true
+                                      },
+                                      {
+                                          "name": "lazyload",
+                                          "active": true
+                                      }
+                                  ]
+                              },
+                              {
+                                  "formKey": "image-size",
+                                  "breakpoints": [
+                                      {
+                                          "name": "xl"
+                                      }
+                                  ],
+                                  "activeFields": [
+                                      {
+                                          "name": "displaySize",
+                                          "active": true
+                                      },
+                                      {
+                                          "name": "imageAlignment",
+                                          "active": true
+                                      }
+                                  ]
+                              },
+                              {
+                                  "formKey": "image-style",
+                                  "breakpoints": [],
+                                  "activeFields": [
+                                      {
+                                          "name": "imageStyle",
+                                          "active": true
+                                      },
+                                      {
+                                          "name": "customStyle",
+                                          "active": true
+                                      },
+                                      {
+                                          "name": "customStyle",
+                                          "active": true
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ],
+                  "selectorType": "topLevel",
+                  "form": null,
+                  "items": []
+              }
+          }
+      },
+      "model": {
+          "e2793948-802a-4bdc-a60c-9671c7adaddf": {
+              "settings": {
+                  "title": "Image",
+                  "styles": {
+                      "xl": {
+                          "displaySize": "coh-image-responsive",
+                          "imageAlignment": "coh-image-align-left"
+                      }
+                  },
+                  "customStyle": [
+                      {
+                          "customStyle": ""
+                      }
+                  ],
+                  "lazyload": false,
+                  "settings": {
+                      "lazyload": false,
+                      "styles": {
+                          "xl": {
+                              "displaySize": "coh-image-responsive"
+                          }
+                      },
+                      "imageStyle": "",
+                      "customStyle": [
+                          {
+                              "customStyle": ""
+                          }
+                      ]
+                  },
+                  "imageStyle": "",
+                  "image": "[media-reference:file:f912fea9-fd41-4f12-bee2-90f6a27219bf]"
+              },
+              "context-visibility": {
+                  "contextVisibility": {
+                      "condition": "ALL"
+                  }
+              },
+              "styles": {
+                  "settings": {
+                      "element": "img"
+                  }
+              }
+          }
+      },
+      "previewModel": {
+          "e2793948-802a-4bdc-a60c-9671c7adaddf": {}
+      },
+      "variableFields": {
+          "e2793948-802a-4bdc-a60c-9671c7adaddf": []
+      },
+      "meta": {
+          "fieldHistory": []
+      }
+  }
+json_mapper: '{}'
+last_entity_update: entityupdate_0033
+locked: false
+modified: true
+selectable: true
+category: cpt_cat_test_category
+preview_image: ''
+has_quick_edit: true
+entity_type_access: {  }
+bundle_access: {  }
+twig_template: component--cohesion-cpt-test-component
+weight: 0

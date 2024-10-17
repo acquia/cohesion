@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Example of a twig template driven by Site Studio custom element parameters.
+ */
+#}
+
+<div class="{{ elementClass }}" data-element="example">
+    My example template twig file.
+
+    <p>Class name: {{ elementClass }}</p>
+
+    <pre>
+        {{ printr(elementSettings) }}
+    </pre>
+
+    <pre>
+        {{ printr(elementMarkup) }}
+    </pre>
+
+    <pre>
+        {{ printr(elementContext) }}
+    </pre>
+
+</div>

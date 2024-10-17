@@ -1,0 +1,3 @@
+admin-custom-select:
+  js:
+    js/example_custom_select.js: { minified: false }
