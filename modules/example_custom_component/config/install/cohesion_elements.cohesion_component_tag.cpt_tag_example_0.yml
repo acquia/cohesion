@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies: {  }
+label: Example
+id: cpt_tag_example_0
+json_values: '{}'
+json_mapper: '{}'
+locked: false
+modified: false
+selectable: true
+class: category-8
+weight: 6

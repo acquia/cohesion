@@ -1,0 +1,1134 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\ckeditor5\HTMLRestrictions;
+use Drupal\cohesion\CohesionEntityViewBuilder;
+use Drupal\cohesion_elements\Plugin\Field\FieldType\CohesionEntityReferenceRevisionsItem;
+use Drupal\Core\Asset\AttachedAssets;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
+use Drupal\tmgmt\JobItemInterface;
+use Drupal\tmgmt\JobInterface;
+use Drupal\cohesion_elements\Entity\CohesionLayout;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\block\Entity\Block;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Component\Serialization\Json;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Uuid\Uuid;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
+use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Style;
+use Drupal\filter\Entity\FilterFormat;
+use Drupal\editor\EditorInterface;
+use Drupal\Core\Extension\Extension;
+
+const COHESION_FILESYSTEM_URI = 'public://cohesion/';
+const COHESION_CSS_PATH = COHESION_FILESYSTEM_URI . 'styles';
+const COHESION_TEMPLATE_PATH = COHESION_FILESYSTEM_URI . 'templates';
+const COHESION_JS_PATH = COHESION_FILESYSTEM_URI . 'scripts';
+const COHESION_ASSETS_PATH = COHESION_FILESYSTEM_URI . 'assets';
+const COHESION_DEFAULT_PATH = COHESION_FILESYSTEM_URI . 'default';
+
+/**
+ * Implements hook_help().
+ */
+function cohesion_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.cohesion':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module defines the base Site Studio entities, import and administration controllers and drush commands.') . '</p>';
+      $output .= '<p><ul>';
+      $output .= '  <li>Administration menu to set up Site Studio and import assets.</li>';
+      $output .= '  <li>Site Studio text format and CKEditor plugins.</li>';
+      $output .= '  <li>Drush commands to set up, import and rebuild Site Studio config entities.</li>';
+      $output .= '  <li>Google map API settings page controller.</li>';
+      $output .= '  <li>Site Studio views formatter plugin.</li>';
+      $output .= '  <li>Dynamic library management on the front end.</li>';
+      $output .= '  <li>Template suggestions on the front end.</li>';
+      $output .= '</ul></p>';
+      $output .= '<p><a href="https://sitestudiodocs.acquia.com/">https://sitestudiodocs.acquia.com/</a></p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function cohesion_token_info() {
+  $info = [];
+  $info['types']['media-reference'] = [
+    'name' => t('Media reference'),
+    'description' => t('Site Studio Group'),
+  ];
+  $info['tokens']['media-reference'] = [
+    'file' => [
+      'name' => t('File entity reference'),
+      'title' => t('File entity reference'),
+      'description' => t('A token to reference a file entity within Site Studio.'),
+      'dynamic' => TRUE,
+    ],
+    'media' => [
+      'title' => t('Media entity reference'),
+      'name' => t('Media entity reference'),
+      'description' => t('A token to reference a media entity, field and index within Site Studio.'),
+      'dynamic' => TRUE,
+    ],
+  ];
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function cohesion_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = [];
+  if ($type == 'media-reference') {
+    foreach ($tokens as $original) {
+      if ($image = \Drupal::service('cohesion_image_browser.update_manager')
+        ->decodeToken($original)) {
+        $replacements[$original] = $image['path'];
+      }
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for html().
+ */
+function cohesion_preprocess_html(&$variables) {
+  $current_theme = \Drupal::service('theme.manager')->getActiveTheme();
+  $is_admin = \Drupal::config('system.theme')
+    ->get('admin') == $current_theme->getName();
+
+  // Check for blanked out admin page.
+  if (\Drupal::request()->query->get('coh_clean_page') === 'true') {
+    // Remove the admin toolbar.
+    $variables['page_top'] = [];
+
+    // Remove all regions except 'content'
+    foreach ($variables['page'] as $region => $render_array) {
+      if ($region != 'content' && !strstr($region, '#')) {
+        $variables['page'][$region] = [];
+      }
+    }
+
+    $variables['#attached']['library'][] = 'cohesion/coh-clean-page';
+  }
+
+  if ($is_admin) {
+    // Display warning message when 'Use Site Studio' is disabled
+    if (!(\Drupal::service('cohesion.utils')
+      ->usedx8Status()) && (strpos(\Drupal::service('path.current')
+      ->getPath(), 'cohesion') !== FALSE) && \Drupal::routeMatch()
+      ->getRouteName() !== 'cohesion.configuration.account_settings') {
+      \Drupal::messenger()->addWarning(t('You cannot  access this page because Site Studio is disabled.'));
+    }
+
+  }
+  else {
+    // Add browser-specific classes to non-admin pages.
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+    if ((bool) preg_match('/msie 9./i', $ua)) {
+      $variables['attributes']['class'][] = 'coh-ie9';
+    }
+    if ((bool) preg_match('/msie 10./i', $ua)) {
+      $variables['attributes']['class'][] = 'coh-ie10';
+    }
+    if ((bool) preg_match('/Trident\/7.0/', $ua)) {
+      $variables['attributes']['class'][] = 'coh-ie11';
+    }
+  }
+}
+
+/**
+ * Page attachments for all Angular forms.
+ *
+ * @param $attachments
+ */
+function _cohesion_shared_page_attachments(&$attachments) {
+  // Support url to drupalSettings
+  $support_url = \Drupal::keyValue('cohesion.assets.static_assets')
+    ->get('support_url');
+
+  if (isset($support_url['url']) && $support_url['url']) {
+    $attachments['#attached']['drupalSettings']['cohesion']['support_url'] = \Drupal::service('cohesion.support_url')
+      ->getSupportUrlPrefix();
+  }
+
+  // Give full permission to user with administrator role
+  $attachments['#attached']['drupalSettings']['cohesion']['permissions'] = \Drupal::service('settings.endpoint.utils')
+    ->dx8PermissionsList();
+
+  // Get the apiUrls
+  $apiUrls = \Drupal::keyValue('cohesion.assets.static_assets')
+    ->get('api-urls');
+
+  // Patch the custom element data in.
+  $apiUrls = \Drupal::service('custom.elements')->patchApiUrls($apiUrls);
+
+  // And attach.
+  $attachments['#attached']['drupalSettings']['cohesion']['api_urls'] = $apiUrls;
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function cohesion_page_attachments(array &$attachments) {
+  $is_admin = \Drupal::service('cohesion.utils')->isAdminTheme();
+  $is_dx8_enabled_theme = \Drupal::service('cohesion.utils')
+    ->currentThemeUseCohesion();
+
+  // Attach the reset.css and other css.
+  if ($is_dx8_enabled_theme && !$is_admin) {
+    $attachments['#attached']['library'][] = 'cohesion/coh-theme';
+  }
+
+  // Load icon library for admin pages.
+  $icon_lib_path = COHESION_CSS_PATH . '/cohesion-icon-libraries.css';
+  if ($is_admin && file_exists($icon_lib_path)) {
+    $attachments['#attached']['library'][] = 'cohesion/admin-icon-library';
+  }
+
+  $reponsive_grid = COHESION_CSS_PATH . '/cohesion-responsive-grid.css';
+  if ($is_admin && file_exists($reponsive_grid)) {
+    $attachments['#attached']['library'][] = 'cohesion/admin-grid-settings';
+  }
+
+  // Load Site Studio toolbar icon if the user is logged in plus some ui fixes.
+  if (\Drupal::currentUser()->isAuthenticated()) {
+    $attachments['#attached']['library'][] = 'cohesion/cohesion-ui';
+  }
+
+  // Add Site Studio libraries to Template, Custom styles list pages
+  // @todo this should be done on each list builder (or a parent list builder). You know, OOP.
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  $allowed_pages = [
+    'entity.cohesion_master_templates.collection',
+    'entity.cohesion_content_templates.collection',
+    'entity.cohesion_custom_style.collection',
+    'entity.cohesion_component.collection',
+  ];
+  if (in_array($route_name, $allowed_pages)) {
+    $attachments['#attached']['library'][] = 'cohesion/cohesion-admin-styles';
+  }
+
+  if ($is_admin) {
+    $assets = new AttachedAssets();
+    $assets->setLibraries(['cohesion/coh-theme']);
+    /** @var \Drupal\Core\Asset\AssetResolver $asset_resolver */
+    $asset_resolver = \Drupal::service('asset.resolver');
+    $css = $asset_resolver->getCssAssets($assets, FALSE);
+
+    $css_urls = [];
+    foreach ($css as $css_entry) {
+      $css_urls[] = \Drupal::service('file_url_generator')->generateAbsoluteString($css_entry['data']);
+    }
+
+    $attachments['#attached']['drupalSettings']['cohesion']['themeCSS'] = $css_urls;
+  }
+
+  // Add current admin theme.
+  $admin_theme = \Drupal::config('system.theme')->get('admin');
+  $attachments['#attached']['drupalSettings']['cohesion']['currentAdminTheme'] = $admin_theme;
+
+  // Add the front-end settings to drupalSettings so React & other libraries
+  // can toggle things.
+  $attachments['#attached']['drupalSettings']['cohesion']['front_end_settings'] = [
+    'global_js' => \Drupal::config('cohesion.frontend.settings')->get('js'),
+  ];
+
+  // Add config to Drupal.settings for use in JS.
+  $attachments['#attached']['drupalSettings']['cohesion']['google_map_api_key'] = \Drupal::config('cohesion.settings')
+    ->get('google_map_api_key');
+
+  $attachments['#attached']['drupalSettings']['cohesion']['google_map_api_key_geo'] = \Drupal::config('cohesion.settings')
+    ->get('google_map_api_key_geo');
+
+  $attachments['#attached']['drupalSettings']['cohesion']['animate_on_view_mobile'] = \Drupal::config('cohesion.settings')
+    ->get('animate_on_view_mobile');
+
+  $attachments['#attached']['drupalSettings']['cohesion']['add_animation_classes'] = \Drupal::config('cohesion.settings')
+    ->get('add_animation_classes');
+
+  // Add responsive grid settings for use in JS.
+  try {
+    /** @var \Drupal\cohesion\Entity\CohesionConfigEntityBase $entity */
+    $entity = \Drupal::service('entity_type.manager')
+      ->getStorage('cohesion_website_settings')
+      ->load('responsive_grid_settings');
+
+    if ($entity) {
+      $attachments['#attached']['drupalSettings']['cohesion']['responsive_grid_settings'] = $entity->getDecodedJsonValues();
+    }
+  } catch (PluginNotFoundException $e) {
+
+  }
+
+  // Attach the font and icon libraries to all pages.
+  $libraries_callback = function ($value, $key) use (&$attachments) {
+    if ($value) {
+      $lib = ['rel' => 'stylesheet', 'href' => $value, 'type' => 'text/css'];
+      $attachments['#attached']['html_head_link'][] = [$lib];
+    }
+  };
+
+  // Add to drupalSettings
+  if (($font_libraries = \Drupal::service('settings.endpoint.utils')
+    ->siteLibraries('font_libraries'))) {
+    array_walk($font_libraries, $libraries_callback);
+  }
+
+  if (($icon_libraries = \Drupal::service('settings.endpoint.utils')
+    ->siteLibraries('icon_libraries'))) {
+    array_walk($icon_libraries, $libraries_callback);
+  }
+
+  // Use Site Studio
+  $attachments['#attached']['drupalSettings']['cohesion']['use_dx8'] = \Drupal::service('cohesion.utils')
+    ->usedx8Status();
+
+  // View style.
+  $attachments['#attached']['drupalSettings']['cohesion']['sidebar_view_style'] = \Drupal::config('cohesion.settings')
+    ->get('sidebar_view_style') ?: 'titles';
+  // Log Site Studio error
+  $attachments['#attached']['drupalSettings']['cohesion']['log_dx8_error'] = !\Drupal::config('cohesion.settings')
+    ->get('log_dx8_error') === 'disable';
+  // Site Studio JS error log endpoint
+  $language_none = \Drupal::languageManager()
+    ->getLanguage(LanguageInterface::LANGCODE_NOT_APPLICABLE);
+  $attachments['#attached']['drupalSettings']['cohesion']['error_url'] = Url::fromRoute('cohesion.error_logger') ? Url::fromRoute('cohesion.error_logger', [], ['language' => $language_none])
+    ->toString() : NULL;
+  // Site Studio content path lookup table
+  $attachments['#attached']['drupalSettings']['cohesion']['dx8_content_paths'] = \Drupal::keyValue('cohesion.assets.static_assets')
+    ->get('dx8_content_paths');
+
+  // Check the image browser has been set up.
+  $current_path = \Drupal::service('path.current')->getPath();
+  $image_browser = \Drupal::configFactory()
+    ->getEditable('cohesion.settings')
+    ->get('image_browser');
+
+  if ($is_admin && (!isset($image_browser['config']) || !isset($image_browser['content'])) && strpos($current_path, 'cohesion') !== FALSE) {
+
+    $args = [
+      '@link' => Link::createFromRoute('Click here to configure the image browser settings.', 'cohesion.configuration.system_settings')->toString(),
+    ];
+
+    \Drupal::messenger()->addWarning(t('No image browsers have been defined for Site Studio. @link', $args));
+  }
+}
+
+/**
+ * @param array $settings
+ */
+function cohesion_editor_js_settings_alter(array &$settings) {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  if (isset($settings['editor']['formats']['cohesion']) && !strstr($route_name, 'entity.cohesion_custom_style.')) {
+    $settings['editor']['formats']['cohesion']['editorSettings']['bodyClass'] = 'coh-wysiwyg';
+  }
+}
+
+/**
+ * Build cohesion libraries (base and theme styles).
+ *
+ * @param $libraries
+ * @param $extension
+ */
+function cohesion_library_info_alter(&$libraries, $extension) {
+  if ('cohesion' == $extension) {
+    // Patch the cohesion folder to a real path.
+    $libraries = Json::decode(str_replace('public:\/\/cohesion\/', '/' . PublicStream::basePath() . '/cohesion/', Json::encode($libraries)));
+  }
+
+  if ('cohesion' == $extension && \Drupal::service('cohesion.utils')->currentThemeUseCohesion()) {
+    $customStylesLoad = \Drupal::service('cohesion.utils')->loadCustomStylesOnPageOnly();
+    $processAsSeparateLibs = \Drupal::service('cohesion.utils')->styleTypesSeparateLibraries();
+
+    $styleTypes = [
+      'base' => [
+        'cohesion_website_settings',
+        'cohesion_base_styles',
+        'default_element_styles',
+      ],
+      'theme' => [
+        'cohesion_custom_style',
+        'custom_element_styles',
+        'other_styles',
+      ],
+    ];
+
+    $themeId = \Drupal::service('theme.manager')->getActiveTheme()->getName();
+    $cssJson = \Drupal::service('cohesion.local_files_manager')->getStyleSheetJson($themeId);
+    $decodedCss = JSON::decode($cssJson);
+
+    if (isset($decodedCss['styles'])) {
+      $styles = $decodedCss['styles'];
+
+      foreach ($styleTypes as $sectionName => $sectionKeys) {
+        $cssValues = array_intersect_key($styles, array_flip($sectionKeys));
+
+        foreach ($cssValues as $entryName => $css) {
+          foreach ($css as $name => $value) {
+            if ($value) {
+              // For default element styles - create own library, so we
+              // can attach to each element twig.
+              if (in_array($entryName, $processAsSeparateLibs)) {
+                $css_file_name = $entryName . '-' . $name . '.css';
+                $full_path_destination = COHESION_CSS_PATH . "/{$sectionName}/" . str_replace('_', '-', $css_file_name);
+                $libraryName = 'coh_';
+                $weight = -10;
+                if ($entryName == 'cohesion_custom_style') {
+                  $libraryName = $libraryName . 'custom_style_';
+                  $name = substr($name, 0, strpos($name, '_'));
+                  $weight = -9;
+                }
+
+                if ($entryName == 'custom_element_styles') {
+                  $css_file_name = 'custom-element-styles-' . $name . '.css';
+                  $full_path_destination = COHESION_CSS_PATH . "/{$sectionName}/" . str_replace('_', '-', $css_file_name);
+                  $libraryName = '';
+                  $weight = -9;
+                }
+
+                $libraries[$libraryName . $name]['css']['component'][$full_path_destination] = ['weight' => $weight];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Custom styles in a separate stylesheet & library for SGM, component &
+    // helper previews if site is set to only load custom styles on page.
+    if ($customStylesLoad) {
+      $previewCSS = \Drupal::service('cohesion.local_files_manager')->getStyleSheetFilename('preview');
+      $libraries['coh-preview']['css']['theme'][$previewCSS] = ['weight' => 0];
+    }
+
+  }
+}
+
+/**
+ * Implements hook_css_alter().
+ *
+ * Alter css per theme for Site Studio base and theme css
+ */
+function cohesion_css_alter(&$css, $assets) {
+
+  $module_path = \Drupal::service('extension.list.module')->getPath('cohesion');
+
+  $cohesion_css = [
+    'base-default' => $module_path . '/css/base-default.css',
+    'reset' => $module_path . '/css/reset.css',
+    'theme-default' => $module_path . '/css/theme-default.css',
+  ];
+
+  if (!empty(array_intersect(array_keys($css), $cohesion_css))) {
+    // Get the smallest weight set on all css libraries
+    // We need to set the reset.css and the base stylesheets as the
+    // first two stylesheet loaded on the head.
+    $min_weight = CSS_BASE;
+    foreach ($css as $css_definition) {
+      if (isset($css_definition['weight']) && $css_definition['weight'] < $min_weight) {
+        $min_weight = $css_definition['weight'];
+      }
+    }
+
+    /** @var \Drupal\cohesion\Services\CohesionUtils $ss_utils */
+    $ss_utils = \Drupal::service('cohesion.utils');
+    $is_admin = $ss_utils->isAdminTheme();
+
+    // Site studio cannot be used in admin theme, so when attached from
+    // an admin theme, get the default theme and check if it has site studio
+    if ($is_admin) {
+      $active_theme_id = \Drupal::config('system.theme')->get('default');
+      if(!$ss_utils->themeHasCohesionEnabled($active_theme_id)) {
+        return;
+      }
+    } else {
+      $active_theme_id = \Drupal::service('theme.manager')
+        ->getActiveTheme()
+        ->getName();
+    }
+
+    if (isset($css[$cohesion_css['base-default']])) {
+      $css_filename = \Drupal::service('cohesion.local_files_manager')
+        ->getStyleSheetFilename('base', $active_theme_id, TRUE);
+      $css[$module_path . '/css/base-default.css']['data'] = $css_filename;
+      // Set the base stylesheet before the first css
+      $min_weight--;
+      $css[$module_path . '/css/base-default.css']['weight'] = $min_weight;
+    }
+
+    if (isset($css[$cohesion_css['reset']])) {
+      // Set the reset.css as the first css to load.
+      $min_weight--;
+      $css[$module_path . '/css/reset.css']['weight'] = $min_weight;
+    }
+
+    if (isset($css[$cohesion_css['theme-default']])) {
+      $css_filename = \Drupal::service('cohesion.local_files_manager')
+        ->getStyleSheetFilename('theme', $active_theme_id, TRUE);
+      $css[$module_path . '/css/theme-default.css']['data'] = $css_filename;
+      // Set the theme css to be the first Component (smacss) CSS to load
+      $css[$module_path . '/css/theme-default.css']['weight'] = CSS_COMPONENT - 1;
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * Allow loading of theme templates from the Site Studio template store.
+ */
+function cohesion_theme_registry_alter(array &$theme_registry) {
+  // Get real path to templates and extract relative path for theme hooks.
+  // Note: The theme registry expects template paths relative to DRUPAL_ROOT.
+  if ($wrapper = \Drupal::service('stream_wrapper_manager')
+    ->getViaUri(COHESION_TEMPLATE_PATH)) {
+    $template_path = $wrapper->basePath() . '/cohesion/templates';
+  }
+  else {
+    // Do nothing if template path is not valid.
+    \Drupal::logger('cohesion')
+      ->error(t('Unable to get stream wrapper for Site Studio templates path: @uri', [
+        '@uri' => COHESION_TEMPLATE_PATH,
+      ]));
+    return;
+  }
+  // Scan for template files and override their location in the theme registry.
+  $template_files = \Drupal::service('cohesion.template_storage')->listAll();
+
+  foreach ($template_files as $file) {
+    $template = \Drupal::service('file_system')->basename($file, '.html.twig');
+    $theme_hook = str_replace('-', '_', $template);
+
+    [$base_theme_hook] = explode('__', $theme_hook, 2);
+
+    // Override existing theme hook or duplicate the base hook (if one exists).
+    if (isset($theme_registry[$base_theme_hook]) || $base_theme_hook === 'component') {
+      if (isset($theme_registry[$theme_hook]) && $theme_registry[$theme_hook]) {
+        $theme_registry[$theme_hook]['path'] = $template_path;
+      }
+      else {
+        // And entry to the theme registry.
+        $theme_info = $theme_registry[$base_theme_hook] ?? [];
+        $theme_info['template'] = str_replace('_', '-', $theme_hook);
+        $theme_info['path'] = $template_path;
+        $theme_info['base hook'] = 'component';
+        $theme_registry[$theme_hook] = $theme_info;
+      }
+    }
+  }
+}
+
+/**
+ * Suggest the cohesion view template specific to this view.
+ *
+ * @param array $variables
+ *   Theme variables.
+ *
+ * @return array
+ *   Return template suggestions.
+ */
+function cohesion_theme_suggestions_views_view(array $variables) {
+  $suggestions = [];
+
+  if ($variables['view']->style_plugin->getPluginId() == 'cohesion_layout') {
+    if ($view_template_id = $variables['view']->style_plugin->options['views_template']) {
+      $suggestions[] = 'views_view__cohesion_' . $view_template_id;
+      $suggestions[] = 'views_view__cohesion_' . $view_template_id . '__' . \Drupal::service('theme.manager')->getActiveTheme()->getName();
+    }
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function cohesion_theme_suggestions_menu_alter(array &$suggestions, array $variables) {
+  if (isset($variables['menu_name'])) {
+    $menu_name = $variables['menu_name'];
+    $is_mobile_menu = strpos($menu_name, 'mobile');
+    if (isset($variables['attributes']['block'])) {
+      $block = Block::load($variables['attributes']['block']);
+      $region = $block->getRegion();
+      $suggestions[] = 'menu__' . $region . '__' . $menu_name;
+    }
+    // If menu name contains the word mobile, create common template suggestion.
+    if ((isset($variables['attributes']['block'])) && ($is_mobile_menu !== FALSE)) {
+      $suggestions[] = 'menu__' . $region . '__mobile-menus';
+    }
+
+    if(isset($variables['theme_hook_original']) && strpos($variables['theme_hook_original'], 'menu__cohesion') == 0){
+      $suggestions[] = $variables['theme_hook_original'] . '__' . \Drupal::service('theme.manager')->getActiveTheme()->getName();
+    }
+
+    $suggestions[] = 'menu__cohesion_test';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function cohesion_theme($existing, $type, $theme, $path) {
+  return [
+    'cohesion_view' => [
+      'render element' => 'elements',
+      'base hook' => 'views_view',
+    ],
+  ];
+}
+
+/**
+ * Implements template_preprocess_token_tree_link().
+ *
+ * Make the token modal appear in the center of the body.
+ */
+function cohesion_preprocess_token_tree_link(&$variables) {
+  $variables['options']['attributes']['data-dialog-options'] = Json::encode([
+    'dialogClass' => 'token-tree-dialog',
+    'width' => 600,
+    'height' => 400,
+    'position' => ['my' => 'center left'],
+    'draggable' => TRUE,
+    'autoResize' => FALSE,
+  ]);
+
+  $variables['link'] = Link::createFromRoute($variables['text'], 'token.tree', [], $variables['options'])
+    ->toRenderable();
+  $variables['url'] = new Url('token.tree', [], $variables['options']);
+  $variables['attributes'] = $variables['options']['attributes'];
+  // Add Drupal tokens link to 'drupalSettings' JS
+  cohesion_expose_drupal_token_links($variables);
+}
+
+/**
+ *
+ * @param array theme(cohesion_preprocess_token_tree_link) $variables
+ * Add Drupal tokens link to 'drupalSettings'
+ *   JS(drupalSettings.cohesion.drupalTokensUri,
+ *   drupalSettings.cohesion.drupalTokensLink)
+ */
+function cohesion_expose_drupal_token_links(&$variables) {
+  $language_none = \Drupal::languageManager()
+    ->getLanguage(LanguageInterface::LANGCODE_NOT_APPLICABLE);
+  $url = new Url('token.tree', [], $variables['options']);
+  // Generate valid csrf token
+  $token = \Drupal::csrfToken()->get($url->getInternalPath());
+  $options = $url->getOptions();
+  $options['query']['token'] = $token;
+  $options['language'] = $language_none;
+  $url->setOptions($options);
+  $variables['#attached']['drupalSettings']['cohesion']['drupalTokensUri'] = urldecode($url->toString());
+}
+
+/**
+ * Implements template_preprocess_views_view()
+ */
+function cohesion_preprocess_views_view(&$variables) {
+  $view = $variables['view'];
+  $cohesion_views = [
+    'custom_styles',
+    'cohesion_components_admin',
+    'cohesion_master_templates_list',
+  ];
+  $id = $view->storage->id();
+  if (in_array($id, $cohesion_views)) {
+    $variables['attributes']['ng-controller'] = 'CohFormRendererCtrl';
+  }
+
+  // Give the template the current page from the pager (if available).
+  $variables['current_page'] = 1;
+
+  if (isset($view->pager)) {
+    $variables['current_page'] = $view->pager->getCurrentPage() + 1;
+  }
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function cohesion_link_alter(&$variables) {
+  // Hide cohesion navigation menu items until assets are imported.
+  /** @var \Drupal\Core\Url $url */
+  $url = $variables['url'];
+  $config = \Drupal::config('cohesion.settings');
+  if ($url->isExternal() || !$url->isRouted() || $config->get('asset_is_imported')) {
+    return;
+  }
+
+  $cohesion_routes = \Drupal::service('cohesion.utils')->getCohesionRoutes();
+  if (!in_array($url->getRouteName(), array_keys($cohesion_routes))) {
+    return;
+  }
+  else {
+    $variables['options']['attributes']['class'][] = 'visually-hidden';
+    $current_path = \Drupal::service('path.current')->getPath();
+    if (strpos($current_path, 'cohesion') !== FALSE) {
+      \Drupal::messenger()->addWarning(t('Please import Site Studio assets.'));
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function cohesion_entity_insert(EntityInterface $entity) {
+  // Run the active image browser plugin function for config and content.
+  \Drupal::service('cohesion_image_browser.update_manager')
+    ->onEntityInsertUpdate($entity);
+
+  // Set dependencies for this content entity.
+  if (method_exists($entity, 'getHost')) {
+    if ($entity->getHost()) {
+      $entity = $entity->getHost();
+    }
+  }
+
+  if ($entity->id()) {
+    \Drupal::service('cohesion_usage.update_manager')->buildRequires($entity);
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function cohesion_entity_update(EntityInterface $entity) {
+  // Run the active image browser plugin function for config and content.
+  \Drupal::service('cohesion_image_browser.update_manager')
+    ->onEntityInsertUpdate($entity);
+
+  // Update dependencies for this content entity.
+  if (method_exists($entity, 'getHost')) {
+    if ($entity->getHost()) {
+      $entity = $entity->getHost();
+    }
+  }
+
+  \Drupal::service('cohesion_usage.update_manager')->buildRequires($entity);
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function cohesion_entity_delete(EntityInterface $entity) {
+  if (method_exists($entity, 'getHost')) {
+    if ($entity->getHost()) {
+      $entity = $entity->getHost();
+    }
+  }
+
+  \Drupal::service('cohesion_usage.update_manager')->removeUsage($entity);
+}
+
+/**
+ * @return array
+ */
+function _get_cohesion_submodules() {
+  $system_modules = \Drupal::service('extension.list.module')->reset()->getList();
+  if (\Drupal::service('module_handler')
+    ->moduleExists('cohesion') && in_array('cohesion', array_keys($system_modules)) && ($required_by = $system_modules['cohesion']->required_by)) {
+
+    $dx8_submodule_callback = function ($module) {
+      return (\Drupal::service('module_handler')
+        ->moduleExists($module) && \Drupal::service('user.permissions')
+        ->moduleProvidesPermissions($module));
+    };
+    $modules = array_filter(array_keys($required_by), $dx8_submodule_callback);
+    $modules[] = 'cohesion';
+    return array_values($modules);
+  }
+  return [];
+}
+
+/**
+ * Implements hook_hook_info().
+ */
+function cohesion_hook_info() {
+  return ['dx8_api_outbound_data_alter' => ['group' => 'dx8']];
+}
+
+/**
+ * Implements hook_entity_view_alter().
+ */
+function cohesion_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+
+  if (isset($build['#view_mode']) && $build['#view_mode'] === 'search_result') {
+    $build['#post_render'][] = [CohesionEntityViewBuilder::class, 'postRender'];
+  }
+}
+
+/**
+ * Implements hook_field_info_alter().
+ */
+function cohesion_field_info_alter(&$info) {
+  if (isset($info['link']['class'])) {
+    $info['link']['class'] = 'Drupal\cohesion\Plugin\Field\FieldType\CohesionLinkItem';
+  }
+
+  if (\Drupal::service('module_handler')->moduleExists('tmgmt') && isset($info['string_long'])) {
+    $info['string_long']['tmgmt_field_processor'] = 'Drupal\cohesion\CohesionLayoutFieldProcessor';
+  }
+}
+
+function cohesion_tmgmt_translatable_fields_alter(&$entity, &$translatable_fields) {
+  if ($entity instanceof CohesionLayout && isset($translatable_fields['json_values'])) {
+    $translatable_fields = [
+      'json_values' => $translatable_fields['json_values'],
+    ];
+  }
+}
+
+/**
+ * Implements hook_tmgmt_source_suggestions().
+ */
+function cohesion_tmgmt_source_suggestions(array $items, JobInterface $job) {
+  $suggestions = [];
+
+  $content_translation_manager = \Drupal::service('content_translation.manager');
+  foreach ($items as $item) {
+    if ($item instanceof JobItemInterface && $item->getPlugin() == 'content') {
+      // Load the entity, skip if it can't be loaded.
+      $entity = \Drupal::entityTypeManager()
+        ->getStorage($item->getItemType())
+        ->load($item->getItemId());
+      if (!$entity || !($entity instanceof ContentEntityInterface)) {
+        continue;
+      }
+
+      foreach ($entity as $field) {
+        /** @var \Drupal\Core\Field\FieldItemListInterface $field */
+        $definition = $field->getFieldDefinition();
+
+        // Skip fields that are already embedded.
+        if (isset($embedded_fields[$definition->getName()])) {
+          continue;
+        }
+
+        // Loop over all field items.
+        foreach ($field as $field_item) {
+
+          if ($field_item instanceof CohesionEntityReferenceRevisionsItem) {
+            // Loop over all properties of a field item.
+            foreach ($field_item->getProperties(TRUE) as $property) {
+              if ($property->getValue() instanceof CohesionLayout) {
+                /** @var \Drupal\cohesion_elements\Entity\CohesionLayout $layout_canvas_entity */
+                $layout_canvas_entity = $property->getValue();
+                $layout_canvas = $layout_canvas_entity->getLayoutCanvasInstance();
+
+                foreach ($layout_canvas->getEntityReferences() as $reference) {
+                  if (Uuid::isValid($reference['entity_id'])) {
+                    $results = \Drupal::service('entity_type.manager')
+                      ->getStorage($reference['entity_type'])
+                      ->loadByProperties(['uuid' => $reference['entity_id']]);
+                    $target = reset($results);
+                  }
+                  else {
+                    $target = \Drupal::service('entity_type.manager')
+                      ->getStorage($reference['entity_type'])
+                      ->load($reference['entity_id']);
+                  }
+                  if ($target instanceof EntityInterface && $target instanceof TranslatableInterface) {
+                    $enabled = $content_translation_manager->isEnabled($target->getEntityTypeId(), $target->bundle());
+                    if ($enabled && $target->hasTranslation($job->getSourceLangcode())) {
+                      $suggestions[] = [
+                        'job_item' => tmgmt_job_item_create('content', $target->getEntityTypeId(), $target->id()),
+                        'reason' => t('Field @label', ['@label' => $definition->getLabel()]),
+                        'from_item' => $item->id(),
+                      ];
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_themes_uninstalled().
+ */
+function cohesion_themes_uninstalled(array $themes) {
+  // Upon uninstall of a theme with cohesion enabled remove all cohesion
+  // stylesheets.
+  foreach ($themes as $theme) {
+    if (\Drupal::service('cohesion.utils')->themeHasCohesionEnabled($theme)) {
+      foreach (['base', 'prefixed', 'theme', 'json', 'preview'] as $type) {
+        $theme_file = \Drupal::service('cohesion.local_files_manager')
+          ->getStyleSheetFilename($type, $theme);
+        \Drupal::service('file_system')->delete($theme_file);
+      }
+    }
+  }
+}
+
+/**
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ */
+function cohesion_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
+  // Get the theme id from the theme settings being edited.
+  $build_info = $form_state->getBuildInfo();
+  $args = $build_info['args'];
+
+  if (isset($args[0])) {
+
+    $theme_id = $args[0];
+
+    if (\Drupal::service('cohesion.utils')->themeHasCohesionEnabled($theme_id)) {
+      $form['cohesion_settings'] = [
+        '#type' => 'details',
+        '#title' => t('Site Studio'),
+        '#open' => TRUE,
+        'toggle_cohesion_build_assets' => [
+          '#type' => 'checkbox',
+          '#title' => t('Build Site Studio assets'),
+          '#disabled' => \Drupal::service('theme_handler')->getDefault() == $theme_id,
+          '#default_value' => (theme_get_setting('features.cohesion_build_assets', $theme_id) || \Drupal::service('theme_handler')->getDefault() == $theme_id),
+        ],
+      ];
+    } else {
+      $form['cohesion'] = [
+        '#type' => 'details',
+        '#title' => t('Site Studio'),
+        '#open' => TRUE,
+        'toggle_layout_canvas_field' => [
+          '#type' => 'checkbox',
+          '#title' => t('Generate templates only.'),
+          '#description' => t('This setting prevents Site Studio from generating CSS styles for this theme. This is required for AMP themes.'),
+          '#default_value' => theme_get_setting('features.layout_canvas_field', $theme_id),
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+function cohesion_config_schema_info_alter(&$definitions) {
+  if (isset($definitions['theme_settings']['mapping']['features']['mapping']) && is_array($definitions['theme_settings']['mapping']['features']['mapping'])) {
+    $definitions['theme_settings']['mapping']['features']['mapping']['cohesion_build_assets'] = [
+      'type' => 'boolean',
+      'label' => 'Build site studio assets',
+    ];
+
+    $definitions['theme_settings']['mapping']['features']['mapping']['layout_canvas_field'] = [
+      'type' => 'boolean',
+      'label' => 'Build site studio assets',
+    ];
+  }
+}
+
+/**
+ * Preprocess the component preview iframe page.html.twig
+ * See: templates/page--cohesionapi--component--preview.html.twig.
+ *
+ * @param $variables
+ */
+function preprocess_cohesion_preview_page(&$variables) {
+  // Load the build created in CohesionComponentController::preview.
+  $variables['preview_build'] = &drupal_static('component_preview_build');
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ *
+ * Remove the "clone" option from site studio entity lists.
+ *
+ */
+function cohesion_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  if (isset($operations['clone']) && str_contains($entity->getEntityTypeId(), 'cohesion_')) {
+    unset($operations['clone']);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function cohesion_form_filter_format_form_alter(&$form, FormStateInterface $form_state) {
+  /** @var \Drupal\editor\Entity\Editor $editor */
+  $editor = $form_state->get('editor');
+
+  if ($editor) {
+    if ($editor->getEditor() == 'ckeditor') {
+      $warning['ssa_warning'] = [
+        '#theme' => 'status_messages',
+        '#message_list' => [
+          'warning' => [t('Site Studio recommends text formats to use CKEditor 5.')],
+        ],
+        '#status_headings' => [
+          'warning' => t('Warning message'),
+        ],
+      ];
+
+      $form['editor']['settings']['subform'] = array_merge($warning, $form['editor']['settings']['subform']);
+    }
+  }
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function cohesion_form_filter_format_edit_form_alter(&$form, FormStateInterface $form_state) {
+  $editor = $form_state->get('editor');
+  if ($editor instanceof EditorInterface && $editor->getEditor() == 'ckeditor5' && isset($form['editor']['settings']['subform']['plugins']['ckeditor5_style']['styles'])) {
+    $form['editor']['settings']['subform']['plugins']['ckeditor5_style']['styles']['#after_build'][] = '_sitestudio_ckeditor_styles_after_build_callback';
+    $form['editor']['settings']['subform']['plugins']['ckeditor5_style']['ssa_enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Add Site Studio styles'),
+      '#default_value' => (bool) $editor->getThirdPartySetting('cohesion', 'ssa_enabled', FALSE),
+      '#ajax' => [
+        'callback' => '_update_ckeditor5_html_filter',
+        'event' => 'change',
+        'trigger_as' => ['name' => 'editor_configure'],
+      ],
+    ];
+    $form['#entity_builders'][] = 'cohesion_form_filter_format_edit_form_builder';
+  }
+}
+
+/*
+ * Adds Site Studio styles based on "ssa_enabled" checkbox state.
+ *
+ * @param array $element
+ *   Textarea element with Styles.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form State.
+ */
+function _sitestudio_ckeditor_styles_after_build_callback(array $element, FormStateInterface $form_state) {
+  if (!$form_state->isProcessingInput()) {
+    return $element;
+  }
+
+  $input = $form_state->getUserInput();
+  $ssa_enabled = $input['editor']['settings']['plugins']['ckeditor5_style']['ssa_enabled'] ?? 0;
+
+  $textFormatStyles = \Drupal::service('cohesion.text_format_styles');
+  $initial_styles = $element['#value'];
+
+  if (!$ssa_enabled || !empty($element['#value'])) {
+    $style_values = $element['#value'];
+    $styles = $textFormatStyles->parseStylesFormValue($style_values);
+    $new_styles = $textFormatStyles->getStyleList($styles[0], $ssa_enabled);
+    $as_selectors = '';
+    foreach ($new_styles as $style) {
+      [$tag, $classes] = Style::getTagAndClasses(HTMLRestrictions::fromString($style['element']));
+      $as_selectors .= sprintf("%s.%s|%s\n", $tag, implode('.', $classes), $style['label']);
+    }
+    $element['#value'] = $as_selectors;
+
+    return $element;
+  }
+
+  $styles = $textFormatStyles->getStylesText();
+  if (!empty($styles)) {
+    $element['#value'] = $styles;
+  }
+  if ($initial_styles !== $element['#value']) {
+    $form_state->setValidationComplete();
+  }
+
+  return $element;
+}
+
+/**
+ * Entity builder for the filter editor config entity.
+ */
+function cohesion_form_filter_format_edit_form_builder($entity_type, FilterFormat $filterFormat, &$form, FormStateInterface $form_state) {
+  $editor = $form_state->get('editor');
+  if ($ssa_enabled = $form_state->getValue([
+    'editor',
+    'settings',
+    'plugins',
+    'ckeditor5_style',
+    'ssa_enabled',
+  ])) {
+    $editor->setThirdPartySetting('cohesion', 'ssa_enabled', (bool) $ssa_enabled);
+    return;
+  }
+  $editor->unsetThirdPartySetting('cohesion', 'ssa_enabled');
+}
+
+/**
+ * Make sure the filter format form alter is the last to run
+ *
+ * @param $implementations
+ * @param $hook
+ *
+ * @return void
+ */
+function cohesion_module_implements_alter(&$implementations, $hook) {
+  if (isset($implementations['cohesion']) && ($hook == 'form_filter_format_form_alter' || $hook == 'form_alter')) {
+    $group = $implementations['cohesion'];
+    unset($implementations['cohesion']);
+    $implementations['cohesion'] = $group;
+  }
+}
+
+/**
+ * Implements hook_system_info_alter().
+ *
+ * Adds prefixed Site Studio CKEditor 5 stylesheet to default and admin themes.
+ */
+function cohesion_system_info_alter(array &$info, Extension $file, $type) {
+  if ($type === 'theme') {
+    $theme_config = \Drupal::config('system.theme');
+    $default_theme_id = $theme_config->get('default');
+    $admin_theme_id = $theme_config->get('admin');
+
+    if (in_array($file->getName(), [$admin_theme_id, $default_theme_id])) {
+      $wysiwyg_cache_token = \Drupal::keyValue('cohesion.wysiwyg_cache_token');
+      $wysiwyg_cache_buster = $wysiwyg_cache_token->get('cache_token') ? '?_t=' . $wysiwyg_cache_token->get('cache_token') : '';
+      $prefixed_ckeditor_css = \Drupal::service('cohesion.local_files_manager')
+        ->getStyleSheetFilename('prefixed', $file->getName(), TRUE);
+      if (!isset($info['ckeditor5-stylesheets']) || $info['ckeditor5-stylesheets'] === FALSE) {
+        $info['ckeditor5-stylesheets'] = [];
+      }
+      $absolute_url = \Drupal::service('file_url_generator')->generateAbsoluteString($prefixed_ckeditor_css) . $wysiwyg_cache_buster;
+      $info['ckeditor5-stylesheets'][] = \Drupal::service('file_url_generator')->transformRelative($absolute_url);
+    }
+
+  }
+}
+
+/**
+ * Implements hook_field_widget_complete_WIDGET_TYPE_form_alter() for text_textarea_with_summary.
+ * Adds the ssa-ck-content class so that the styles can be "previewed".
+ */
+function cohesion_field_widget_complete_text_textarea_with_summary_form_alter(&$field_widget_complete_form, FormStateInterface $form_state, $context) {
+  $field_widget_complete_form['#attributes']['class'][] = 'ssa-ck-content';
+}
+
+/**
+ * Implements hook_field_widget_complete_WIDGET_TYPE_form_alter() for text_textarea_with_summary.
+ * Adds the ssa-ck-content class so that the styles can be "previewed".
+ */
+function cohesion_field_widget_complete_text_textarea_form_alter(&$field_widget_complete_form, FormStateInterface $form_state, $context) {
+  $field_widget_complete_form['#attributes']['class'][] = 'ssa-ck-content';
+}

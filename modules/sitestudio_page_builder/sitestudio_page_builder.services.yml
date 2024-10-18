@@ -1,0 +1,22 @@
+services:
+  eventsubscriber:
+    class: '\Drupal\sitestudio_page_builder\EventSubscriber\SitestudioPageBuilderEventSubscriber'
+    arguments:
+      - '@entity_type.manager'
+      - '@current_user'
+      - '@current_route_match'
+      - '@request_stack'
+      - '@library.discovery'
+      - '@sitestudio_page_builder.manager'
+      - '@module_handler'
+      - '@cohesion.utils'
+      - '@cohesion.api_client'
+      - '@entity.repository'
+      - '@file_url_generator'
+    tags:
+      - { name: 'event_subscriber' }
+
+
+  sitestudio_page_builder.manager:
+    class: Drupal\sitestudio_page_builder\Services\SitestudioPageBuilderManager
+    arguments: ['@cohesion_current_route_match']

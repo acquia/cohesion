@@ -1,0 +1,44 @@
+services:
+  dx8-gateway:
+    build:
+      context: cohesion-services/dx8-gateway
+      target: development
+    container_name: dx8-gateway
+    ports:
+      - "2000:3000"
+    volumes:
+      - ./cohesion-services/dx8-gateway/node:/node
+      - ./cohesion-services/dx8-gateway/php:/php
+      - ./cohesion-services/dx8-gateway/assets:/assets
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+
+  scss-gateway:
+    build: cohesion-services/scss-gateway
+    container_name: scss-gateway
+    ports:
+      - "2001:3000"
+    volumes:
+      - ./cohesion-services/scss-gateway/node:/node
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"
+
+  dynamodb:
+    user: root
+    build: cohesion-services/cache/dynamodb
+    ports:
+      - '8000:8000'
+
+  dynamodb-admin:
+    build: cohesion-services/cache/dynamodb/admin
+    ports:
+      - '8001:8001'
+    environment:
+      DYNAMO_ENDPOINT: 'http://dynamodb:8000'
+    depends_on:
+      - dynamodb
+

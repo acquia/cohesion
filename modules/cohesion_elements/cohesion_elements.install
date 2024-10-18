@@ -1,0 +1,732 @@
+<?php
+
+use Drupal\Core\Database\Database;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\cohesion_elements\Entity\CohesionLayout;
+use Drupal\Core\Config\FileStorage;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\Core\Config\Entity\ConfigEntityType;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Annotation\PluralTranslation;
+use Drupal\Core\Installer\InstallerKernel;
+
+/**
+ * Implements hook_install().
+ */
+function cohesion_elements_install() {
+  // Create preview images directory.
+  $path = COHESION_FILESYSTEM_URI . '/preview';
+  if (\Drupal::service('file_system')->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS)) {
+    // Skip the message about preview directory being created if the
+    // module was installed in the Drupal installation process.
+    if (InstallerKernel::installationAttempted()) {
+      return;
+    }
+    \Drupal::messenger()->addMessage(t('Site Studio preview directory created.'));
+  }
+}
+
+/**
+ * Implements hook_schema().
+ *
+ * Create cohesion_elements database tables.
+ */
+function cohesion_elements_schema() {
+  return [
+    'coh_element_usage' => [
+      'description' => 'Site Studio element usage tracking.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+          'description' => 'Primary Key: Unique schema ID.',
+        ],
+        'element' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Type of the required entity',
+        ],
+        'source_uuid' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'UUID of the source entity.',
+        ],
+        'source_type' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'Type of the source entity',
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'id' => ['id'],
+        'source_uuid' => ['source_uuid']
+      ],
+      'unique_keys' => ['id'],
+    ],
+  ];
+}
+
+/**
+ * Remove component in use tacking for deleted entities.
+ */
+function cohesion_elements_update_8003() {
+  // deprecated
+}
+
+/**
+ * Components selectable property
+ */
+function cohesion_elements_update_8004() {
+  $cohesion_components = \Drupal::entityTypeManager()->getStorage('cohesion_component')->loadMultiple();
+  foreach ($cohesion_components as $cohesion_component) {
+    $cohesion_component->setSelectable();
+    $cohesion_component->save();
+  }
+}
+
+/**
+ * Helpers selectable property
+ */
+function cohesion_elements_update_8005() {
+  $cohesion_helpers = \Drupal::entityTypeManager()->getStorage('cohesion_helper')->loadMultiple();
+  foreach ($cohesion_helpers as $cohesion_helper) {
+    $cohesion_helper->setSelectable();
+    $cohesion_helper->save();
+  }
+}
+
+/**
+ * Move cohesion field layout to entity reference
+ */
+function cohesion_elements_update_8305() {
+
+  $fieldsArray = \Drupal::service('entity_field.manager')->getFieldMapByFieldType('cohesion_layout');
+
+  $entity_type = \Drupal::service('entity_type.manager')->getDefinition('cohesion_layout');
+  \Drupal::service('entity_type.listener')->onEntityTypeCreate($entity_type);
+
+  foreach ($fieldsArray as $entity_type => $fields) {
+
+
+    foreach ($fields as $field_name => $field_map) {
+
+      $field_config = [];
+
+      // Get all entities by entity type and bundle that have the cohesion_layout field
+      $entity_type_storage = \Drupal::service('entity_type.manager')->getStorage($entity_type);
+      $bundle_key = $entity_type_storage->getEntityType()->getKey('bundle');
+      $old_entities = $entity_type_storage->loadByProperties([$bundle_key => $field_map['bundles']]);
+
+      foreach ($field_map['bundles'] as $bundle) {
+
+        // Store the field config before deleting (to assing the same label to the reference entity field)
+        $field_config[$bundle] = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+
+        // Remove the cohesion layout formatter dependency from the view display of every cohesion layout field
+        // as it prevents from deleting the field because the formatter has been removed
+        $entity_view_display = EntityViewDisplay::load($entity_type . '.' . $bundle . '.default');
+        $components = $entity_view_display->getComponents();
+        foreach ($components as $component_name => $component) {
+          if (isset($component['type']) && $component['type'] == 'cohesion_layout_formatter') {
+            $entity_view_display->removeComponent($component_name);
+          }
+        }
+        $entity_view_display->save();
+      }
+
+      // Delete the cohesion_layout field
+      $field = FieldStorageConfig::loadByName($entity_type, $field_name);
+      $field->delete();
+
+      // Create the field storage for the entity_reference_revisions field
+      if (!FieldStorageConfig::loadByName($entity_type, $field_name)) {
+        FieldStorageConfig::create([
+          'field_name' => $field_name,
+          'entity_type' => $entity_type,
+          'type' => 'entity_reference_revisions',
+          'cardinality' => 1,
+          'settings' => [
+            'target_type' => 'cohesion_layout',
+          ],
+        ])->save();
+      }
+
+      foreach ($field_map['bundles'] as $bundle) {
+
+        // Create the field on each bundle that has the cohesion_layout field
+        if (!FieldConfig::loadByName($entity_type, $bundle, $field_name)) {
+          FieldConfig::create([
+            'field_name' => $field_name,
+            'entity_type' => $entity_type,
+            'bundle' => $bundle,
+            'label' => $field_config[$bundle]->getLabel(),
+          ])->save();
+
+          $entity_form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.default');
+          $entity_form_display->setComponent($field_name, [
+            'type' => 'cohesion_layout_builder_widget',
+          ]);
+          $entity_form_display->save();
+
+          $entity_view_display = EntityViewDisplay::load($entity_type . '.' . $bundle . '.default');
+          $entity_view_display->setComponent($field_name, [
+            'label' => 'hidden',
+          ]);
+          $entity_view_display->save();
+
+        }
+      }
+
+      // Load the new entities
+      $entity_type_storage = \Drupal::service('entity_type.manager')->getStorage($entity_type);
+      $bundle_key = $entity_type_storage->getEntityType()->getKey('bundle');
+      $new_entities = $entity_type_storage->loadByProperties([$bundle_key => $field_map['bundles']]);
+
+      foreach ($new_entities as $id => $entity) {
+        $old_entity = $old_entities[$id];
+        $cohesion_layout = $old_entity->get($field_name)->getValue();
+
+        // if the olf entity had values, create the CohesionLayout entity
+        // and link it to the newly created entity reference field
+        if (isset($cohesion_layout[0])) {
+          $cohesion_reference = CohesionLayout::create([
+            'json_values' => $cohesion_layout[0]['json_values'],
+            'styles' => $cohesion_layout[0]['styles'],
+            'template' => $cohesion_layout[0]['template'],
+            'parent_id' => $id,
+            'parent_type' => $entity_type,
+            'parent_field_name' => $field_name,
+          ]);
+
+          $entity->set($field_name, $cohesion_reference);
+          $entity->save();
+        }
+
+      }
+    }
+  }
+}
+
+/**
+ * Update component entity types and bundles
+ */
+function cohesion_elements_update_8306() {
+  $components = \Drupal::entityTypeManager()->getStorage('cohesion_component')->loadMultiple();
+
+  foreach ($components as $component) {
+    $access_type = $component->get('entity_type_access');
+    $access_bundle = $component->get('bundle_access');
+    $config_name = $component->getConfigDependencyName();
+
+    if (!is_array($access_type) && !is_array($access_bundle)) {
+      _update_component_access_types($config_name, [$access_type], [$access_bundle]);
+    }
+  }
+}
+
+/**
+ * Update component content
+ */
+function cohesion_elements_update_8307() {
+  //Enclose in a try catch as it may already have been added
+  try {
+    $spec = [
+      'type' => 'int',
+      'length' => 10,
+      'not null' => FALSE,
+      'unsigned' => TRUE,
+    ];
+    $schema = Database::getConnection()->schema();
+    $schema->addField('component_content_field_revision', 'layout_canvas__target_id', $spec);
+    $schema->addField('component_content_field_revision', 'layout_canvas__target_revision_id', $spec);
+
+    $component_contents = Database::getConnection()->query('SELECT id, layout_canvas__target_id, layout_canvas__target_revision_id FROM component_contents_field_data')->fetchAll();
+
+    foreach ($component_contents as $component_content) {
+
+      Database::getConnection()->update('component_content_field_revision')->fields([
+        'layout_canvas__target_id' => $component_content->layout_canvas__target_id,
+        'layout_canvas__target_revision_id' => $component_content->layout_canvas__target_revision_id,
+      ])->condition('id', $component_content->id, '=')->execute();
+    }
+  } catch (\Exception $e) {
+
+  }
+
+}
+
+/**
+ * Change DX8 layout canvas fields from entity_reference_revisions to cohesion_entity_reference_revisions
+ */
+function cohesion_elements_update_8308() {
+  $is_update = &drupal_static('cohesion_elements_update_8308');
+  $is_update = TRUE;
+
+  $fieldsArray = \Drupal::service('entity_field.manager')->getFieldMapByFieldType('entity_reference_revisions');
+
+  $database = \Drupal::database();
+
+  foreach ($fieldsArray as $entity_type => $fields) {
+
+
+    foreach ($fields as $field_name => $field_map) {
+
+      $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+
+      if (is_null($field_storage) || $field_storage->getSetting('target_type') != 'cohesion_layout') {
+        continue;
+      }
+
+      $table = "{$entity_type}__{$field_name}";
+      $revision_table = "{$entity_type}_revision__{$field_name}";
+
+      $rows = NULL;
+      $revision_rows = NULL;
+
+      // Step 2: Store data.
+      $rows = NULL;
+      $revision_rows = NULL;
+      if ($database->schema()->tableExists($table)) {
+        // The table data to restore after the update is completed.
+        $rows = $database->select($table, 'n')->fields('n')->execute()->fetchAll();
+      }
+
+      if ($database->schema()->tableExists($revision_table)) {
+        $revision_rows = $database->select($revision_table, 'n')->fields('n')->execute()->fetchAll();
+      }
+
+
+      // Step 3: Save new field configs & delete existing fields.
+      $new_fields = [];
+      $new_field_form_display = [];
+      $new_field_view_display = [];
+      foreach ($field_storage->getBundles() as $bundle => $label) {
+        $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+        $new_field = $field->toArray();
+        $new_field['field_type'] = 'cohesion_entity_reference_revisions';
+        $new_fields[$bundle] = $new_field;
+
+        $entity_form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.default')->get('content');
+        if (isset($entity_form_display[$field_name])) {
+          $new_field_form_display[$bundle] = $entity_form_display[$field_name];
+        }
+
+        $entity_view_display = EntityViewDisplay::load($entity_type . '.' . $bundle . '.default')->get('content');
+        if (isset($entity_view_display[$field_name])) {
+          $new_field_view_display[$bundle] = $entity_view_display[$field_name];
+          $new_field_view_display[$bundle]['type'] = 'cohesion_entity_reference_revisions_entity_view';
+        }
+
+        // Delete field.
+        $field->delete();
+      }
+
+      // Step 4: Create new storage configs from existing.
+      $new_field_storage = $field_storage->toArray();
+      $new_field_storage['type'] = 'cohesion_entity_reference_revisions';
+      $new_field_storage['module'] = 'cohesion_elements';
+
+      // Step 5: Purge deleted fields data.
+      // This is required to create new fields.
+      field_purge_batch(250);
+
+      // Step 6: Create new fieldstorage.
+      FieldStorageConfig::create($new_field_storage)->save();
+
+      // Step 7: Create new fields for all bundles.
+      foreach ($new_fields as $bundle => $new_field) {
+        $new_field = FieldConfig::create($new_field);
+        $new_field->save();
+
+        if (isset($new_field_form_display[$bundle])) {
+          $entity_form_display = EntityFormDisplay::load($entity_type . '.' . $bundle . '.default');
+          $entity_form_display->setComponent($field_name, $new_field_form_display[$bundle]);
+          $entity_form_display->save();
+        }
+
+        if (isset($new_field_view_display[$bundle])) {
+          $entity_view_display = EntityViewDisplay::load($entity_type . '.' . $bundle . '.default');
+          $entity_view_display->setComponent($field_name, $new_field_view_display[$bundle]);
+          $entity_view_display->save();
+        }
+      }
+
+      // Step 8: Restore existing data in fields & revision tables.
+      if (!is_null($rows)) {
+        foreach ($rows as $row) {
+          $row = (array) $row;
+          $database->insert($table)->fields($row)->execute();
+        }
+      }
+      if (!is_null($revision_rows)) {
+        foreach ($revision_rows as $row) {
+          $row = (array) $row;
+          $database->insert($revision_table)->fields($row)->execute();
+        }
+      }
+
+    }
+  }
+}
+
+/**
+ * Modify the dx8_component_preview image style.
+ */
+function cohesion_elements_update_8601() {
+  // Overwrite the existing entity config.
+  $config_path = \Drupal::service('extension.path.resolver')->getPath('module', 'cohesion_elements') . '/config/optional';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $source = $source->read('image.style.dx8_component_preview');
+  $config_storage->write('image.style.dx8_component_preview', $source);
+
+  // Flush the image cache.
+  if ($style = ImageStyle::load('dx8_component_preview')) {
+    $style->flush();
+  }
+}
+
+/**
+ * Install component and helper category entities.
+ */
+function cohesion_elements_update_8602() {
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  // If the entities don't exist, create them (can't rely on entup existing because of: https://www.drupal.org/node/3034742)
+  $entity_definitions = [
+    [
+      'id' => "cohesion_component_category",
+      'label' => new TranslatableMarkup("Component category"),
+      'label_singular' => new TranslatableMarkup("Component category"),
+      'label_plural' => new TranslatableMarkup("Component categories"),
+      'label_collection' => new TranslatableMarkup("Component categories"),
+      'label_count' => new PluralTranslation([
+        'singular' => "@count category",
+        'plural' => "@count categories",
+      ]),
+      'config_prefix' => "cohesion_component_category",
+      'handlers' => [
+        "list_builder" => "Drupal\cohesion_elements\CategoriesListBuilder",
+        "form" => [
+          "default" => "Drupal\cohesion_elements\Form\CategoryForm",
+          "add" => "Drupal\cohesion_elements\Form\CategoryForm",
+          "edit" => "Drupal\cohesion_elements\Form\CategoryForm",
+          "delete" => "Drupal\cohesion_elements\Form\CategoryDeleteForm",
+        ],
+        "route_provider" => [
+          "html" => "Drupal\cohesion\CohesionHtmlRouteProvider",
+        ],
+      ],
+      'admin_permission' => "administer component categories",
+      'entity_keys' => [
+        "id" => "id",
+        "label" => "label",
+        "uuid" => "uuid",
+        "class" => "class",
+        "weight" => "weight",
+      ],
+      "links" => [
+        "edit-form" => "/admin/cohesion/components/categories/{cohesion_component_category}/edit",
+        "add-form" => "/admin/cohesion/components/categories/add",
+        "delete-form" => "/admin/cohesion/components/categories/{cohesion_component_category}/delete",
+        "collection" => "/admin/cohesion/components/categories",
+        "in-use" => "/admin/cohesion/components/categories/{cohesion_component_category}/in_use",
+      ],
+    ],
+    [
+      'id' => "cohesion_helper_category",
+      'label' => new TranslatableMarkup("Helper category"),
+      'label_singular' => new TranslatableMarkup("Helper category"),
+      'label_plural' => new TranslatableMarkup("Helper categories"),
+      'label_collection' => new TranslatableMarkup("Helper categories"),
+      'label_count' => new PluralTranslation([
+        'singular' => "@count category",
+        'plural' => "@count categories",
+      ]),
+      'config_prefix' => "cohesion_helper_category",
+      'handlers' => [
+        "list_builder" => "Drupal\cohesion_elements\CategoriesListBuilder",
+        "form" => [
+          "default" => "Drupal\cohesion_elements\Form\CategoryForm",
+          "add" => "Drupal\cohesion_elements\Form\CategoryForm",
+          "edit" => "Drupal\cohesion_elements\Form\CategoryForm",
+          "delete" => "Drupal\cohesion_elements\Form\CategoryDeleteForm",
+        ],
+        "route_provider" => [
+          "html" => "Drupal\cohesion\CohesionHtmlRouteProvider",
+        ],
+      ],
+      'admin_permission' => "administer helper categories",
+      'entity_keys' => [
+        "id" => "id",
+        "label" => "label",
+        "uuid" => "uuid",
+        "class" => "class",
+        "weight" => "weight",
+      ],
+      "links" => [
+        "edit-form" => "/admin/cohesion/helpers/categories/{cohesion_helper_category}/edit",
+        "add-form" => "/admin/cohesion/helpers/categories/add",
+        "delete-form" => "/admin/cohesion/helpers/categories/{cohesion_helper_category}/delete",
+        "collection" => "/admin/cohesion/helpers/categories",
+        "in-use" => "/admin/cohesion/helpers/categories/{cohesion_helper_category}/in_use"
+      ],
+    ]
+  ];
+
+  foreach ($entity_definitions as $entity_definition) {
+    $entity_update_manager = \Drupal::entityDefinitionUpdateManager();
+    $entity_type = $entity_update_manager->getEntityType($entity_definition['id']);
+
+    // If the entity type doesn't exist, create it.
+    if (!$entity_type) {
+      \Drupal::entityDefinitionUpdateManager()->installEntityType(new ConfigEntityType($entity_definition));
+    }
+  }
+
+  // Overwrite the existing entity config.
+  $config_path = \Drupal::service('extension.path.resolver')->getPath('module', 'cohesion_elements') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+
+  foreach ($source->listAll('cohesion_elements.') as $config_item_name) {
+    // Load the config in.
+    $config = $source->read($config_item_name);
+
+    // Write to the config storage (create the entity).
+    $config_storage->write($config_item_name, $config);
+  }
+
+  // Save all the entities (this is required otherwise lookup by
+  // UUID fails for some reason :/ )
+  foreach (['cohesion_component_category', 'cohesion_helper_category'] as $entity_type_id) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type_id);
+    foreach ($storage->loadMultiple() as $entity) {
+      $entity->save();
+    }
+  }
+
+}
+
+/**
+ * Add uuid to dx8_component_preview image style.
+ */
+function cohesion_elements_update_8603() {
+  $image_style = ImageStyle::load('dx8_component_preview');
+  if (!$image_style->uuid()) {
+    $config = \Drupal::configFactory()->getEditable('image.style.dx8_component_preview');
+    $config->set('uuid', \Drupal::service('uuid')->generate());
+    $config->save();
+  }
+}
+
+/**
+ * Add weight to components / helpers
+ */
+function cohesion_elements_update_8604(){
+  $dx8_no_send_to_api = &drupal_static('dx8_no_send_to_api');
+  $dx8_no_send_to_api = TRUE;
+
+  $entity_types = ['cohesion_component', 'cohesion_helper'];
+
+  foreach ($entity_types as $entity_type){
+    $component_ids = \Drupal::entityTypeManager()->getStorage($entity_type)->getQuery()
+      ->accessCheck(TRUE)
+      ->sort('label', 'asc')
+      ->execute();
+    $components = \Drupal\cohesion_elements\Entity\Component::loadMultiple($component_ids);
+    $weight = 0;
+    foreach ($components as $component){
+      $config = \Drupal::configFactory()->getEditable($component->getConfigDependencyName());
+      $config->set('weight', $weight);
+      $config->save(true);
+      $weight++;
+    }
+  }
+}
+
+/**
+ * Define data_table and revision_data_table for cohesion_layout entity type
+ */
+function cohesion_elements_update_8701() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $definition_update_manager->getEntityType('cohesion_layout');
+  $entity_type->set('data_table', 'cohesion_layout_field_data');
+  $entity_type->set('revision_data_table', 'cohesion_layout_field_revision');
+  $definition_update_manager->updateEntityType($entity_type);
+}
+
+/**
+ * Update the layout_canvas field settings to allow elements on a layout canvas for sites being upgraded.
+ */
+function cohesion_elements_update_8702() {
+  $fieldsArray = \Drupal::service('entity_field.manager')->getFieldMapByFieldType('cohesion_entity_reference_revisions');
+
+  if (!empty($fieldsArray)) {
+    foreach ($fieldsArray as $group_id => $group) {
+      foreach ($group as $field_id => $field_def) {
+        if (strstr($field_id,'field_')) {
+          foreach ($field_def['bundles'] as $bundle) {
+            if ($field = Drupal::entityTypeManager()->getStorage('field_config')->load($group_id . '.' . $bundle . '.' . $field_id)) {
+              $field->setSetting('access_elements', "1");
+              $field->save();
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Add Site Studio view mode to Component Content entity type
+ */
+function cohesion_elements_update_8800() {
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_view_mode');
+  // Add a Site Studio view mode if it does not already exist.
+  if (!$storage->load("component_content.cohesion")) {
+    $storage->create([
+      'targetEntityType' => 'component_content',
+      'id' => "component_content.cohesion",
+      'status' => TRUE,
+      'label' => t('Site Studio'),
+    ])->save();
+  }
+}
+
+/**
+ * Update preview images on components,cohesion_component_category and cohesion_helper_category
+ */
+function cohesion_elements_update_8903() {
+  $component_ids = \Drupal::configFactory()->listAll('cohesion_elements.cohesion_component.');
+  foreach ($component_ids as $config_id) {
+    if(!is_string(\Drupal::config($config_id)->get('preview_image'))){
+      $editable = \Drupal::configFactory()->getEditable($config_id);
+      $editable->set('preview_image', '');
+      $editable->save();
+    }
+  }
+
+  $cohesion_helper_ids = \Drupal::configFactory()->listAll('cohesion_elements.cohesion_helper.');
+  foreach ($cohesion_helper_ids as $config_id) {
+    if(!is_string(\Drupal::config($config_id)->get('preview_image'))){
+      $editable = \Drupal::configFactory()->getEditable($config_id);
+      $editable->set('preview_image', '');
+      $editable->save();
+    }
+  }
+
+  $component_category_ids = \Drupal::configFactory()->listAll('cohesion_elements.cohesion_component_category.');
+  foreach ($component_category_ids as $config_id) {
+    $editable = \Drupal::configFactory()->getEditable($config_id);
+    $editable->clear('preview_image');
+    $editable->save();
+  }
+
+  $cohesion_helper_category_ids = \Drupal::configFactory()->listAll('cohesion_elements.cohesion_helper_category.');
+  foreach ($cohesion_helper_category_ids as $config_id) {
+    $editable = \Drupal::configFactory()->getEditable($config_id);
+    $editable->clear('preview_image');
+    $editable->save();
+  }
+}
+
+/**
+ * Update cohesion_component_contents missing references to the component it was created from
+ */
+  function cohesion_elements_update_8904() {
+
+    // Get component content ids where the component field is NULL or empty string.
+    $query_condition = \Drupal::entityTypeManager()->getStorage('component_content')->getQuery()
+      ->orConditionGroup()
+      ->condition('component', '')
+      ->condition('component', NULL , 'IS NULL');
+
+    $component_content_ids = \Drupal::entityTypeManager()->getStorage('component_content')->getQuery()
+      ->accessCheck(TRUE)
+      ->condition($query_condition)
+      ->execute();
+
+    // If we have any ids then load and update the component field to have the component id.
+    if ($component_content_ids) {
+      $component_contents = \Drupal\cohesion_elements\Entity\ComponentContent::loadMultiple($component_content_ids);
+
+      foreach ($component_contents as $component_content) {
+        // Get the layout canvas target id
+        $cc_target_layout_canvas = $component_content->get('layout_canvas')->target_id;
+
+        $component_id_query = Database::getConnection()->select('cohesion_layout_field_data', 'n')
+          ->fields('n', ['id', 'json_values'])
+          ->condition('id', $cc_target_layout_canvas)->execute()->fetch();
+
+        // Decode the layout canvas so we can get the component id & update in the database.
+        $layout_canvas_values = json_decode($component_id_query->json_values);
+        if ($layout_canvas_values->canvas[0]->componentId) {
+          Database::getConnection()->update('component_contents_field_data')->fields([
+            'component' => $layout_canvas_values->canvas[0]->componentId,
+          ])
+            ->condition('id', $component_content->id(), '=')
+            ->execute();
+        }
+      }
+    }
+  }
+
+/**
+ * Update cohesion_component_contents missing references to the component it was created from for custom components
+ */
+  function cohesion_elements_update_8905() {
+    // Re-run update 8904 as this fixes the same issue.
+    cohesion_elements_update_8904();
+  }
+
+/**
+ * Update helpers preview_image to empty string if its an empty array.
+ */
+function cohesion_elements_update_8906() {
+  $helpers = \Drupal::entityTypeManager()->getStorage('cohesion_helper')->loadMultiple();
+
+  foreach ($helpers as $helper) {
+    $previewImage = $helper->get('preview_image');
+    if (is_array($previewImage) && empty($previewImage)) {
+      $helper->setPreviewImage('');
+      $helper->save();
+    }
+  }
+}
+
+/**
+ * Create the element usage tracking table.
+ */
+function cohesion_elements_update_8907() {
+  Database::getConnection()->schema()->createTable('coh_element_usage', cohesion_elements_schema()['coh_element_usage']);
+}
+
+/**
+ *
+ * @param string $config_key
+ * @param array $access_type
+ * @param array $access_bundle
+ */
+function _update_component_access_types($config_key, $access_type = [], $access_bundle = []) {
+  try {
+    $config = \Drupal::configFactory()->getEditable($config_key);
+    $config->set('entity_type_access', $access_type);
+    $config->set('bundle_access', $access_bundle);
+    $config->save(TRUE);
+  } catch (\Exception $ex) {
+
+  }
+}

@@ -1,0 +1,10 @@
+name: Site Studio website settings
+type: module
+description: 'Defines the website settings configuration entities.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+libraries:
+  - jquery_ui/core
+dependencies:
+  - cohesion
+  - jquery_ui

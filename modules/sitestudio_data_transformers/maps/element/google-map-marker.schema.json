@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {"type": "string", "pattern": "^google-map-marker"},
+    "id": {"type": "string", "pattern": "^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$"},
+    "data": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string"},
+        "markerType": {"type": "string"},
+        "markerInfo": {
+          "type": "object",
+          "properties": {
+            "text": {"type":"string"},
+            "textFormat": {"type":"string"}
+          }
+        },
+        "link": {
+          "type": "object",
+          "properties": {
+            "type": {"type":"string"}
+          }
+        },
+        "label": {"type": "string"}
+      }
+    }
+  },
+  "required": ["id", "type", "data"]
+}

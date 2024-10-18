@@ -1,0 +1,533 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Route;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\cohesion_website_settings\Entity\WebsiteSettings;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Cache\Cache;
+use Drupal\cohesion\Entity\CohesionConfigEntityBase;
+use Drupal\Core\TypedData\TranslatableInterface;
+
+/**
+ * Implements hook_help().
+ */
+function cohesion_website_settings_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the cohesion_website_settings module.
+    case 'help.page.cohesion_website_settings':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module defines the website settings config entities.') . '</p>';
+      $output .= '<p><ul>';
+      $output .= '  <li>Website settings configuration entity and supporting forms.</li>';
+      $output .= '  <li>Site Studio API integration.</li>';
+      $output .= '</ul></p>';
+      $output .= '<p><a href="https://sitestudiodocs.acquia.com/" target="_blank">https://sitestudiodocs.acquia.com/</a></p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Process a batch of settings to import.
+ *
+ * @param $element
+ * @param $context
+ */
+function cohesion_website_settings_process_batch_import($element, &$context) {
+  if (!isset($context['results']['error'])) {
+    \Drupal::service('settings.endpoint.utils')->importAsset($element, $context);
+  }
+}
+
+/**
+ * Set up the batch import.
+ *
+ * @param $context
+ */
+function cohesion_website_settings_process_batch_import_start(&$context) {
+  $running_dx8_batch = &drupal_static('running_dx8_batch');
+  // Initial state.
+  $running_dx8_batch = TRUE;
+
+  // Copy the live stylesheet.json to temporary:// so styles don't get wiped
+  // when  re-importing.
+  \Drupal::service('cohesion.local_files_manager')->liveToTemp();
+}
+
+/**
+ * Batch settings import finished callback.
+ *
+ * @param $success
+ * @param $results
+ * @param $operations
+ */
+function cohesion_website_settings_batch_import_finished($success, $results, $operations) {
+  $config_editable = \Drupal::configFactory()->getEditable('cohesion.settings');
+  $config = \Drupal::config('cohesion.settings');
+
+  if ($success && !isset($results['error'])) {
+    $running_dx8_batch = &drupal_static('running_dx8_batch');
+    $running_dx8_batch = TRUE;
+
+    \Drupal::service('cohesion.local_files_manager')->tempToLive();
+    \Drupal::messenger()->addMessage(t('Account settings have been saved.'));
+    \Drupal::messenger()->addMessage(t('Site Studio is installed and up to date.'));
+    if ($config->get('api_key') && !$config->get('asset_is_imported')) {
+      $config_editable->set('asset_is_imported', TRUE);
+      $config_editable->save();
+    }
+  }
+  elseif (isset($results['error'])) {
+    \Drupal::messenger()->addError($results['error']);
+  }
+
+  $cohesion_routes = \Drupal::service('cohesion.utils')->getCohesionRoutes();
+  // Allow access to cohesion menu items.
+  foreach ($cohesion_routes as $route) {
+    if (($route instanceof Route) && $config->get('api_key') && $config->get('asset_is_imported')) {
+      $route->setRequirement('_access', 'TRUE');
+    }
+  }
+  \Drupal::service('router.builder')->rebuild();
+  Cache::invalidateTags(['dx8-form-data-tag']);
+
+  // Clear the js/css cache to update the cachebuster.
+  $module_handler = \Drupal::moduleHandler();
+  $module_handler->invokeAll('cache_flush');
+  foreach (Cache::getBins() as $service_id => $cache_backend) {
+    $cache_backend->deleteAll();
+  }
+
+  \Drupal::service('asset.css.collection_optimizer')->deleteAll();
+  \Drupal::service('asset.js.collection_optimizer')->deleteAll();
+  \Drupal::service('asset.query_string')->reset();
+  drupal_static_reset();
+
+  return new RedirectResponse(Url::fromRoute('cohesion.configuration.account_settings')->toString());
+}
+
+/**
+ * Resaves a config entity as part of a batch functions (including drush dx8
+ * rebuild).
+ *
+ * @param $entity CohesionConfigEntityBase
+ * @param bool $realsave
+ * @param bool $verbose
+ * @param array $context
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _resave_entity($entity, $realsave = FALSE, &$context = []) {
+  if ($entity) {
+    // Ignore base styles that have not been created.
+    if (isset($context['results']['error']) || ($entity->getEntityTypeId() === 'cohesion_base_styles' && !$entity->get('modified'))) {
+      return;
+    }
+
+    $running_dx8_batch = &drupal_static('running_dx8_batch');
+    // Initial state.
+    $running_dx8_batch = TRUE;
+
+    if ($entity instanceof CohesionConfigEntityBase) {
+
+      // Saving the entity will
+      // call the API via postSave()
+      // and run buildRequires via hook_entity_update().
+      if ($realsave) {
+        try {
+          $entity->save();
+        }
+        catch (\Exception $e) {
+          $context['results']['error'] = $e->getMessage();
+        }
+      }
+      else {
+        // Rebuild the Usage.
+        \Drupal::service('cohesion_usage.update_manager')->buildRequires($entity);
+
+        // Perform the Send to API.
+        try {
+          $send_to_api = $entity->process();
+          if ($send_to_api) {
+            // Get response from the API.
+            $data = $send_to_api->getData();
+            if (isset($data['error'])) {
+              $context['results']['error'] = $data['error'];
+            }
+          }
+        } catch (\Throwable $e) {
+          $context['results']['error'] = $e->getMessage();
+        }
+      }
+    }
+  }
+}
+
+function _resave_config_entity($entity_ids, $entity_type, $verbose = FALSE, &$context = []) {
+  $time_start = microtime(TRUE);
+  $entity_update_manager = \Drupal::service('cohesion.entity_update_manager');
+  $entity_list = \Drupal::entityTypeManager()->getStorage($entity_type)->loadMultiple($entity_ids);
+  foreach ($entity_list as $entity) {
+    _resave_entity($entity, $entity_update_manager->entityNeedUpdate($entity), $context);
+  }
+  $time_end = microtime(TRUE);
+  // Set batch message.
+  if ($verbose) {
+    $context['message'] = t('Building @entity_type: - @ids (@time seconds, @memory MB (total) @memory_peak MB (peak), start at: @time_start, end at: @time_end)', [
+      '@entity_type' => $entity_type,
+      '@ids' => implode(', ', $entity_ids),
+      '@time' => number_format((float) microtime(TRUE) - $time_start, 2, '.', ''),
+      '@memory' => number_format(memory_get_usage() / 1024768, 2, '.', ','),
+      '@memory_peak' => number_format(memory_get_peak_usage() / 1024768, 2, '.', ','),
+      '@time_start' => date("H:i:s", $time_start),
+      '@time_end' => date("H:i:s", $time_end),
+    ]);
+  } else {
+    $context['message'] = t('Building @entity_type: - @ids', [
+      '@entity_type' => $entity_type,
+      '@ids' => implode(', ', $entity_ids),
+    ]);
+  }
+}
+
+/**
+ * @param $forms
+ * @param bool $verbose
+ * @param array $context
+ */
+function _cohesion_style_save($forms, $verbose = FALSE, &$context = []) {
+
+  // Check if we should clean up css files.
+  if (!\Drupal::service('cohesion.utils')->loadCustomStylesOnPageOnly()) {
+    _cohesion_cleanup_css_files('/^cohesion-custom-style.*$/');
+  }
+
+  if (!\Drupal::service('cohesion.utils')->loadElementStylesOnPageOnly()) {
+    _cohesion_cleanup_css_files('/^custom-element-styles.*$/');
+  }
+
+  $time_start = microtime(TRUE);
+
+  $running_dx8_batch = &drupal_static('running_dx8_batch');
+  $running_dx8_batch = TRUE;
+  /** @var \Drupal\cohesion\StylesApi $send_to_api */
+  $send_to_api = \Drupal::service('plugin.manager.api.processor')->createInstance('styles_api');
+  $send_to_api->setForms($forms);
+  try {
+    $send_to_api->send();
+
+    // Get response from the API.
+    $data = $send_to_api->getData();
+    if (isset($data['error'])) {
+      $context['results']['error'] = $data['error'];
+    }
+  } catch (\Exception $e) {
+    $context['results']['error'] = $e->getMessage();
+  }
+
+  // Set batch message.
+  if ($verbose) {
+    $context['message'] = t('Rebuilding all styles (@time seconds, @memory MB (total) @memory_peak MB (peak), @timestamp)', [
+      '@time' => number_format((float) microtime(TRUE) - $time_start, 2, '.', ''),
+      '@memory' => number_format(memory_get_usage() / 1024768, 2, '.', ','),
+      '@memory_peak' => number_format(memory_get_peak_usage() / 1024768, 2, '.', ','),
+      '@timestamp' => date("H:i:s"),
+    ]);
+  }
+  else {
+    $context['message'] = t('Rebuilding all styles');
+  }
+
+}
+
+/**
+ * @param $mask
+ * @return void
+ */
+function _cohesion_cleanup_css_files($mask) {
+  $cssFiles = \Drupal::service('file_system')->scanDirectory(COHESION_CSS_PATH . '/theme', $mask);
+
+  foreach ($cssFiles as $cssFile) {
+    \Drupal::service('file_system')->delete($cssFile->uri);
+  }
+}
+
+function _cohesion_styles_bulk_save($ids, $entity_type, $verbose = FALSE, &$context = []) {
+  /** @var \Drupal\cohesion\EntityUpdateManager $entity_update_manager */
+  $entity_update_manager = \Drupal::service('cohesion.entity_update_manager');
+  $forms = [];
+  foreach ($ids as $entity_id) {
+    $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+    $entity_update_manager->entityNeedUpdate($entity);
+    if ($entity && $entity->status()) {
+      $api_plugin = $entity->getApiPluginInstance();
+      $api_plugin->setEntity($entity);
+      $forms = array_merge($api_plugin->getForms(), $forms);
+      unset($api_plugin, $entity);
+    }
+  }
+
+  if ($forms) {
+
+    $time_start = microtime(TRUE);
+
+    $running_dx8_batch = &drupal_static('running_dx8_batch');
+    $running_dx8_batch = TRUE;
+    /** @var Drupal\cohesion\Plugin\Api\StylesApi $send_to_api */
+    $send_to_api = \Drupal::service('plugin.manager.api.processor')->createInstance('styles_api');
+    $send_to_api->setForms($forms);
+    try {
+      $send_to_api->send();
+
+      // Get response from the API.
+      $data = $send_to_api->getData();
+      if (isset($data['error'])) {
+        $context['results']['error'] = $data['error'];
+      }
+    } catch (\Exception $e) {
+      $context['results']['error'] = $e->getMessage();
+    }
+
+    $time_end = microtime(TRUE);
+    // Set batch message.
+    if ($verbose) {
+      $context['message'] = t('Building styles: @entity_type - @ids (@time seconds, @memory MB (total) @memory_peak MB (peak), start at: @time_start, end at: @time_end)', [
+        '@entity_type' => $entity_type,
+        '@ids' => implode(', ', $ids),
+        '@time' => number_format((float) microtime(TRUE) - $time_start, 2, '.', ''),
+        '@memory' => number_format(memory_get_usage() / 1024768, 2, '.', ','),
+        '@memory_peak' => number_format(memory_get_peak_usage() / 1024768, 2, '.', ','),
+        '@time_start' => date("H:i:s", $time_start),
+        '@time_end' => date("H:i:s", $time_end),
+      ]);
+    } else {
+      $context['message'] = t('Building styles: @entity_type - @ids', [
+        '@entity_type' => $entity_type,
+        '@ids' => implode(', ', $ids),
+      ]);
+    }
+  }
+}
+
+/**
+ * @param $entity
+ * @param $context
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _resave_content_entity($entity, &$context) {
+  if (isset($context['results']['error'])) {
+    return;
+  }
+
+  $running_dx8_batch = &drupal_static('running_dx8_batch');
+  // Initial state.
+  $running_dx8_batch = TRUE;
+  // Save the entity.
+  $context['message'] = t('Rebuilding content entities.');
+
+  if ($entity instanceof RevisionableInterface && $entity->getRevisionId()) {
+    $entity->setNewRevision(FALSE);
+  }
+  $entity->save();
+  cohesion_entity_update($entity);
+}
+
+/**
+ * Resaves a cohesion layout entity as part of a batch functions (including
+ * drush dx8 rebuild).
+ *
+ * @param $ids
+ * @param $verbose
+ * @param $context
+ */
+function _resave_cohesion_layout_entity($ids, $verbose = FALSE, &$context = []) {
+  if (!isset($context['results']['error'])) {
+
+    $running_dx8_batch = &drupal_static('running_dx8_batch');
+    // Initial state.
+    $running_dx8_batch = TRUE;
+    // Save the entity.
+    $context['message'] = t('Rebuilding content entities.');
+    $entity_data = \Drupal::service('entity_type.manager')->getStorage('cohesion_layout');
+
+    if ($entity_data && ($entities = $entity_data->loadMultiple($ids))) {
+      /** @var \Drupal\cohesion_elements\Entity\CohesionLayout $entity */
+      foreach ($entities as $entity) {
+        _process_cohesion_layout_entity($entity, $context, $verbose);
+
+        // Rebuild all translations of this entity
+        if($entity->isTranslatable()) {
+          $languages = \Drupal::languageManager()->getLanguages();
+          $lang_codes = [];
+          foreach ($languages as $language) {
+            if ($language->getId() !== $entity->language()->getId() && $entity->hasTranslation($language->getId())) {
+              $translation_entity = $entity->getTranslation($language->getId());
+              _process_cohesion_layout_entity($translation_entity, $context, $verbose);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function _process_cohesion_layout_entity($entity, &$context, $verbose) {
+  if (!isset($context['results']['error'])) {
+    $time_start = microtime(TRUE);
+    // Rebuild the Usage.
+    $parent_entity_type_id = 'unknown';
+    $parent_entity_label = 'unknown';
+    $parent_entity_id = 'unknown';
+
+    if ($parent_entity = $entity->getParentEntity()) {
+      $parent_entity_type_id = $parent_entity->getEntityTypeId();
+      $parent_entity_label = $parent_entity->label();
+      $parent_entity_id = $parent_entity->id();
+      \Drupal::service('cohesion_usage.update_manager')->buildRequires($entity);
+    }
+
+    // Re-save the entity.
+    if ($entity instanceof RevisionableInterface && $entity->getRevisionId()) {
+      $entity->setNewRevision(FALSE);
+    }
+    $entity->save();
+    $cohesion_error = &drupal_static('entity_cohesion_error');
+    if ($cohesion_error) {
+      $context['results']['error'] = $cohesion_error;
+    }
+
+    // Batch message.
+    if ($verbose) {
+      $context['message'] = t('Building @entity_type_id - @label - @entity_id (@time seconds, @memory MB (total) @memory_peak MB (peak), @timestamp)', [
+        '@entity_type_id' => $parent_entity_type_id,
+        '@label' => $parent_entity_label,
+        '@entity_id' => $parent_entity_id,
+        '@time' => number_format((float) microtime(TRUE) - $time_start, 2, '.', ''),
+        '@memory' => number_format(memory_get_usage() / 1024768, 2, '.', ','),
+        '@memory_peak' => number_format(memory_get_peak_usage() / 1024768, 2, '.', ','),
+        '@timestamp' => date("H:i:s"),
+      ]);
+    }
+    else {
+      $context['message'] = t('Building @entity_type_id - @label - @entity_id', [
+        '@entity_type_id' => $parent_entity_type_id,
+        '@label' => $parent_entity_label,
+        '@entity_id' => $parent_entity_id,
+      ]);
+    }
+  }
+
+  // Process latest revisions as well as it can differ from the default revision
+  // (ex: published = default vs draft = latest)
+  if(!$entity->isLatestRevision()) {
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = \Drupal::service('entity_type.manager')->getStorage('cohesion_layout');
+    $latest_revision_id = $storage->getLatestRevisionId($entity->id());
+    $latest_revision = $storage->loadRevision($latest_revision_id);
+    if ($latest_revision instanceof TranslatableInterface &&  $latest_revision->hasTranslation($entity->language()->getId())) {
+      $latest_entity = $storage->loadRevision($latest_revision_id)->getTranslation($entity->language()->getId());
+      _process_cohesion_layout_entity($latest_entity, $context, $verbose);
+    }
+  }
+}
+
+/**
+ * Rebuilds the view entities usage.
+ *
+ * @param bool $verbose
+ * @param array $context
+ */
+function _rebuild_views_usage($verbose = FALSE, &$context = []) {
+  if (isset($context['results']['error'])) {
+    return;
+  }
+
+  $time_start = microtime(TRUE);
+
+  \Drupal::service('cohesion_usage.update_manager')->rebuildEntityType('view');
+
+  $time_end = microtime(TRUE);
+  // Batch message.
+  if ($verbose) {
+    $context['message'] = t('Rebuild view entities usage - (@time seconds, @memory MB (total) @memory_peak MB (peak), start at: @time_start, end at: @time_end)', [
+      '@time' => number_format((float) microtime(TRUE) - $time_start, 2, '.', ''),
+      '@memory' => number_format(memory_get_usage() / 1024768, 2, '.', ','),
+      '@memory_peak' => number_format(memory_get_peak_usage() / 1024768, 2, '.', ','),
+      '@time_start' => date("H:i:s", $time_start),
+      '@time_end' => date("H:i:s", $time_end),
+    ]);
+  }
+  else {
+    $context['message'] = t('Rebuild view entities usage.');
+  }
+
+}
+
+/**
+ * Implements hook_theme().
+ */
+function cohesion_website_settings_theme() {
+  return [
+    'cohesion_website_settings' => [
+      'template' => 'cohesion_website_settings',
+      'render element' => 'children',
+    ],
+  ];
+}
+
+/**
+ * Process a batch of settings to import.
+ *
+ * @param $element
+ * @param $context
+ */
+function cohesion_website_settings_process_batch(&$context) {
+  if (!isset($context['results']['error'])) {
+    $context['message'] = t('Importing Website Settings entities');
+    \Drupal::service('website_settings.defaults')->importEntities();
+  }
+}
+
+/**
+ * @param $entities
+ * @param $context
+ */
+function cohesion_website_settings_enable_website_settings($entities, &$context) {
+  if (!isset($context['results']['error'])) {
+    $context['message'] = t('Enabling Website Settings entities');
+
+    $errors = [];
+    if ($entities) {
+      foreach ($entities as $id) {
+        $running_dx8_batch = &drupal_static('running_dx8_batch');
+        // Initial state.
+        $running_dx8_batch = TRUE;
+
+        // Attempt to load existing website settings entity.
+        if (($ws_entity = WebsiteSettings::load($id)) && $ws_entity->isModified()) {
+          continue;
+        }
+        else {
+          // It doesn't exist, so create defaults.
+          if (($errors = \Drupal::service('website_settings.defaults')->createDefaultWebsiteSettings($id))) {
+            // Immediately break if there is an error.
+            break;
+          }
+        }
+      }
+    }
+
+    if ($errors) {
+      $context['results']['error'] = $errors['error'];
+    }
+  }
+}

@@ -1,0 +1,14 @@
+# Style guide
+entity.cohesion_style_guide:
+  title: 'Style guides'
+  description: 'Manage your style guide.'
+  route_name: entity.cohesion_style_guide.collection
+  parent: cohesion.settings
+  weight: 70
+
+entity.cohesion_style_guide.add_page:
+  title: 'Add style guide'
+  description: 'Add a new style guide.'
+  route_name: entity.cohesion_style_guide.add_form
+  parent: entity.cohesion_style_guide
+  weight: 0
