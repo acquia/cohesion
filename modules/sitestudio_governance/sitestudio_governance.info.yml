@@ -1,0 +1,7 @@
+name: Site Studio Governance
+type: module
+description: 'Adds more granular permissions for governance.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion
