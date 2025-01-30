@@ -1,0 +1,7 @@
+/* Fixes issue with bootstrap conflicting with Drupal popups */
+.ui-dialog,
+.ui-dialog .ui-widget-content.ui-dialog-content {
+  -webkit-box-sizing: initial;
+  -moz-box-sizing: initial;
+  box-sizing: initial;
+}

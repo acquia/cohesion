@@ -1,0 +1,12 @@
+sitestudio-page-builder.save:
+  path: '/cohesionapi/fontend-builder/save'
+  defaults:
+    _controller: '\Drupal\sitestudio_page_builder\Controller\SitestudioPageBuilderController::saveFrontendBuilder'
+  methods:  [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access visual page builder'
+  _format: json
+
+route_callbacks:
+  - '\Drupal\sitestudio_page_builder\Routing\Routes::routes'

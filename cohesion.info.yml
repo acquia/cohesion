@@ -1,0 +1,15 @@
+name: Site Studio core
+type: module
+description: 'Defines the base Site Studio entities, import and administration controllers and drush commands.'
+version: 8.x-8.0.3
+package: Site Studio
+core_version_requirement: ^10.2.2 || ^11
+dependencies:
+  - contextual
+  - imce
+  - token
+  - entity_reference_revisions
+  - rest
+  - ckeditor5
+  - jquery_ui
+  - drupal:file

@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/cohesion-services/dx8-gateway/node'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+    target-branch: '${{ github.head_ref }}-dependabot-vulnerabilities'
+    versioning-strategy: 'increase'
+
+  - package-ecosystem: 'composer'
+    directory: '/cohesion-services/dx8-gateway/php'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+    target-branch: '${{ github.head_ref }}-dependabot-vulnerabilities'
+    versioning-strategy: 'increase'
+
+  - package-ecosystem: 'npm'
+    directory: '/cohesion-services/scss-gateway/node'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+    target-branch: '${{ github.head_ref }}-dependabot-vulnerabilities'
+    versioning-strategy: 'increase'
