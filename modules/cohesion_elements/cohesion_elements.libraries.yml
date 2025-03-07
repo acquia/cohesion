@@ -1,0 +1,29 @@
+canvas-preview:
+  js:
+    js/canvas-preview.js: {}
+  css:
+    component:
+      css/canvas-preview.css: {}
+  dependencies:
+    - core/jquery
+    - jquery_ui/core
+    - cohesion/global_libraries.jquery_ui_resizable
+
+custom-component-form-builder:
+  js:
+    js/custom-component-form-builder.js: {}
+  css:
+    component:
+      css/custom-component-form-builder.css: {}
+  dependencies:
+    - core/jquery
+
+component-category:
+  css:
+    component:
+      css/component-category.css: {}
+
+element-toggle:
+  css:
+    component:
+      css/element-toggle.css: {}

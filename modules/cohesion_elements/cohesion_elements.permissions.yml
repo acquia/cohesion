@@ -1,0 +1,27 @@
+administer components:
+  title: Site Studio components
+  description: 'Grant access to create, edit and manage Site Studio components.'
+administer component content:
+  title: Site Studio component content
+  description: 'Grant access to create, edit and manage Site Studio component content.'
+administer component categories:
+  title: Site Studio component categories
+  description: 'Grant access to create, edit and manage Site Studio component categories.'
+
+administer helpers:
+  title: Site Studio helpers
+  description: 'Grant access to create, edit and manage Site Studio helpers.'
+administer helper categories:
+  title: Site Studio helpers categories
+  description: 'Grant access to create, edit and manage Site Studio helper categories.'
+
+permission_callbacks:
+  - \Drupal\cohesion_elements\CategoryPermissions::getPermissions
+
+use custom component builder:
+  title: Site Studio custom component builder
+  description: 'Grant access to custom component builder UI.'
+
+toggle elements:
+  title: Site Studio toggle elements
+  description: 'Grant access to allow disabling and enabling of elements'

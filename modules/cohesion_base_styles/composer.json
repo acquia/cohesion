@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_base_styles",
+    "type": "drupal-module",
+    "description": "Defines the base style configuration entities for creating HTML element base styles.",
+    "license": "GPL-2.0-or-later"
+}

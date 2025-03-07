@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_page_attachments().
+ */
+function sitestudio_governance_page_attachments(array &$attachments) {
+  $attachments['#attached']['drupalSettings']['cohesion']['extra_governance'] = TRUE;
+}
