@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset name="Acquia Subset" namespace="Cohesion\CS\Standard">
+  <description>A subset of the Acquia coding standards.</description>
+  <exclude-pattern>/apps/*</exclude-pattern>
+  <exclude-pattern>/cohesion-services/*</exclude-pattern>
+  <exclude-pattern>/e2e-tests/*</exclude-pattern>
+  <exclude-pattern>*/tests/src/*</exclude-pattern>
+  <rule ref="AcquiaDrupalStrict">
+    <exclude name="Drupal.Commenting.FunctionComment"/>
+    <exclude name="Drupal.Commenting.DocComment"/>
+    <exclude name="Drupal.NamingConventions.ValidFunctionName"/>
+    <exclude name="Drupal.NamingConventions.ValidClassName"/>
+    <exclude name="Drupal.NamingConventions.ValidVariableName"/>
+    <exclude name="Generic.NamingConventions.UpperCaseConstantName"/>
+    <exclude name="Drupal.Commenting.InlineComment"/>
+    <exclude name="Drupal.ControlStructures.ControlSignature"/>
+    <exclude name="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
+    <exclude name="DrupalPractice.Objects.GlobalDrupal"/>
+    <exclude name="DrupalPractice.Objects.GlobalFunction"/>
+    <exclude name="DrupalPractice.Constants.GlobalConstant"/>
+    <exclude name="DrupalPractice.Constants.GlobalDefine"/>
+    <exclude name="DrupalPractice.CodeAnalysis.VariableAnalysis"/>
+    <exclude name="DrupalPractice.General.OptionsT"/>
+    <exclude name="PHPCompatibility.Keywords.ForbiddenNamesAsDeclared"/>
+    <exclude name="SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable"/>
+  </rule>
+</ruleset>

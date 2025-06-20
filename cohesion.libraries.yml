@@ -1,0 +1,80 @@
+coh-theme:
+  css:
+    base:
+      css/reset.css: {}
+      css/base-default.css: {}
+    theme:
+      css/theme-default.css: {}
+
+cohesion-admin-scripts:
+  js:
+    js/ios.js: {}
+    public://cohesion/scripts/dx8/app.js: { minified: true }
+  css:
+    theme:
+      css/loading.css: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - editor/drupal.editor
+    - editor/drupal.editor.admin
+    - ckeditor5/internal.drupal.ckeditor5
+    - core/drupalSettings
+    - core/backbone
+
+drupal.machine-name:
+  js:
+    js/machine-name.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.form
+
+cohesion-accordion-element:
+  js:
+    js/cohesion-accordion-element.js: {}
+  css:
+    theme:
+      css/cohesion-accordion-element.css: {}
+  dependencies:
+    - core/jquery
+
+# temporary - remove this after code has been moved into angular.
+cohesion_token:
+  css:
+    component:
+      css/cohesion-token.css: { weight: -10 }
+
+admin-icon-libraries:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-icon-libraries.css: { media: all }
+
+admin-responsive-grid-settings:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-responsive-grid-settings.css: { media: all }
+
+cohesion-ui:
+  css:
+    theme:
+      css/cohesion-ui.css: { weight: -10}
+
+cohesion-list-builder-sort:
+  js:
+    js/cohesion-list-builder-sort.js: {}
+    js/list-builder-sort.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupalSettings
+  css:
+    component:
+      css/list-builder-sort.css: {}
+
+coh-clean-page:
+  css:
+    component:
+      css/cohesion-clean-page.css: {}
