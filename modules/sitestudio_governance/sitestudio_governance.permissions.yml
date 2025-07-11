@@ -1,0 +1,27 @@
+administer layout canvas add:
+  title: Site Studio add items to layout canvas
+  description: 'Grant access to add Site Studio items on the layout canvas and visual page builder.'
+
+administer layout canvas delete:
+  title: Site Studio delete items on the layout canvas
+  description: 'Grant access to delete Site Studio items on the layout canvas and visual page builder.'
+
+administer layout canvas duplicate:
+  title: Site Studio duplicate items on the layout canvas
+  description: 'Grant access to show the option to duplicate Site Studio items on the layout canvas and visual page builder.'
+
+administer layout canvas drag:
+  title: Site Studio drag and move items on the layout canvas
+  description: 'Grant access to drag and move Site Studio items on the layout canvas and visual page builder.'
+
+administer layout canvas save:
+  title: Site Studio save helpers on the layout canvas
+  description: 'Grant access to show the option to save helpers on the layout canvas and visual page builder.'
+
+administer layout canvas edit:
+  title: Site Studio edit items on the layout canvas
+  description: 'Grant access to edit Site Studio items on the layout canvas and visual page builder.'
+
+administer layout canvas configure:
+  title: Site Studio configure items on the layout canvas
+  description: 'Grant access to show the option to configure Site Studio items on the layout canvas and visual page builder.'

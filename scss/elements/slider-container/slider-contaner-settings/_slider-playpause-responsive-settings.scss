@@ -1,0 +1,321 @@
+@use "../../../mixins/coh-breakpoint";
+/// @name slider-playpause-responsive-settings
+/// @group Elements Slider item settings
+/// @description Sets Responsive defaults for Slider item
+@mixin slider-playpause-responsive-settings()   {
+
+    .coh-slider-container {
+
+        @include coh-breakpoint.breakpoint-looper {
+
+            $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+            @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+                // Play/pause (inside)
+                &-playpause-inside-top-left-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: auto;
+                            bottom: auto;
+                            left: 0;
+                            transform: translate(0);
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-inside-top-middle-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: auto;
+                            bottom: auto;
+                            left: 50%;
+                            transform: translate(-50%, 0);
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-inside-top-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            bottom: auto;
+                            left: auto;
+                            transform: translate(0);
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-inside-bottom-left-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: auto;
+                            right: auto;
+                            bottom: 0;
+                            left: 0;
+                            transform: translate(0);
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-inside-bottom-middle-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: auto;
+                            right: auto;
+                            bottom: 0;
+                            left: 50%;
+                            transform: translate(-50%, 0);
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-inside-bottom-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: auto;
+                            right: 0;
+                            bottom: 0;
+                            left: auto;
+                            transform: translate(0);
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-inside-middle-left-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 50%;
+                            right: auto;
+                            bottom: auto;
+                            left: 0;
+                            transform: translate(0, -50%);
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-inside-middle-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 50%;
+                            right: 0;
+                            bottom: auto;
+                            left: auto;
+                            transform: translate(0, -50%);
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                // playpause (outside)
+                &-playpause-outside-top-left-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: auto;
+                            bottom: auto;
+                            left: 0;
+                            transform: translate(0);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-outside-top-middle-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: auto;
+                            bottom: auto;
+                            left: 50%;
+                            transform: translate(-50%, 0);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-outside-top-right-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            bottom: auto;
+                            left: auto;
+                            transform: translate(0);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-outside-bottom-left-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        position:relative;
+
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: auto;
+                            bottom: auto;
+                            left: 0;
+                            transform: translate(0);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-outside-bottom-middle-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        position:relative;
+
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: auto;
+                            bottom: auto;
+                            left: 50%;
+                            transform: translate(-50%, 0);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-outside-bottom-right-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        position:relative;
+
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            bottom: auto;
+                            left: auto;
+                            transform: translate(0);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-outside-middle-left-#{$breakpoint} {
+                    > .coh-slider-container-mid {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 50%;
+                            right: auto;
+                            bottom: auto;
+                            left: 0;
+                            transform: translate(0, -50%);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-playpause-outside-middle-right-#{$breakpoint} {
+                    > .coh-slider-container-mid {
+                        .slick-playpause-button {
+                            position: absolute;
+                            top: 50%;
+                            right: 0;
+                            bottom: auto;
+                            left: auto;
+                            transform: translate(0, -50%);
+                            z-index: 1;
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

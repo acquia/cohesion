@@ -1,0 +1,71 @@
+@use "../../mixins/coh-breakpoint";
+
+.coh-image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    /*fix Edge for lazy-loading https://github.com/verlok/lazyload/issues/152 */
+    &[data-src],
+    &[data-srcset] {
+        min-height: 1px;
+    }
+
+    @include coh-breakpoint.breakpoint-looper {
+
+        $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+        @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+            // Actual size image
+            &-#{$breakpoint} {
+                display: block;
+                width: auto;
+                max-width: 100%;
+                height: auto;
+            }
+
+            // Responsive size image
+            &-responsive-#{$breakpoint} {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                float: none;
+                margin-left: 0;
+                transform: translateX(0);
+            }
+
+            // Alignment options for actual size image
+            &-float-left-#{$breakpoint} {
+                float: left;
+                margin-left: 0;
+                transform: translateX(0);
+            }
+
+            &-float-right-#{$breakpoint} {
+                float: right;
+                margin-left: 0;
+                transform: translateX(0);
+            }
+
+            &-align-left-#{$breakpoint} {
+                float: none;
+                margin-left: 0;
+                transform: translateX(0);
+            }
+
+            &-align-centre-#{$breakpoint} {
+                float: none;
+                margin-left: 50%;
+                transform: translateX(-50%);
+            }
+
+            &-align-right-#{$breakpoint} {
+                float: none;
+                margin-left: 100%;
+                transform: translateX(-100%);
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+cohesion_elements.cohesion_helper_category.*:
+  type: cohesion_config_entity
+  label: 'Helper category configuration'
+  mapping:
+    class:
+      type: string
+      label: 'Class'
+    weight:
+      type: integer
+      label: 'Weight'
