@@ -1,0 +1,95 @@
+.coh-preloader-x-small:before {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-width: 2px;
+}
+
+.coh-preloader-small:before {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-width: 2px;
+}
+
+.coh-preloader-medium:before {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-width: 3px;
+}
+
+.coh-preloader-large:before {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-width: 4px;
+}
+
+.ssa-is-loading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.ssa-is-loading.ssa-app {
+  min-height: 40px;
+  margin-bottom: 20px;
+}
+
+.ssa-is-loading:before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: #DDD;
+  border-left-color: #0e68a7;
+  animation: rotate 0.75s infinite linear;
+}
+
+.ssa-is-loading > * {
+  opacity: 0;
+  visibility: hidden;
+  width: 100%;
+}
+
+.ssa-is-loading.coh-preloader-inline {
+  display: flex;
+  margin-left: 5px;
+}
+
+.schema-form-select > .ssa-is-loading {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  z-index: 1;
+}
+
+.field--type-cohesion-entity-reference-revisions .ssa-is-loading {
+  min-height: 100px;
+}
+
+.ssa-form-is-loading .form-actions,
+.ssa-form-is-loading .coh-devel-json-textarea {
+  display: none;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
