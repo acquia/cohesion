@@ -1,0 +1,185 @@
+@use "../../mixins/coh-breakpoint";
+
+.coh-accordion-tabs {
+
+    &:before, &:after {
+        clear: both;
+        content: " ";
+        display: table;
+    }
+
+    &-nav {
+        margin: 0;
+        padding-bottom: 0;
+        list-style: none;
+        display: none; // Accordion view by default if no options are selected
+
+        > li {
+            display: inline-block;
+            vertical-align: top;
+
+            a {
+                display: block;
+            }
+
+            &.is-hidden {
+                display: none;
+            }
+        }
+    }
+
+    // Stop the flash of all the tab content showing at once
+    &-content {
+        display: none;
+    }
+
+    // Accordion tabs position - horizontal
+    &-horizontal-left,
+    &-horizontal-left-grid {
+        > .coh-accordion-tabs-nav {
+            text-align: left;
+            padding: 0;
+        }
+    }
+
+    &-horizontal-center {
+        > .coh-accordion-tabs-nav {
+            text-align: center;
+            padding: 0;
+        }
+    }
+
+    &-horizontal-right,
+    &-horizontal-right-grid {
+        > .coh-accordion-tabs-nav {
+            text-align: right;
+            padding: 0;
+        }
+    }
+
+    &-horizontal-justify,
+    &-horizontal-justify-grid {
+        > .coh-accordion-tabs-nav {
+            margin: 0 auto;
+            padding: 0;
+
+            > li {
+                display: table-cell;
+                width: 1%;
+                text-align: center;
+            }
+        }
+    }
+
+    // Accordion tabs position - vertical
+    &-vertical-left,
+    &-vertical-right {
+        > .coh-accordion-tabs-nav {
+            > li {
+                display: block;
+            }
+        }
+    }
+
+    &-vertical-left {
+        > .coh-accordion-tabs-nav {
+            order: 0;
+        }
+
+        > .coh-accordion-tabs-content-wrapper {
+            order: 1;
+        }
+    }
+
+    &-vertical-right {
+        > .coh-accordion-tabs-nav {
+            order: 1;
+        }
+
+        > .coh-accordion-tabs-content-wrapper {
+            order: 0;
+        }
+    }
+
+    // Accordion tabs position - horizontal boxed width of grid
+    &-horizontal-left-grid,
+    &-horizontal-right-grid,
+    &-horizontal-justify-grid {
+
+        > .coh-accordion-tabs-nav {
+            max-width: var(--ssa-responsive-grid-settings-boxed-width);
+            margin-left: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+            margin-right: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+        }
+
+        > .coh-accordion-tabs-content-wrapper {
+            clear: both;
+        }
+    }
+
+    @include coh-breakpoint.breakpoint-looper {
+
+        $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+        @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+            // Accordion tabs - display style
+            &-display-accordion-#{$breakpoint} {
+
+                > .coh-accordion-tabs-nav {
+                    display: none;
+
+                    .coh-accordion-tabs > .coh-accordion-tabs-inner & {
+                        display: none;
+                    }
+                }
+
+                > .coh-accordion-tabs-content-wrapper {
+
+                    .coh-accordion-title    {
+                        display: block;
+
+                        .coh-accordion-tabs > .coh-accordion-tabs-inner & {
+                            display: block;
+                        }
+
+                        &.is-hidden {
+                            display: none;
+                        }
+                    }
+                }
+
+            }
+
+            &-display-inner-accordion-#{$breakpoint} {
+
+                .coh-accordion-tabs > .coh-accordion-tabs-inner > & {
+                    flex: 0 0 100%;
+                    max-width: 100%;
+                }
+            }
+
+            &-display-tabs-#{$breakpoint} {
+
+                > .coh-accordion-tabs-nav {
+                    display: block;
+
+                    .coh-accordion-tabs > .coh-accordion-tabs-inner & {
+                        display: block;
+                    }
+                }
+
+                >.coh-accordion-tabs-content-wrapper {
+
+                    .coh-accordion-title    {
+                        display: none;
+
+                        .coh-accordion-tabs > .coh-accordion-tabs-inner & {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

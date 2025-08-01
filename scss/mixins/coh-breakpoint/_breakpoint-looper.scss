@@ -1,0 +1,25 @@
+@use "sass:map";
+@use "../../abstracts/variables";
+
+$coh-breakpoint-looper-key : null; // Global
+
+/// @name coh-grid-breakpoint-looper
+/// @group Website settings Responsive grid settings
+/// @description    Loop over each breakpoint and updates the global var $coh-breakpoint-looper-key so the mixin being called knows which breakpoint we are at
+/// @param {Map}    $responsive-grid-settings   - Keyed responsive grid settings map
+@mixin breakpoint-looper($responsive-grid-settings: variables.$responsive-grid-settings)    {
+
+    $breakpoints: map.get($responsive-grid-settings, breakpoints);
+
+    @each $key, $breakpoint in $breakpoints {
+
+        $old : $coh-breakpoint-looper-key;
+
+        $coh-breakpoint-looper-key: $key !global;
+
+        @content;
+
+        $coh-breakpoint-looper-key: $old !global;
+    }
+}
+

@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-recommended-scss"
+  ],
+  "plugins": [
+    "stylelint-scss",
+    "@stylistic/stylelint-plugin"
+  ],
+  "rules": {
+    "number-max-precision": 10,
+    "@stylistic/indentation": [4, { "baseIndentLevel": 0 }]
+  }
+}
