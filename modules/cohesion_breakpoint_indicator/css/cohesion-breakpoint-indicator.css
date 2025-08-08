@@ -1,0 +1,37 @@
+body.coh-breakpoint-indicator:after {
+  background-color: #000;
+  text-align: center;
+  line-height: 45px;
+  display: block;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 35px;
+  height: 35px;
+  z-index: 10000;
+  opacity: 0.8;
+}
+
+body.coh-breakpoint-indicator-xl.coh-breakpoint-indicator:after {
+  content: url("../images/xl.svg");
+}
+
+body.coh-breakpoint-indicator-lg.coh-breakpoint-indicator:after {
+  content: url("../images/lg.svg");
+}
+
+body.coh-breakpoint-indicator-md.coh-breakpoint-indicator:after {
+  content: url("../images/md.svg");
+}
+
+body.coh-breakpoint-indicator-sm.coh-breakpoint-indicator:after {
+  content: url("../images/sm.svg");
+}
+
+body.coh-breakpoint-indicator-ps.coh-breakpoint-indicator:after {
+  content: url("../images/ps.svg");
+}
+
+body.coh-breakpoint-indicator-xs.coh-breakpoint-indicator:after {
+  content: url("../images/xs.svg");
+}

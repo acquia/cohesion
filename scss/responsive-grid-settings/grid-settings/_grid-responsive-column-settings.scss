@@ -1,0 +1,167 @@
+@use "sass:math";
+@use "../../mixins/coh-breakpoint";
+
+@mixin grid-responsive-column-settings() {
+
+    $columns: 12;
+
+    // Used for Drupal UX
+    $column-margin: 10px;
+
+    @include coh-breakpoint.breakpoint-looper {
+
+        $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+        @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+            // *** Width - Undefined *** //
+
+            // Front-end
+            .coh-col-#{$breakpoint} {
+                flex-basis: 0;
+                flex-grow: 1;
+                max-width: 100%;
+            }
+
+            // Layout canvas
+            .coh-layout-col-#{$breakpoint} {
+                flex-basis: 0;
+                flex-grow: 1;
+                max-width: 100%;
+                opacity: 1;
+            }
+
+            // *** Width - Auto *** //
+
+            // Front-end
+            .coh-col-#{$breakpoint + '-auto'} {
+                flex: 0 0 auto;
+                width: auto;
+                max-width: none;
+            }
+
+            // Layout canvas
+            .coh-layout-col-#{$breakpoint + '-auto'} {
+                flex: 0 0 auto;
+                width: auto;
+                max-width: 200px;
+                opacity: 1;
+            }
+
+            // *** Width - None (hidden) *** //
+
+            // Layout canvas
+            .coh-layout-col-#{$breakpoint + '-hidden'} {
+                max-width: 200px;
+                opacity: 0.5;
+            }
+
+            @for $i from 1 through $columns {
+
+                $percentage: math.percentage(math.div($i, $columns));
+
+                // Front-end
+                .coh-col-#{$breakpoint}-#{$i} {
+                    flex: 0 0 $percentage;
+                    max-width: $percentage;
+                }
+
+                // Layout canvas
+                .coh-layout-col-#{$breakpoint}-#{$i} {
+                    flex: 0 0 calc(#{$percentage} - #{$column-margin});
+                    max-width: calc(#{$percentage} - #{$column-margin});
+                    opacity: 1;
+
+                    &.coh-layout-canvas-component-drop-zone {
+                        flex: 0 0 #{$percentage};
+                        max-width: #{$percentage};
+                    }
+                }
+            }
+
+            // Front-end
+            .coh-col-#{$breakpoint + '-1-5'} {
+                flex: 0 0 20%;
+                max-width: 20%;
+            }
+
+            // Layout Canvas
+            .coh-layout-col-#{$breakpoint + '-1-5'} {
+                flex: 0 0 calc(20% - #{$column-margin});
+                max-width: calc(20% - #{$column-margin});
+                opacity: 1;
+
+                &.coh-layout-canvas-component-drop-zone {
+                    flex: 0 0 20%;
+                    max-width: 20%;
+                }
+            }
+
+            // Push, Pull, Offset, Visibility
+            @for $i from $columns through 0 {
+
+                @if $i == 0 {
+
+                    // Hidden
+                    .coh-hidden-#{$breakpoint} {
+                        display: none;
+                    }
+
+                    // Push
+                    .coh-col-#{$breakpoint}-push-#{$i} {
+                        left: auto;
+                    }
+
+                    // Pull
+                    .coh-col-#{$breakpoint}-pull-#{$i} {
+                        right: auto;
+                    }
+
+                    // Offset
+                    .coh-col-#{$breakpoint}-offset-#{$i} {
+                        margin-left: 0;
+                    }
+
+                } @else {
+
+                    @if $i == 1 {
+                        // Visible
+                        .coh-visible-#{$breakpoint} {
+                            display: block;
+                        }
+                    }
+
+                    // Push
+                    $push: math.div($i, $columns);
+                    .coh-col-#{$breakpoint}-push-#{$i} {
+                        left: math.percentage($push);
+                    }
+
+                    // Pull
+                    $pull: math.div($i, $columns);
+                    .coh-col-#{$breakpoint}-pull-#{$i} {
+                        right: math.percentage($pull);
+                    }
+
+                    // Offset
+                    $offset: math.div($i, $columns);
+                    .coh-col-#{$breakpoint}-offset-#{$i} {
+                        margin-left: math.percentage($offset);
+                    }
+                }
+            }
+
+            .coh-col-#{$breakpoint}-push-1-5 {
+                left: 20%;
+            }
+
+            .coh-col-#{$breakpoint}-pull-1-5 {
+                right: 20%;
+            }
+
+            .coh-col-#{$breakpoint}-offset-1-5 {
+                margin-left: 20%;
+            }
+        }
+    }
+}

@@ -1,0 +1,68 @@
+.coh-accordion-tabs:before, .coh-accordion-tabs:after {
+  clear: both;
+  content: " ";
+  display: table;
+}
+.coh-accordion-tabs-nav {
+  margin: 0;
+  padding-bottom: 0;
+  list-style: none;
+  display: none;
+}
+.coh-accordion-tabs-nav > li {
+  display: inline-block;
+  vertical-align: top;
+}
+.coh-accordion-tabs-nav > li a {
+  display: block;
+}
+.coh-accordion-tabs-nav > li.is-hidden {
+  display: none;
+}
+.coh-accordion-tabs-content {
+  display: none;
+}
+.coh-accordion-tabs-horizontal-left > .coh-accordion-tabs-nav, .coh-accordion-tabs-horizontal-left-grid > .coh-accordion-tabs-nav {
+  text-align: left;
+  padding: 0;
+}
+.coh-accordion-tabs-horizontal-center > .coh-accordion-tabs-nav {
+  text-align: center;
+  padding: 0;
+}
+.coh-accordion-tabs-horizontal-right > .coh-accordion-tabs-nav, .coh-accordion-tabs-horizontal-right-grid > .coh-accordion-tabs-nav {
+  text-align: right;
+  padding: 0;
+}
+.coh-accordion-tabs-horizontal-justify > .coh-accordion-tabs-nav, .coh-accordion-tabs-horizontal-justify-grid > .coh-accordion-tabs-nav {
+  margin: 0 auto;
+  padding: 0;
+}
+.coh-accordion-tabs-horizontal-justify > .coh-accordion-tabs-nav > li, .coh-accordion-tabs-horizontal-justify-grid > .coh-accordion-tabs-nav > li {
+  display: table-cell;
+  width: 1%;
+  text-align: center;
+}
+.coh-accordion-tabs-vertical-left > .coh-accordion-tabs-nav > li, .coh-accordion-tabs-vertical-right > .coh-accordion-tabs-nav > li {
+  display: block;
+}
+.coh-accordion-tabs-vertical-left > .coh-accordion-tabs-nav {
+  order: 0;
+}
+.coh-accordion-tabs-vertical-left > .coh-accordion-tabs-content-wrapper {
+  order: 1;
+}
+.coh-accordion-tabs-vertical-right > .coh-accordion-tabs-nav {
+  order: 1;
+}
+.coh-accordion-tabs-vertical-right > .coh-accordion-tabs-content-wrapper {
+  order: 0;
+}
+.coh-accordion-tabs-horizontal-left-grid > .coh-accordion-tabs-nav, .coh-accordion-tabs-horizontal-right-grid > .coh-accordion-tabs-nav, .coh-accordion-tabs-horizontal-justify-grid > .coh-accordion-tabs-nav {
+  max-width: var(--ssa-responsive-grid-settings-boxed-width);
+  margin-left: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+  margin-right: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+}
+.coh-accordion-tabs-horizontal-left-grid > .coh-accordion-tabs-content-wrapper, .coh-accordion-tabs-horizontal-right-grid > .coh-accordion-tabs-content-wrapper, .coh-accordion-tabs-horizontal-justify-grid > .coh-accordion-tabs-content-wrapper {
+  clear: both;
+}

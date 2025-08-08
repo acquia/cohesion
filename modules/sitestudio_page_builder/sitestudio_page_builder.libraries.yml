@@ -1,0 +1,13 @@
+editor-loader:
+  css:
+    component:
+      css/editor-loader.css: {}
+  js:
+    js/editor-loader.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+
+cohesion-frontend-edit-scripts:
+  js:
+    public://cohesion/scripts/dx8/app.js: { minified: true }
