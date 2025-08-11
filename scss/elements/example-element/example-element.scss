@@ -1,0 +1,30 @@
+@use "sass:map";
+@use "../../mixins/example";
+@use "../../mixins/coh-breakpoint";
+
+$example-element: (
+    xs: 16px,
+    ps: 20px,
+    sm: 24px,
+    md: 30px,
+    lg: 34px,
+    xl: 38px
+);
+
+.example  {
+    @include example.mixin;
+}
+
+@include coh-breakpoint.breakpoint-looper {
+
+    $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+    @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+        $font-size: map.get($example-element, $breakpoint);
+
+        .example-split-#{$breakpoint} {
+            font-size: $font-size;
+        }
+    }
+}
