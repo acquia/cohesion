@@ -1,0 +1,5 @@
+.coh-wysiwyg:before, .coh-wysiwyg:after {
+  clear: both;
+  content: " ";
+  display: table;
+}

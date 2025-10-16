@@ -1,0 +1,7 @@
+name: Site Studio example custom element
+type: module
+description: 'A working example of a custom Site Studio element to show a developer how they can create one.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion

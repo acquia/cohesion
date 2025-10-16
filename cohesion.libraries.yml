@@ -1,0 +1,169 @@
+coh-theme:
+  css:
+    base:
+      css/reset.css: {}
+      css/base-default.css: {}
+    theme:
+      css/theme-default.css: {}
+
+cohesion-admin-scripts:
+  js:
+    js/ios.js: {}
+    public://cohesion/scripts/dx8/app.js: { minified: true }
+  css:
+    theme:
+      css/loading.css: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - editor/drupal.editor
+    - editor/drupal.editor.admin
+    - ckeditor5/internal.drupal.ckeditor5
+    - core/drupalSettings
+    - core/backbone
+
+drupal.machine-name:
+  js:
+    js/machine-name.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.form
+
+cohesion-accordion-element:
+  js:
+    js/cohesion-accordion-element.js: {}
+  css:
+    theme:
+      css/cohesion-accordion-element.css: {}
+  dependencies:
+    - core/jquery
+
+# temporary - remove this after code has been moved into angular.
+cohesion_token:
+  css:
+    component:
+      css/cohesion-token.css: { weight: -10 }
+
+admin-icon-libraries:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-icon-libraries.css: { media: all }
+
+admin-responsive-grid-settings:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-responsive-grid-settings.css: { media: all }
+
+cohesion-ui:
+  css:
+    theme:
+      css/cohesion-ui.css: { weight: -10}
+
+cohesion-list-builder-sort:
+  js:
+    js/cohesion-list-builder-sort.js: {}
+    js/list-builder-sort.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal.tabledrag
+  css:
+    component:
+      css/list-builder-sort.css: {}
+
+coh-clean-page:
+  css:
+    component:
+      css/cohesion-clean-page.css: {}
+
+coh_element_accordion_tabs_container:
+  css:
+    component:
+      css/dist/elements/accordion-tabs/accordion-tabs.css: {}
+      css/dist/elements/accordion-tabs/accordion-tabs-xl.css: { media: 'xl' }
+      css/dist/elements/accordion-tabs/accordion-tabs-lg.css: { media: 'lg' }
+      css/dist/elements/accordion-tabs/accordion-tabs-md.css: { media: 'md' }
+      css/dist/elements/accordion-tabs/accordion-tabs-sm.css: { media: 'sm' }
+      css/dist/elements/accordion-tabs/accordion-tabs-ps.css: { media: 'ps' }
+      css/dist/elements/accordion-tabs/accordion-tabs-xs.css: { media: 'xs' }
+
+coh_element_wysiwyg:
+  css:
+    component:
+      css/dist/elements/wysiwyg/wysiwyg.css: {}
+
+coh_element_container:
+  css:
+    component:
+      css/dist/elements/container/container.css: {}
+
+coh_element_video:
+  css:
+    component:
+      css/dist/elements/media-element/media-element.css: {}
+
+coh_element_link:
+  css:
+    component:
+      css/dist/elements/link/link.css: {}
+
+coh_element_image:
+  css:
+    component:
+      css/dist/elements/image/image.css: {}
+      css/dist/elements/image/image-xl.css: { media: 'xl' }
+      css/dist/elements/image/image-lg.css: { media: 'lg' }
+      css/dist/elements/image/image-md.css: { media: 'md' }
+      css/dist/elements/image/image-sm.css: { media: 'sm' }
+      css/dist/elements/image/image-ps.css: { media: 'ps' }
+      css/dist/elements/image/image-xs.css: { media: 'xs' }
+
+coh_element_google_map:
+  css:
+    component:
+      css/dist/elements/google-map/google-map.css: {}
+
+coh_element_drupal_menu:
+  css:
+    component:
+      css/dist/elements/drupal-menu/drupal-menu.css: {}
+
+coh_element_youtube_video_embed:
+  css:
+    component:
+      css/dist/elements/youtube-embed/youtube-embed.css: {}
+
+coh_element_youtube_video_background:
+  css:
+    component:
+      css/dist/elements/youtube-background/youtube-background.css: {}
+
+coh_element_video_background:
+  css:
+    component:
+      css/dist/elements/video-background/video-background.css: {}
+
+coh_element_slider_container:
+  css:
+    component:
+      css/dist/elements/slider-container/slider-container.css: {}
+      css/dist/elements/slider-container/slider-container-xl.css: { media: 'xl' }
+      css/dist/elements/slider-container/slider-container-lg.css: { media: 'lg' }
+      css/dist/elements/slider-container/slider-container-md.css: { media: 'md' }
+      css/dist/elements/slider-container/slider-container-sm.css: { media: 'sm' }
+      css/dist/elements/slider-container/slider-container-ps.css: { media: 'ps' }
+      css/dist/elements/slider-container/slider-container-xs.css: { media: 'xs' }
+
+coh_element_slide:
+  css:
+    component:
+      css/dist/elements/slide/slide.css: {}
+
+coh_element_modal:
+  css:
+    component:
+      css/dist/elements/modal/modal.css: {}
