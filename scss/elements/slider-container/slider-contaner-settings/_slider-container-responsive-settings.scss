@@ -1,0 +1,68 @@
+@use "../../../mixins/coh-breakpoint";
+/// @name slider-continer-responsive-settings
+/// @group Elements Slider container settings
+/// @descripton Sets responsive settings for Slider container
+@mixin slider-container-responsive-settings() {
+
+    .coh-slider-container   {
+
+        @include coh-breakpoint.breakpoint-looper {
+
+            $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+            @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+                // Bleed
+                &-bleed-#{$breakpoint} {
+
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+
+                        > .slick-list {
+                            margin-right: 0;
+                            margin-left: 0;
+                        }
+
+                        .slick-slide {
+                            padding-right: 0;
+                            padding-left: 0;
+                        }
+                    }
+                }
+
+                // Overflow settings
+                &-overflow-visible-#{$breakpoint} {
+
+                    .coh-slider-container-inner,
+                    .slick-list {
+                        overflow: visible;
+                    }
+                }
+
+                &-overflow-hidden-#{$breakpoint} {
+
+                    .coh-slider-container-inner,
+                    .slick-list {
+                        overflow: hidden;
+                    }
+                }
+
+                // No bleed
+                &-no-bleed-#{$breakpoint} {
+
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+
+                        > .slick-list {
+                          margin-left: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+                          margin-right: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+                        }
+
+                        .slick-slide {
+                          padding-left: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+                          padding-right: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

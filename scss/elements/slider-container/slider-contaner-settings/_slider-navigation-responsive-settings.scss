@@ -1,0 +1,535 @@
+@use "../../../mixins/coh-breakpoint";
+/// @name slider-navigation-responsive-settings
+/// @group Elements Slider item settings
+/// @description Sets Responsive defaults for Slider item
+@mixin slider-navigation-responsive-settings()   {
+
+    .coh-slider-container {
+
+        @include coh-breakpoint.breakpoint-looper {
+
+            $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+            @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+                // Navigation outside
+                &-nav-outside-top-left-right-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        .slick-prev {
+                            float: left;
+
+                            [dir="rtl"] & {
+                                float: right;
+                            }
+                        }
+
+                        .slick-next {
+                            float: right;
+
+                            [dir="rtl"] & {
+                                float: left;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-outside-middle-left-right-#{$breakpoint} {
+                    > .coh-slider-container-mid {
+                        .slick-arrow {
+                            position: absolute;
+                            top: 50%;
+                            bottom: auto;
+                            transform: translateY(-50%);
+                            z-index: 1;
+                        }
+                        .slick-prev {
+                            right: auto;
+                            left: 0;
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+
+                        .slick-next {
+                            right: 0;
+                            left: auto;
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-outside-bottom-left-right-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        .slick-prev {
+                            float: left;
+
+                            [dir="rtl"] & {
+                                float: right;
+                            }
+                        }
+
+                        .slick-next {
+                            float: right;
+
+                            [dir="rtl"] & {
+                                float: left;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-outside-left-top-bottom-#{$breakpoint},
+                &-nav-outside-middle-top-bottom-#{$breakpoint},
+                &-nav-outside-right-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid {
+                        .slick-arrow {
+                            position: relative;
+                        }
+                    }
+                }
+
+                &-nav-outside-left-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid {
+                        .slick-arrow {
+                            right: auto;
+                            left: 0;
+                            transform: translateX(0);
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-outside-middle-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid {
+                        .slick-arrow {
+                            right: auto;
+                            left: 50%;
+                            transform: translateX(-50%);
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-outside-right-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid {
+                        .slick-arrow {
+                            right: auto;
+                            left: 100%;
+                            transform: translateX(-100%);
+
+                            [dir="rtl"] & {
+                                right: 100%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-outside-top-left-#{$breakpoint},
+                &-nav-outside-top-middle-#{$breakpoint},
+                &-nav-outside-top-right-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        .slick-prev,
+                        .slick-next {
+                            float: none;
+                        }
+                    }
+                }
+
+                &-nav-outside-top-left-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        text-align: left;
+
+                        [dir="rtl"] & {
+                            text-align: right;
+                        }
+                    }
+                }
+
+                &-nav-outside-top-middle-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        text-align: center;
+                    }
+                }
+
+                &-nav-outside-top-right-#{$breakpoint} {
+                    > .coh-slider-nav-top {
+                        text-align: right;
+
+                        [dir="rtl"] & {
+                            text-align: left;
+                        }
+                    }
+                }
+
+                &-nav-outside-bottom-left-#{$breakpoint},
+                &-nav-outside-bottom-middle-#{$breakpoint},
+                &-nav-outside-bottom-right-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        .slick-prev,
+                        .slick-next {
+                            float: none;
+                        }
+                    }
+                }
+
+                &-nav-outside-bottom-left-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        text-align: left;
+
+                        [dir="rtl"] & {
+                            text-align: right;
+                        }
+                    }
+                }
+
+                &-nav-outside-bottom-middle-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        text-align: center;
+                    }
+                }
+
+                &-nav-outside-bottom-right-#{$breakpoint} {
+                    > .coh-slider-nav-bottom {
+                        text-align: right;
+
+                        [dir="rtl"] & {
+                            text-align: left;
+                        }
+                    }
+                }
+
+                // Navigation (Inside)
+                &-nav-inside-top-left-right-#{$breakpoint},
+                &-nav-inside-middle-left-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            width: 100%;
+
+                            .slick-arrow {
+                                position: absolute;
+                                top: 0;
+                                bottom: auto;
+                                transform: translateY(0);
+                                z-index: 1;
+                            }
+                            .slick-prev {
+                                right: auto;
+                                left: 0;
+
+                                [dir="rtl"] & {
+                                    right: 0;
+                                    left: auto;
+                                }
+                            }
+                            .slick-next {
+                                right: 0;
+                                left: auto;
+
+                                [dir="rtl"] & {
+                                    right: auto;
+                                    left: 0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-middle-left-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            .slick-arrow {
+                                top: 50%;
+                                bottom: auto;
+                                transform: translateY(-50%);
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-bottom-left-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-bottom {
+                            width: 100%;
+
+                            .slick-arrow {
+                                position: absolute;
+                                top: auto;
+                                bottom: 0;
+                                z-index: 1;
+                            }
+                            .slick-prev {
+                                right: auto;
+                                left: 0;
+
+                                [dir="rtl"] & {
+                                    right: 0;
+                                    left: auto;
+                                }
+                            }
+                            .slick-next {
+                                right: 0;
+                                left: auto;
+
+                                [dir="rtl"] & {
+                                    right: auto;
+                                    left: 0;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-left-top-bottom-#{$breakpoint},
+                &-nav-inside-middle-top-bottom-#{$breakpoint},
+                &-nav-inside-right-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        > .slick-arrow {
+                            position: absolute;
+                            z-index: 1;
+                        }
+                        > .slick-prev {
+                            top: 0;
+                            bottom: auto;
+                        }
+                        > .slick-next {
+                            top: auto;
+                            bottom: 0;
+                        }
+                    }
+                }
+
+                &-nav-inside-left-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        > .slick-arrow {
+                            right: auto;
+                            left: 0;
+                            transform: translateX(0);
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-middle-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        > .slick-arrow {
+                            right: auto;
+                            left: 50%;
+                            transform: translateX(-50%);
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-right-top-bottom-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        > .slick-arrow {
+                            right: 0;
+                            left: auto;
+                            transform: translateX(0);
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-top-left-#{$breakpoint},
+                &-nav-inside-top-middle-#{$breakpoint},
+                &-nav-inside-top-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            position: absolute;
+                            top: 0;
+                            bottom: auto;
+                            z-index: 1;
+                            width: auto;
+
+                            .slick-arrow {
+                                position: static;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-top-left-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            right: auto;
+                            left: 0;
+                            transform: translateX(0);
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-top-middle-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            right: auto;
+                            left: 50%;
+                            transform: translateX(-50%);
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-top-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            right: 0;
+                            left: auto;
+                            transform: translateX(0);
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-bottom-left-#{$breakpoint},
+                &-nav-inside-bottom-middle-#{$breakpoint},
+                &-nav-inside-bottom-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-bottom {
+                            position: absolute;
+                            top: auto;
+                            bottom: 0;
+                            z-index: 1;
+                            width: auto;
+
+                            .slick-arrow {
+                                position: static;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-bottom-left-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-bottom {
+                            right: auto;
+                            left: 0;
+                            transform: translateX(0);
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-bottom-middle-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-bottom {
+                            right: auto;
+                            left: 50%;
+                            transform: translateX(-50%);
+
+                            [dir="rtl"] & {
+                                right: 50%;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-bottom-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-bottom {
+                            right: 0;
+                            left: auto;
+                            transform: translateX(0);
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-middle-left-#{$breakpoint},
+                &-nav-inside-middle-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            position: absolute;
+                            top: 50%;
+                            bottom: auto;
+                            transform: translateY(-50%);
+                            z-index: 1;
+                            width: auto;
+
+                            .slick-arrow {
+                                position: static;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-middle-left-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            right: auto;
+                            left: 0;
+
+                            [dir="rtl"] & {
+                                right: 0;
+                                left: auto;
+                            }
+                        }
+                    }
+                }
+
+                &-nav-inside-middle-right-#{$breakpoint} {
+                    > .coh-slider-container-mid > .coh-slider-container-inner {
+                        .coh-slider-nav-inner-top {
+                            right: 0;
+                            left: auto;
+
+                            [dir="rtl"] & {
+                                right: auto;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
