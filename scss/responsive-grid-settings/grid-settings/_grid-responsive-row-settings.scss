@@ -1,0 +1,55 @@
+@use "../../mixins/coh-breakpoint";
+
+/// @name grid-responsive-row-settings
+/// @group Website settings Responsive grid settings
+/// @description    Sets up a responsive helper classes for Row
+/// @param {Map}    $grid-settings - Keyed responsive grid settings map
+@mixin grid-responsive-row-settings() {
+
+  @include coh-breakpoint.breakpoint-looper {
+
+    $breakpoint: coh-breakpoint.$coh-breakpoint-looper-key;
+
+    @include coh-breakpoint.breakpoint-mq($breakpoint) {
+
+      // Bleed by breakpoint
+      .coh-row-bleed-#{$breakpoint} {
+
+        > .coh-row-inner {
+          margin-right: 0;
+          margin-left: 0;
+
+          > .coh-column {
+            padding-right: 0;
+            padding-left: 0;
+          }
+        }
+      }
+
+      // Show overflow by breakpoint
+      .coh-row-visible-#{$breakpoint} {
+        overflow: visible;
+      }
+
+      // Hide overflow by breakpoint
+      .coh-row-hidden-#{$breakpoint} {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+
+      .coh-row-#{$breakpoint} {
+
+        > .coh-row-inner {
+            margin-right: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+            margin-left: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+
+          > .coh-column {
+            padding-left: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+            padding-right: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+          }
+        }
+      }
+    }
+  }
+}
