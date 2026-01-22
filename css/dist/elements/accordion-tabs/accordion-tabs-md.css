@@ -1,0 +1,32 @@
+
+  .coh-accordion-tabs-display-accordion-md > .coh-accordion-tabs-nav {
+    display: none;
+  }
+  .coh-accordion-tabs > .coh-accordion-tabs-inner .coh-accordion-tabs-display-accordion-md > .coh-accordion-tabs-nav {
+    display: none;
+  }
+  .coh-accordion-tabs-display-accordion-md > .coh-accordion-tabs-content-wrapper .coh-accordion-title {
+    display: block;
+  }
+  .coh-accordion-tabs > .coh-accordion-tabs-inner .coh-accordion-tabs-display-accordion-md > .coh-accordion-tabs-content-wrapper .coh-accordion-title {
+    display: block;
+  }
+  .coh-accordion-tabs-display-accordion-md > .coh-accordion-tabs-content-wrapper .coh-accordion-title.is-hidden {
+    display: none;
+  }
+  .coh-accordion-tabs > .coh-accordion-tabs-inner > .coh-accordion-tabs-display-inner-accordion-md {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .coh-accordion-tabs-display-tabs-md > .coh-accordion-tabs-nav {
+    display: block;
+  }
+  .coh-accordion-tabs > .coh-accordion-tabs-inner .coh-accordion-tabs-display-tabs-md > .coh-accordion-tabs-nav {
+    display: block;
+  }
+  .coh-accordion-tabs-display-tabs-md > .coh-accordion-tabs-content-wrapper .coh-accordion-title {
+    display: none;
+  }
+  .coh-accordion-tabs > .coh-accordion-tabs-inner .coh-accordion-tabs-display-tabs-md > .coh-accordion-tabs-content-wrapper .coh-accordion-title {
+    display: none;
+  }

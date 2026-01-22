@@ -1,0 +1,105 @@
+<?php
+
+use Drupal\Core\Config\FileStorage;
+use Drupal\rest\Entity\RestResourceConfig;
+
+/**
+ * Custom style selectable property
+ */
+function cohesion_custom_styles_update_8401(&$variables) {
+
+  $custom_styles = \Drupal::entityTypeManager()->getStorage('cohesion_custom_style')->loadMultiple();
+  foreach ($custom_styles as $custom_style) {
+    if ($custom_style->status()) {
+      $custom_style->setSelectable();
+      $custom_style->save();
+    }
+  }
+}
+
+/**
+ * Update custom styles weight
+ */
+function cohesion_custom_styles_update_8402(&$variables) {
+  $results = [];
+  $storage = \Drupal::entityTypeManager()
+    ->getStorage('cohesion_custom_style');
+
+  $entities = $storage->loadMultiple();
+
+  // Get parents styles
+  foreach ($entities as $entity) {
+    if (($entity->get('parent'))) {
+      continue;
+    }
+    $results[$entity->get('custom_style_type')][$entity->label()] = $entity->id();
+  }
+
+  if (!$results) {
+    return null;
+  }
+  //
+  foreach ($results as $parents) {
+    $parent_count = 0;
+    // Sort parent styles in ascending order
+    ksort($parents);
+
+    foreach ($parents as $id) {
+      $parent_entity = $entities[$id];
+      // Set parent weight
+      _update_custom_styles_weight($parent_entity->getConfigDependencyName(), $parent_count);
+      $child_count = 1;
+
+
+      if ($parent = $storage->load($id)) {
+        $children_styles = $storage->getQuery()
+          ->accessCheck(TRUE)
+          ->condition('parent', $parent->getClass(), '=')
+          ->sort('label', 'ASC')
+          ->sort('weight', 'ASC')
+          ->execute();
+
+        if($children_styles){
+          foreach ($children_styles as $childId) {
+            $child_entity = $entities[$childId];
+            // Set children weight
+            _update_custom_styles_weight($child_entity->getConfigDependencyName(), $child_count);
+            $child_count++;
+          }
+        }
+      }
+
+      $parent_count++;
+    }
+  }
+}
+
+/**
+ * Removing rest endpoints for custom styles
+ */
+function cohesion_custom_styles_update_8501() {
+
+  $resources_to_delete = ['rest.resource.cohesion_custom_styles', 'rest.resource.cohesion_custom_style_type', 'rest.resource.dx8_resource'];
+
+  foreach($resources_to_delete as $resource) {
+    if(\Drupal::configFactory()->getEditable($resource)) {
+      \Drupal::configFactory()->getEditable($resource)->delete();
+    }
+  }
+}
+
+/**
+ *
+ * @param type $config_key
+ * @param type $weight
+ */
+function _update_custom_styles_weight($config_key, $weight = 0) {
+  try {
+    $config = \Drupal::configFactory()->getEditable($config_key);
+    $config->set('weight', $weight);
+    $config->save(true);
+  } catch (\Exception $ex) {
+
+  }
+}
+
