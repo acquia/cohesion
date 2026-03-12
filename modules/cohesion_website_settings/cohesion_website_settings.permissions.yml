@@ -1,0 +1,9 @@
+# Website settings
+administer website settings:
+  title: Site Studio Website settings
+  description: 'Grant access to administer Site Studio website settings.'
+
+# Website settings
+access color_picker:
+  title: Site Studio Color picker
+  description: 'Grant access to the color picker. Restricted access will only allow the use of the color palette.'
