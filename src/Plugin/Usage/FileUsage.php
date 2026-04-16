@@ -112,7 +112,7 @@ class FileUsage extends UsagePluginBase {
 
     // This regex now handles spaces in filenames.
     $this->uriRegex = '/(?<!"preview_image":{"id":")((' . implode('|', array_keys($this->wrappers)) . '):\/\/(.*?)\.(.*?))([\s|:"*?<>|\\\\]|$)/m';
-    $this->mediaReferenceRegex = '/\[media-reference:file:(.*?)\]/m';
+    $this->mediaReferenceRegex = '#(?:<img[^>]*data-entity-uuid=\\\"([^"]+)\\\"[^>]*src=\\\"([^"]+)\\\"|\[media-reference:file:([^\]]+)\])#i';
     $this->fileRepository = $fileRepository;
   }
 
