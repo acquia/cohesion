@@ -187,6 +187,16 @@ class FileUsage extends UsagePluginBase {
   private function registerCoreFileUsage($files, EntityInterface $entity) {
 
     if ($entity->id() && strlen($entity->id()) < 32) {
+
+      // Load previously referenced file IDs so we can invalidate their cache.
+      $existingFids = $this->connection->select('file_usage', 'fu')
+        ->fields('fu', ['fid'])
+        ->condition('module', 'cohesion')
+        ->condition('type', $entity->getEntityTypeId())
+        ->condition('id', $entity->id())
+        ->execute()
+        ->fetchCol();
+
       // Remove 'cohesion' registered usage of all files for scanned entity.
       try {
         $this->connection->delete('file_usage')
@@ -197,6 +207,14 @@ class FileUsage extends UsagePluginBase {
       }
       catch (\Throwable $e) {
         return;
+      }
+
+      // Invalidate cache for files that were previously referenced.
+      if (!empty($existingFids)) {
+        $existingFiles = $this->storage->loadMultiple($existingFids);
+        foreach ($existingFiles as $existingFile) {
+          $this->refreshFileListCache($existingFile);
+        }
       }
 
       // Add file usages back in one by one, so we end up with the correct count
@@ -319,10 +337,7 @@ class FileUsage extends UsagePluginBase {
       }
     }
 
-    // Register file usages with core 'file.usage'.
-    if (!empty($files)) {
-      $this->registerCoreFileUsage($files, $entity);
-    }
+    $this->registerCoreFileUsage($files, $entity);
 
     return $entities;
   }
