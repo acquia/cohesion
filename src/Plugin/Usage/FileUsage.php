@@ -110,6 +110,11 @@ class FileUsage extends UsagePluginBase {
       $this->wrappers[$key]['instance'] = $stream_wrapper_manager->getViaUri($key . '://');
     }
 
+    // Ensure 'public' is processed before 'asset' in convertBasepathsToUris
+    // so base-path URIs resolve to public:// (the canonical form) and don't
+    // create duplicate file entities when both wrappers share the same path.
+    uksort($this->wrappers, fn($a, $b) => ($b === 'public') <=> ($a === 'public') ?: strcmp($a, $b));
+
     // This regex now handles spaces in filenames.
     $this->uriRegex = '/(?<!"preview_image":{"id":")((' . implode('|', array_keys($this->wrappers)) . '):\/\/(.*?)\.(.*?))([\s|:"*?<>|\\\\]|$)/m';
     $this->mediaReferenceRegex = '/\[media-reference:file:(.*?)\]/m';
