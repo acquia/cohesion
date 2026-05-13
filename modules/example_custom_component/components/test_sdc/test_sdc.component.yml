@@ -1,0 +1,89 @@
+'$schema': 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Test - SDC
+status: stable
+group: Atom/Text
+description: A test SDC
+props:
+  type: object
+  required:
+    - text
+    - select
+  properties:
+    text:
+      type: string
+      title: Text
+      description: Test string.
+      examples: ['A string value']
+    select:
+      type: string
+      title: Style
+      description: Test select / enum.
+      enum:
+        - option-1
+        - option-2
+      examples: [option-1, option-2]
+    boolean:
+      title: 'Bool'
+      type: boolean
+      examples:
+        - false
+    integer:
+      title: 'Integer'
+      type: integer
+      examples:
+        - -42
+    integer_range_minimum:
+      title: 'Integer, minimum=0'
+      type: integer
+      minimum: 0
+      examples:
+        - 40
+    image_src:
+      title: Image source URL
+      type: string
+      format: uri-reference
+    link:
+      title: 'String, format=uri-reference, x-allowed-schemes: [http, https]'
+      type: string
+      format: uri-reference
+      x-allowed-schemes:
+        - http
+        - https
+      examples:
+        - https://uri.example.com
+        - /my-account
+    video_url:
+      title: 'String, format=uri-reference, x-allowed-schemes: [http, https]'
+      type: string
+      format: uri-reference
+      x-allowed-schemes:
+        - http
+        - https
+      examples:
+        - https://uri.example.com
+        - /my-account
+    entity_reference_entity_type:
+      title: 'Entity Reference entity type'
+      type: string
+      description: Reference to an entity type (e.g., node).
+      examples:
+        - 'node'
+    entity_reference_view_mode:
+      title: 'Entity Reference view mode'
+      type: string
+      description: Reference to a view mode (e.g., default, teaser).
+      examples:
+        - 'teaser'
+    entity_reference_entity:
+      title: 'Entity Reference entity'
+      type: string
+      description: Reference to an entity (e.g., node ID or UUID).
+      examples:
+        - '123'
+        - 'a1b2c3d4-5678-90ef-gh12-3456789ijklm'
+slots:
+  slot_example:
+    title: Body
+    description: The contents of the card.
+    examples:
+      - <p>Foo is <strong>NOT</strong> bar.</p>

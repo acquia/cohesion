@@ -1,0 +1,104 @@
+cohesion_website_settings.color_palette_edit_form:
+  path: '/admin/cohesion/cohesion_website_settings/color_palette/bulk_edit'
+  defaults:
+    _form: 'Drupal\cohesion_website_settings\Form\ColorPaletteEditForm'
+    _title_callback: 'Drupal\cohesion_website_settings\Form\ColorPaletteEditForm::getTitle'
+  requirements:
+    _permission: 'administer website settings'
+  options:
+    _admin_route: TRUE
+
+cohesion_website_settings.icon_libraries_edit_form:
+  path: '/admin/cohesion/cohesion_website_settings/icon_libraries/bulk_edit'
+  defaults:
+    _form: 'Drupal\cohesion_website_settings\Form\IconLibrariesEditForm'
+    _title_callback: 'Drupal\cohesion_website_settings\Form\IconLibrariesEditForm::getTitle'
+  requirements:
+    _permission: 'administer website settings'
+  options:
+    _admin_route: TRUE
+
+cohesion_website_settings.font_libraries_edit_form:
+  path: '/admin/cohesion/cohesion_website_settings/font_libraries/bulk_edit'
+  defaults:
+    _form: 'Drupal\cohesion_website_settings\Form\FontLibrariesEditForm'
+    _title_callback: 'Drupal\cohesion_website_settings\Form\FontLibrariesEditForm::getTitle'
+  requirements:
+    _permission: 'administer website settings'
+  options:
+    _admin_route: TRUE
+
+cohesion_website_settings.batch_reload:
+  path: '/admin/cohesion/cohesion_website_settings/base_unit_settings/rebuild'
+  defaults:
+    _controller: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController::batch'
+    _title: 'Disc batch'
+  requirements:
+    _permission: 'administer website settings'
+
+cohesion_website_settings.font_libraries.upload:
+  path: '/admin/cohesion/upload/font_libraries'
+  defaults:
+    _controller: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController::fontLibrariesPostCallback'
+    _title: 'File upload'
+  method: [POST]
+  requirements:
+    _permission: 'administer website settings'
+cohesion_website_settings.icon_libraries.upload:
+ path: '/admin/cohesion/upload/icons'
+ defaults:
+   _controller: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController::iconLibrariesPostCallback'
+   _title: 'File upload'
+ method: [POST]
+ requirements:
+   _permission: 'administer website settings'
+
+cohesion_website_settings.libraries:
+  path: '/cohesionapi/main/{type}'
+  defaults:
+    _controller: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController::libraryAction'
+    _title: "Settings endpoint"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+cohesion_website_settings.libraries.item:
+  path: '/cohesionapi/main/{type}/{item}'
+  defaults:
+    _controller: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController::libraryAction'
+    _title: "Settings endpoint"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+cohesion_website_settings.elements:
+  path: '/cohesionapi/element/{group}/{type}'
+  defaults:
+    _controller: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController::elementAction'
+    _title: "Elements endpoint"
+    type: '__ALL__'
+  methods:  [GET]
+  requirements:
+    group: ^[a-zA-Z0-9_-]+
+    type: ^[a-zA-Z0-9_-]+
+    _custom_access: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController:elementActionAccess'
+
+cohesion_website_settings.elements_all:
+  path: '/cohesionapi/element'
+  defaults:
+    _controller: '\Drupal\cohesion_website_settings\Controller\WebsiteSettingsController::elementActionAll'
+    _title: "Elements endpoint (all)"
+    type: '__ALL__'
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+cohesion_website_settings.scss_variables_edit_form:
+  path: '/admin/cohesion/cohesion_website_settings/scss_variables/edit'
+  defaults:
+    _form: 'Drupal\cohesion_website_settings\Form\SCSSVariablesEditForm'
+    _title_callback: 'Drupal\cohesion_website_settings\Form\SCSSVariablesEditForm::getTitle'
+  requirements:
+    _permission: 'administer website settings'
+  options:
+    _admin_route: TRUE
