@@ -1,0 +1,41 @@
+
+  .coh-image-md {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+  }
+  .coh-image-responsive-md {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    float: none;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-float-left-md {
+    float: left;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-float-right-md {
+    float: right;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-align-left-md {
+    float: none;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-align-centre-md {
+    float: none;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+  .coh-image-align-right-md {
+    float: none;
+    margin-left: 100%;
+    transform: translateX(-100%);
+  }
