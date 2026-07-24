@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_example_custom_component",
+    "type": "drupal-module",
+    "description": "A working example of a custom Site Studio component to show a developer how they can create one.",
+    "license": "GPL-2.0-or-later"
+}

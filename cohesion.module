@@ -1,0 +1,455 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\ckeditor5\HTMLRestrictions;
+use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Style;
+use Drupal\filter\Entity\FilterFormat;
+use Drupal\tmgmt\JobInterface;
+use Drupal\cohesion\Hook\CohesionHooks;
+use Drupal\cohesion\Hook\CohesionEntityHooks;
+use Drupal\cohesion\Hook\CohesionFormHooks;
+use Drupal\cohesion\Hook\CohesionThemeHooks;
+use Drupal\cohesion\Hook\CohesionTokenHooks;
+use Drupal\cohesion\Hook\CohesionTmgmtHooks;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Extension\Extension;
+
+const COHESION_FILESYSTEM_URI = 'public://cohesion/';
+const COHESION_CSS_PATH = COHESION_FILESYSTEM_URI . 'styles';
+const COHESION_TEMPLATE_PATH = COHESION_FILESYSTEM_URI . 'templates';
+const COHESION_JS_PATH = COHESION_FILESYSTEM_URI . 'scripts';
+const COHESION_ASSETS_PATH = COHESION_FILESYSTEM_URI . 'assets';
+const COHESION_DEFAULT_PATH = COHESION_FILESYSTEM_URI . 'default';
+const COHESION_MAX_CRON_ORPHANS = 1000;
+const COHESION_CRON_BATCH_SIZE = 25;
+
+/**
+ * Implements hook_help().
+ */
+#[LegacyHook]
+function cohesion_help($route_name): string|\Stringable|array|null {
+  return \Drupal::getContainer()->get(CohesionHooks::class)->help($route_name);
+}
+
+/**
+ * Implements hook_token_info().
+ */
+#[LegacyHook]
+function cohesion_token_info() {
+  return \Drupal::getContainer()->get(CohesionTokenHooks::class)->token_info();
+}
+
+/**
+ * Implements hook_tokens().
+ */
+#[LegacyHook]
+function cohesion_tokens($type, $tokens) {
+  return \Drupal::getContainer()->get(CohesionTokenHooks::class)->tokens($type, $tokens);
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for html().
+ */
+#[LegacyHook]
+function cohesion_preprocess_html(&$variables): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->preprocess_html($variables);
+}
+
+/**
+ * Page attachments for all React forms.
+ *
+ * @param $attachments
+ */
+function _cohesion_shared_page_attachments(&$attachments) {
+
+  // Support url to drupalSettings
+  $attachments['#attached']['drupalSettings']['cohesion']['support_url'] = \Drupal::service('cohesion.support_url')
+    ->getSupportUrlPrefix();
+
+  // Give full permission to user with administrator role
+  $attachments['#attached']['drupalSettings']['cohesion']['permissions'] = \Drupal::service('settings.endpoint.utils')
+    ->dx8PermissionsList();
+
+  // Get the apiUrls
+  $apiUrls = \Drupal::keyValue('cohesion.assets.static_assets')
+    ->get('api-urls')['urls'];
+
+  // Patch the custom element data in.
+  $apiUrls = \Drupal::service('custom.elements')->patchApiUrls($apiUrls);
+
+  // And attach.
+  $attachments['#attached']['drupalSettings']['cohesion']['api_urls'] = $apiUrls;
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+#[LegacyHook]
+function cohesion_page_attachments(array &$attachments): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->page_attachments($attachments);
+}
+
+/**
+ * @param array $settings
+ */
+#[LegacyHook]
+function cohesion_editor_js_settings_alter(array &$settings): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->editor_js_settings($settings);
+}
+
+/**
+ * Build cohesion libraries (base and theme styles).
+ *
+ * @param $libraries
+ * @param $extension
+ */
+#[LegacyHook]
+function cohesion_library_info_alter(&$libraries, $extension): void {
+  \Drupal::getContainer()->get(CohesionThemeHooks::class)->library_info_alter($libraries, $extension);
+}
+
+/**
+ * Implements hook_css_alter().
+ *
+ * Alter CSS per theme for Site Studio base and theme CSS
+ */
+#[LegacyHook]
+function cohesion_css_alter(&$css): void {
+  \Drupal::getContainer()->get(CohesionThemeHooks::class)->css_alter($css);
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * Allow loading of theme templates from the Site Studio template store.
+ */
+#[LegacyHook]
+function cohesion_theme_registry_alter(array &$theme_registry): void {
+  \Drupal::getContainer()->get(CohesionThemeHooks::class)->theme_registry_alter($theme_registry);
+}
+
+/**
+ * Suggest the cohesion view template specific to this view.
+ *
+ * @param array $variables
+ *   Theme variables.
+ *
+ * @return array
+ *   Return template suggestions.
+ */
+#[LegacyHook]
+function cohesion_theme_suggestions_views_view(array $variables): array {
+  return \Drupal::getContainer()->get(CohesionThemeHooks::class)->theme_suggestions_views_view($variables);
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+#[LegacyHook]
+function cohesion_theme_suggestions_menu_alter(&$suggestions, $variables): void {
+  \Drupal::getContainer()->get(CohesionThemeHooks::class)->theme_suggestions_menu_alter($suggestions, $variables);
+}
+
+/**
+ * Implements hook_theme().
+ */
+#[LegacyHook]
+function cohesion_theme() {
+  return \Drupal::getContainer()->get(CohesionThemeHooks::class)->theme();
+}
+
+/**
+ * Implements template_preprocess_token_tree_link().
+ *
+ * Make the token modal appear in the center of the body.
+ */
+#[LegacyHook]
+function cohesion_preprocess_token_tree_link(&$variables): void {
+  \Drupal::getContainer()->get(CohesionTokenHooks::class)->preprocess_token_tree_link($variables);
+}
+
+/**
+ * Implements template_preprocess_views_view()
+ */
+#[LegacyHook]
+function cohesion_preprocess_views_view(&$variables): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->preprocess_views_view($variables);
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+#[LegacyHook]
+function cohesion_link_alter(&$variables): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->link_alter($variables);
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+#[LegacyHook]
+function cohesion_entity_insert(EntityInterface $entity): void {
+  \Drupal::getContainer()->get(CohesionEntityHooks::class)->entity_insert($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+#[LegacyHook]
+function cohesion_entity_update(EntityInterface $entity): void {
+  \Drupal::getContainer()->get(CohesionEntityHooks::class)->entity_update($entity);
+}
+
+/**
+ * Implements hook_entity_delete().
+ * @throws \Drupal\Component\Plugin\Exception\PluginException
+ */
+#[LegacyHook]
+function cohesion_entity_delete(EntityInterface $entity): void {
+  \Drupal::getContainer()->get(CohesionEntityHooks::class)->entity_delete($entity);
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Cleanup of orphaned cohesion layout revisions.
+ */
+#[LegacyHook]
+function cohesion_cron(): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->cron();
+}
+
+/**
+ * @return array
+ */
+function _get_cohesion_submodules() {
+  $system_modules = \Drupal::service('extension.list.module')->reset()->getList();
+  if (\Drupal::service('module_handler')
+    ->moduleExists('cohesion') && in_array('cohesion', array_keys($system_modules)) && ($required_by = $system_modules['cohesion']->required_by)) {
+
+    $dx8_submodule_callback = function ($module) {
+      return (\Drupal::service('module_handler')
+        ->moduleExists($module) && \Drupal::service('user.permissions')
+        ->moduleProvidesPermissions($module));
+    };
+    $modules = array_filter(array_keys($required_by), $dx8_submodule_callback);
+    $modules[] = 'cohesion';
+    return array_values($modules);
+  }
+  return [];
+}
+
+/**
+ * Implements hook_hook_info().
+ */
+function cohesion_hook_info() {
+  return ['dx8_api_outbound_data_alter' => ['group' => 'dx8']];
+}
+
+/**
+ * Implements hook_entity_view_alter().
+ */
+#[LegacyHook]
+function cohesion_entity_view_alter(array &$build): void {
+  \Drupal::getContainer()->get(CohesionEntityHooks::class)->entity_view_alter($build);
+}
+
+/**
+ * Implements hook_field_info_alter().
+ */
+#[LegacyHook]
+function cohesion_field_info_alter(&$info): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->field_info_alter($info);
+}
+
+/**
+ * Implements hook_tmgmt_translatable_fields_alter().
+ */
+#[LegacyHook]
+function cohesion_tmgmt_translatable_fields_alter(&$entity, &$translatable_fields): void {
+  \Drupal::getContainer()->get(CohesionTmgmtHooks::class)->tmgmt_translatable_fields_alter($entity, $translatable_fields);
+}
+
+/**
+ * Implements hook_tmgmt_source_suggestions().
+ */
+#[LegacyHook]
+function cohesion_tmgmt_source_suggestions(array $items, JobInterface $job) {
+  return \Drupal::getContainer()->get(CohesionTmgmtHooks::class)->tmgmt_source_suggestions($items, $job);
+}
+
+/**
+ * Implements hook_themes_uninstalled().
+ */
+#[LegacyHook]
+function cohesion_themes_uninstalled(array $themes): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->themes_uninstalled($themes);
+}
+
+/**
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ */
+#[LegacyHook]
+function cohesion_form_system_theme_settings_alter(&$form, FormStateInterface $form_state): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->form_system_theme_settings_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_config_schema_info_alter().
+ */
+#[LegacyHook]
+function cohesion_config_schema_info_alter(&$definitions): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->config_schema_info_alter($definitions);
+}
+
+/**
+ * Preprocess the component preview iframe page.html.twig
+ * See: templates/page--cohesionapi--component--preview.html.twig.
+ *
+ * @param $variables
+ */
+#[LegacyHook]
+function preprocess_cohesion_preview_page(&$variables): void {
+  // Load the build created in CohesionComponentController::preview.
+  \Drupal::getContainer()->get(CohesionThemeHooks::class)->preprocess_cohesion_preview_page($variables);
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ *
+ * Remove the "clone" option from site studio entity lists.
+ *
+ */
+#[LegacyHook]
+function cohesion_entity_operation_alter(array &$operations, EntityInterface $entity): void {
+  \Drupal::getContainer()->get(CohesionEntityHooks::class)->entity_operation_alter($operations, $entity);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+#[LegacyHook]
+function cohesion_form_filter_format_form_alter(&$form, FormStateInterface $form_state): void {
+  \Drupal::getContainer()->get(CohesionFormHooks::class)->form_filter_format_form_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+#[LegacyHook]
+function cohesion_form_filter_format_edit_form_alter(&$form, FormStateInterface $form_state): void {
+  \Drupal::getContainer()->get(CohesionFormHooks::class)->form_filter_format_edit_form_alter($form, $form_state);
+}
+
+/**
+ * Make sure the filter format form alter is the last to run
+ *
+ * @param $implementations
+ * @param $hook
+ *
+ * @return void
+ */
+function cohesion_module_implements_alter(&$implementations, $hook) {
+  if (isset($implementations['cohesion']) && ($hook == 'form_filter_format_form_alter' || $hook == 'form_alter')) {
+    $group = $implementations['cohesion'];
+    unset($implementations['cohesion']);
+    $implementations['cohesion'] = $group;
+  }
+}
+
+/**
+ * Implements hook_system_info_alter().
+ *
+ * Adds prefixed Site Studio CKEditor 5 stylesheet to default and admin themes.
+ */
+#[LegacyHook]
+function cohesion_system_info_alter(array &$info, Extension $file, $type): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->system_info_alter($info, $file, $type);
+}
+
+/**
+ * Implements hook_field_widget_complete_WIDGET_TYPE_form_alter() for text_textarea_with_summary.
+ * Adds the ssa-ck-content class so that the styles can be "previewed".
+ */
+#[LegacyHook]
+function cohesion_field_widget_complete_text_textarea_with_summary_form_alter(&$field_widget_complete_form): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->field_widget_complete_text_textarea_with_summary_form_alter($field_widget_complete_form);
+}
+
+/**
+ * Implements hook_field_widget_complete_WIDGET_TYPE_form_alter() for text_textarea_with_summary.
+ * Adds the ssa-ck-content class so that the styles can be "previewed".
+ */
+#[LegacyHook]
+function cohesion_field_widget_complete_text_textarea_form_alter(&$field_widget_complete_form): void {
+  \Drupal::getContainer()->get(CohesionHooks::class)->field_widget_complete_text_textarea_form_alter($field_widget_complete_form);
+}
+
+/*
+ * Adds Site Studio styles based on "ssa_enabled" checkbox state.
+ *
+ * @param array $element
+ *   Textarea element with Styles.
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *   Form State.
+ */
+function _sitestudio_ckeditor_styles_after_build_callback(array $element, FormStateInterface $form_state) {
+  if (!$form_state->isProcessingInput()) {
+    return $element;
+  }
+
+  $input = $form_state->getUserInput();
+  $ssa_enabled = $input['editor']['settings']['plugins']['ckeditor5_style']['ssa_enabled'] ?? 0;
+
+  $textFormatStyles = \Drupal::service('cohesion.text_format_styles');
+  $initial_styles = $element['#value'];
+
+  if (!$ssa_enabled || !empty($element['#value'])) {
+    $style_values = $element['#value'];
+    $styles = $textFormatStyles->parseStylesFormValue($style_values);
+    $new_styles = $textFormatStyles->getStyleList($styles[0], $ssa_enabled);
+    $as_selectors = '';
+    foreach ($new_styles as $style) {
+      [$tag, $classes] = Style::getTagAndClasses(HTMLRestrictions::fromString($style['element']));
+      $as_selectors .= sprintf("%s.%s|%s\n", $tag, implode('.', $classes), $style['label']);
+    }
+    $element['#value'] = $as_selectors;
+
+    return $element;
+  }
+
+  $styles = $textFormatStyles->getStylesText();
+  if (!empty($styles)) {
+    $element['#value'] = $styles;
+  }
+  if ($initial_styles !== $element['#value']) {
+    $form_state->setValidationComplete();
+  }
+
+  return $element;
+}
+
+/**
+ * Entity builder for the filter editor config entity.
+ */
+function _cohesion_form_filter_format_edit_form_builder($entity_type, FilterFormat $filterFormat, &$form, FormStateInterface $form_state): void {
+  $editor = $form_state->get('editor');
+  if ($ssa_enabled = $form_state->getValue([
+    'editor',
+    'settings',
+    'plugins',
+    'ckeditor5_style',
+    'ssa_enabled',
+  ])) {
+    $editor->setThirdPartySetting('cohesion', 'ssa_enabled', (bool) $ssa_enabled);
+    return;
+  }
+  $editor->unsetThirdPartySetting('cohesion', 'ssa_enabled');
+}

@@ -1,0 +1,7 @@
+name: Site Studio base styles
+type: module
+description: 'Defines the base style configuration entities for creating HTML element base styles.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion

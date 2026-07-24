@@ -1,0 +1,4 @@
+services:
+
+  Drupal\cohesion_style_helpers\Hook\CohesionStyleHelperHooks:
+    class: Drupal\cohesion_style_helpers\Hook\CohesionStyleHelperHooks

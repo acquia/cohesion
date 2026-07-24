@@ -1,0 +1,3 @@
+services:
+  Drupal\sitestudio_governance\Hook\SiteStudioGovernanceHooks:
+    class: Drupal\sitestudio_governance\Hook\SiteStudioGovernanceHooks

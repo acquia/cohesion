@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\cohesion_custom_styles\Hook\CohesionCustomStylesHooks;
+use Drupal\cohesion_custom_styles\Entity\CustomStyleType;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+
+const COHESION_CUSTOM_STYLES_CLASS_PREFIX = '.coh-style-';
+
+/**
+ * Implements hook_help().
+ */
+#[LegacyHook]
+function cohesion_custom_styles_help($route_name): void {
+  \Drupal::getContainer()->get(CohesionCustomStylesHooks::class)->help($route_name);
+}
+
+/**
+ * Process a batch of settings to import.
+ *
+ * @param $context
+ */
+function cohesion_custom_styles_process_batch(&$context) {
+  if (!isset($context['results']['error'])) {
+    $context['message'] = t('Importing custom style entities');
+    $elements = \Drupal::service('cohesion.element.storage')->getByGroup('custom_styles');
+
+    // Import elements.
+    if ($elements) {
+      CustomStyleType::importCustomStyleTypeEntities($elements);
+    }
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+#[LegacyHook]
+function cohesion_custom_styles_page_attachments(array &$attachments): void {
+  \Drupal::getContainer()->get(CohesionCustomStylesHooks::class)->page_attachments($attachments);
+}
+
+/**
+ * Implements hook_menu_local_actions_alter().
+ */
+#[LegacyHook]
+function cohesion_custom_styles_menu_local_actions_alter(&$local_actions): void {
+  \Drupal::getContainer()->get(CohesionCustomStylesHooks::class)->menu_local_actions_alter($local_actions);
+}

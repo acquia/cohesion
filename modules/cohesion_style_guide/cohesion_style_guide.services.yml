@@ -1,0 +1,18 @@
+services:
+
+  cohesion_style_guide.style_guide_handler:
+    class: Drupal\cohesion_style_guide\Services\StyleGuideManagerHandler
+    arguments: ['@entity_type.manager', '@entity.repository', '@cohesion_usage.update_manager', '@theme_handler', '@cohesion.utils']
+
+  Drupal\cohesion_style_guide\Hook\CohesionStyleGuidesHooks:
+    class: Drupal\cohesion_style_guide\Hook\CohesionStyleGuidesHooks
+    autowire: true
+    arguments:
+      - '@config.factory'
+      - '@entity_type.manager'
+      - '@cohesion.utils'
+      - '@cohesion_style_guide.style_guide_handler'
+      - '@messenger'
+      - '@extension.path.resolver'
+      - '@cohesion.rebuild_inuse_batch'
+      - '@theme.manager'

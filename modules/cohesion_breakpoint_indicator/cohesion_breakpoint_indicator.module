@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\cohesion_breakpoint_indicator\Hook\CohesionBreakpointIndicatorHooks;
+
+/**
+ * Implements hook_page_attachments().
+ */
+#[LegacyHook]
+function cohesion_breakpoint_indicator_page_attachments(array &$attachments) {
+  \Drupal::getContainer()->get(CohesionBreakpointIndicatorHooks::class)->page_attachments($attachments);
+}

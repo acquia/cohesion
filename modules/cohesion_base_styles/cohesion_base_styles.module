@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\cohesion_base_styles\Entity\BaseStyles;
+use Drupal\cohesion_base_styles\Hook\CohesionBaseStylesHooks;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+
+/**
+ * Implements hook_help().
+ */
+#[LegacyHook]
+function cohesion_base_styles_help($route_name) {
+  \Drupal::getContainer()->get(CohesionBaseStylesHooks::class)->help($route_name);
+}
+
+/**
+ * Process a batch of settings to import.
+ *
+ * @param array $context
+ *   Batch context.
+ */
+function cohesion_base_styles_process_batch(&$context) {
+  if (!isset($context['results']['error'])) {
+    $context['message'] = t('Importing base style entities');
+    $elements = \Drupal::service('cohesion.element.storage')->getByGroup('base_styles');
+
+    // Import elements.
+    if ($elements) {
+      BaseStyles::importEntities($elements);
+    }
+  }
+}

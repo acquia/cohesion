@@ -1,0 +1,187 @@
+{
+    "cssFontWeight": {
+        "regx": "^((normal|bold|lighter|bolder|100|200|300|400|500|600|700|800|900|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid font-weight value"
+    },
+    "cssInteger": {
+        "regx": "^((-?\\d+)|(inherit|initial|unset))?$",
+        "message": "Invalid CSS value"
+    },
+    "cssIntegerWithAuto": {
+        "regx": "^((-?\\d+)|(auto|inherit|initial|unset))?$",
+        "message": "Invalid CSS value"
+    },
+    "cssLength": {
+        "regx": "^(-?\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssLengthNoPercent": {
+        "regx": "^(-?\\d*(\\.?\\d+)(em|ex|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssLengthNoPercentWithNormal": {
+        "regx": "^(-?\\d*(\\.?\\d+)(em|ex|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(normal|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssLengthWithAuto": {
+        "regx": "^(-?\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(auto|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssLengthWithXOriginKeyword": {
+        "regx": "^(-?\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(left|center|right|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssLengthWithYOriginKeyword": {
+        "regx": "^(-?\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(top|center|bottom|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveIntegerWithAuto": {
+        "regx": "^(([1-9]\\d*$)|(auto|inherit|initial|unset))?$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLength": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLengthNoPercent": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLengthNoPercentWithAuto": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(auto|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLengthNoPercentWithThicknessKeyword": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(inherit|initial|unset|thin|medium|thick)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLengthWithAuto": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(auto|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLengthWithFontSize": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(xx-small|x-small|small|medium|large|x-large|xx-large|smaller|larger|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLengthWithNone": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(none|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveLengthWithNormal": {
+        "regx": "^(\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?|(normal|inherit|initial|unset)?|(calc\\(.*?\\))?)$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveNumber": {
+        "regx": "^(\\d*(\\.?\\d+)?|(inherit|initial|unset))$",
+        "message": "Invalid CSS value"
+    },
+    "cssPositiveNumberWithPercent": {
+        "regx": "^(\\d*(\\.?\\d+)(%)?|(inherit|initial|unset))$",
+        "message": "Invalid CSS value"
+    },
+    "cssTransformAngle": {
+        "regx": "^([-+]?\\d*(\\.*\\d+))(deg|grad|rad|turn)?$|(calc\\(.*?\\))$",
+        "message": "Invalid CSS value"
+    },
+    "cubicBezier": {
+        "regx": "^(-?[0-9]\\d*(\\.\\d+)?,){3}-?[0-9]\\d*(\\.\\d+)?$",
+        "message": "Must be 4 comma separated numbers"
+    },
+    "idOrClass": {
+        "regx": "^[.#][^\\s]+$",
+        "message": "Invalid ID or class"
+    },
+    "numberWithInfinite": {
+        "regx": "^(([+]?([0-9]+(?:[\\.][0-9]*)?|\\.[0-9]+))|(infinite))$",
+        "message": "Invalid number"
+    },
+    "safeNumber": {
+        "regx": "^[-+]?[0-9]\\d*(\\.\\d+)?$",
+        "message": "Invalid number"
+    },
+    "lengthWithUnit": {
+        "regx": "^(-?\\d*(\\.?\\d+)(em|ex|px|%|cm|mm|in|pt|pc|ch|rem|vh|vw|vmin|vmax)?)$",
+        "message": "Invalid css length"
+    },
+    "safeText": {
+        "regx": "^[0-9a-zA-Z\\-_]*$",
+        "message": "Invalid text"
+    },
+    "safeTextWithSpace": {
+        "regx": "^[0-9a-zA-Z\\s\\-_]*$",
+        "message": "Invalid text"
+    },
+    "safeFontStack": {
+        "regx": "^[0-9a-zA-Z'\",\\s\\-_]*$",
+        "message": "Invalid text"
+    },
+    "scssVariableName":{
+        "regx": "^(?=[a-zA-Z]{1})(?!([\\$]?)coh-)[0-9a-zA-Z\\-_]*$",
+        "message": "Must start with a letter"
+    },
+    "scssVariableNameExcludeCohPrefix": {
+        "regx": "^(?!([\\$]?)coh-)[a-zA-Z0-9-_]*$",
+        "message": "Invalid variable"
+    },
+    "url": {
+        "regx": "^(http:|https:)?\\/\\/.+(\\.[a-z]+)",
+        "message": "Invalid url"
+    },
+    "breakpointWidth": {
+        "function": true,
+        "message": "Breakpoint widths should not intersect."
+    },
+    "componentMachineNameUnique": {
+        "function": true,
+        "message": "This name is already in use on this component."
+    },
+    "validConditionStatement": {
+        "function": true,
+        "message": "Please enter a valid conditional statement."
+    },
+    "conditionStatementVariableWarning": {
+        "function": true,
+        "message": "Please refer to form fields using the correct syntax e.g. [field.input]."
+    },
+    "uniqueValue": {
+        "function": true,
+        "message": "This value must be unique."
+    },
+    "validateCustomGetOptionsFunction": {
+        "function": true,
+        "message": ""
+    },
+    "validateCustomGetOptionsEndpoint": {
+        "function": true,
+        "message": ""
+    },
+    "scssVariable": {
+        "regx": "^[\\$][A-Za-z0-9-]+$",
+        "message": "Invalid variable"
+    },
+    "cssOpacity": {
+        "regx": "^(0(\\.\\d+)?|1(\\.0+)?)$",
+        "message": "Invalid opacity",
+        "comment": "https://regex101.com/r/T5eD87/1"
+    },
+    "html5Video": {
+        "regx": "^(http:|https:)?\\/\\/.+(\\.(mp4|ogv|ogg|webm|mkv)+)",
+        "message": "Invalid HTML5 video url"
+    },
+    "scssValue": {
+        "regx": "^[^$;:^$]+$",
+        "message": "Invalid value"
+    },
+    "youTubeUrl": {
+        "regx": "^.*(?:(?:youtu\\.be\\/|v\\/|vi\\/|u\\/\\w\\/|embed\\/)|(?:(?:watch)?\\?v(?:i)?=|\\&v(?:i)?=))([^#\\&\\?]*).*",
+        "message": "Invalid link"
+    },
+    "idOrClassOrBase": {
+        "regx": "^(.|#)\\w+|\\w+$",
+        "message": "Invalid selector"
+    },
+    "machineName": {
+        "regx": "^[a-z0-9_-]+$",
+        "message": "Invalid machine name. It may only contain lowercase letters, numbers, hyphens`-` or underscores `_`"
+    }
+}

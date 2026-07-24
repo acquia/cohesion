@@ -1,0 +1,506 @@
+coh-theme:
+  css:
+    base:
+      css/reset.css: {}
+      css/base-default.css: {}
+    theme:
+      css/theme-default.css: {}
+
+cohesion-admin-scripts:
+  js:
+    js/ios.js: {}
+    js/react-app/app.js: { minified: true }
+  css:
+    theme:
+      css/loading.css: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - editor/drupal.editor
+    - editor/drupal.editor.admin
+    - ckeditor5/internal.drupal.ckeditor5
+    - core/drupalSettings
+    - core/backbone
+
+drupal.machine-name:
+  js:
+    js/machine-name.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - core/drupalSettings
+    - core/drupal.form
+
+cohesion-accordion-element:
+  js:
+    js/cohesion-accordion-element.js: {}
+  css:
+    theme:
+      css/cohesion-accordion-element.css: {}
+  dependencies:
+    - core/jquery
+
+# temporary - remove this after code has been moved into angular.
+cohesion_token:
+  css:
+    component:
+      css/cohesion-token.css: { weight: -10 }
+
+admin-icon-libraries:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-icon-libraries.css: { media: all }
+
+admin-responsive-grid-settings:
+  css:
+    theme:
+      public://cohesion/styles/cohesion-responsive-grid-settings.css: { media: all }
+
+cohesion-ui:
+  css:
+    theme:
+      css/cohesion-ui.css: { weight: -10}
+
+cohesion-list-builder-sort:
+  js:
+    js/cohesion-list-builder-sort.js: {}
+    js/list-builder-sort.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal.tabledrag
+  css:
+    component:
+      css/list-builder-sort.css: {}
+
+coh-clean-page:
+  css:
+    component:
+      css/cohesion-clean-page.css: {}
+
+coh_element_accordion_tabs_container:
+  css:
+    component:
+      css/dist/elements/accordion-tabs/accordion-tabs.css: {}
+      css/dist/elements/accordion-tabs/accordion-tabs-xl.css: { media: 'xl' }
+      css/dist/elements/accordion-tabs/accordion-tabs-lg.css: { media: 'lg' }
+      css/dist/elements/accordion-tabs/accordion-tabs-md.css: { media: 'md' }
+      css/dist/elements/accordion-tabs/accordion-tabs-sm.css: { media: 'sm' }
+      css/dist/elements/accordion-tabs/accordion-tabs-ps.css: { media: 'ps' }
+      css/dist/elements/accordion-tabs/accordion-tabs-xs.css: { media: 'xs' }
+  js:
+    js/elements/accordion-tabs-container/jquery.responsiveTabs.js: {}
+    js/elements/accordion-tabs-container/init.responsiveTabs.js: { weight: -1 }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.responsiveJs
+
+coh_element_wysiwyg:
+  css:
+    component:
+      css/dist/elements/wysiwyg/wysiwyg.css: {}
+
+coh_element_container:
+  css:
+    component:
+      css/dist/elements/container/container.css: {}
+
+coh_element_video:
+  css:
+    component:
+      css/dist/elements/media-element/media-element.css: {}
+  js:
+    js/elements/mediaelement/mediaelement-and-player.min.js: { minified: true }
+    js/elements/mediaelement/init.mediaelement.js: { weight: -2 }
+    js/elements/mediaelement/vimeo.min.js: { minified: true }
+    js/elements/mediaelement/facebook.min.js: { minified: true }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+coh_element_link:
+  css:
+    component:
+      css/dist/elements/link/link.css: {}
+  js:
+    js/elements/link/jquery.scrollTo.js: {}
+    js/elements/link/link.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+coh_element_image:
+  css:
+    component:
+      css/dist/elements/image/image.css: {}
+      css/dist/elements/image/image-xl.css: { media: 'xl' }
+      css/dist/elements/image/image-lg.css: { media: 'lg' }
+      css/dist/elements/image/image-md.css: { media: 'md' }
+      css/dist/elements/image/image-sm.css: { media: 'sm' }
+      css/dist/elements/image/image-ps.css: { media: 'ps' }
+      css/dist/elements/image/image-xs.css: { media: 'xs' }
+  js:
+    js/elements/lazyload/init.lazyload.js: { weight: -1 }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.lazyload
+
+coh_element_google_map:
+  css:
+    component:
+      css/dist/elements/google-map/google-map.css: {}
+  js:
+    js/elements/google-map/google-map.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+coh_element_drupal_menu:
+  css:
+    component:
+      css/dist/elements/drupal-menu/drupal-menu.css: {}
+  js:
+    js/elements/drupal-menu/drupal-menu.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.responsiveJs
+    - cohesion/global_libraries.pep
+
+coh_element_youtube_video_embed:
+  css:
+    component:
+      css/dist/elements/youtube-embed/youtube-embed.css: {}
+  js:
+    js/elements/youtube-embed/youtube-embed.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+coh_element_youtube_video_background:
+  css:
+    component:
+      css/dist/elements/youtube-background/youtube-background.css: {}
+  js:
+    js/elements/youtube-video-background/jquery.mb.YTPlayer.js: {}
+    js/elements/youtube-video-background/init.YTPlayer.js: { weight: -1 }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+coh_element_video_background:
+  css:
+    component:
+      css/dist/elements/video-background/video-background.css: {}
+  js:
+    js/elements/video-background/init.videoBackground.js: { weight: -1 }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.inview
+
+coh_element_slider_container:
+  css:
+    component:
+      css/dist/elements/slider-container/slider-container.css: {}
+      css/dist/elements/slider-container/slider-container-xl.css: { media: 'xl' }
+      css/dist/elements/slider-container/slider-container-lg.css: { media: 'lg' }
+      css/dist/elements/slider-container/slider-container-md.css: { media: 'md' }
+      css/dist/elements/slider-container/slider-container-sm.css: { media: 'sm' }
+      css/dist/elements/slider-container/slider-container-ps.css: { media: 'ps' }
+      css/dist/elements/slider-container/slider-container-xs.css: { media: 'xs' }
+  js:
+    js/elements/slider-container/slick.js: {}
+    js/elements/slider-container/init.slick.js: { weight: -1 }
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - cohesion/global_libraries.cohContainerMatchHeights
+
+coh_element_slide:
+  css:
+    component:
+      css/dist/elements/slide/slide.css: {}
+
+coh_element_modal:
+  css:
+    component:
+      css/dist/elements/modal/modal.css: {}
+  js:
+    js/elements/modal/polyfills/inert-polyfill.js: { weight: -10 }
+    js/elements/modal/aria.modal.js: { weight: -10 }
+    js/elements/modal/init.aria.modal.js: { weight: -1 }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+element_templates.read-more:
+  js:
+    js/elements/read-more/read-more.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.responsiveJs
+    - cohesion/global_libraries.jquery_ui_effect
+    - cohesion/global_libraries.jquery_ui_effect_scale
+    - cohesion/global_libraries.jquery_ui_effect_fade
+    - cohesion/global_libraries.jquery_ui_effect_slide
+
+element_templates.drupal-view:
+  js:
+    js/elements/drupal-view/drupal-view.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupalSettings
+
+element_templates.row-for-columns:
+  js:
+    js/elements/row-for-columns/row-for-columns.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - core/drupalSettings
+    - cohesion/global_libraries.cohContainerMatchHeights
+
+# Global JavaScript Libraries (migrated from API)
+global_libraries.windowscroll:
+  js:
+    js/global-libraries/coh-scroll.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+global_libraries.animateonview:
+  css:
+    theme:
+      css/global-libraries/animate.css: {}
+  js:
+    js/global-libraries/wow.min.js: { minified: true }
+    js/global-libraries/wow.init.js: { weight: -2 }
+  dependencies:
+    - core/jquery
+    - core/drupal
+
+global_libraries.inview:
+  js:
+    js/global-libraries/jquery.inview.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+
+global_libraries.analytics:
+  js:
+    js/global-libraries/analytics-events.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.inview
+
+global_libraries.datalayer:
+  js:
+    js/global-libraries/analytics-datalayer.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.inview
+
+global_libraries.lazyload:
+  js:
+    js/global-libraries/lazyload.min.js: { minified: true }
+  dependencies:
+    - cohesion/global_libraries.intersectionobserver
+
+global_libraries.intersectionobserver:
+  js:
+    js/global-libraries/intersection-observer.js: {}
+
+global_libraries.responsiveJs:
+  js:
+    js/global-libraries/responsive-js.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - system/matchmedia
+
+global_libraries.matchHeight:
+  js:
+    js/global-libraries/jquery.matchHeight.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+
+global_libraries.cohMatchHeights:
+  js:
+    js/global-libraries/coh-match-heights.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+    - cohesion/global_libraries.matchHeight
+    - cohesion/global_libraries.responsiveJs
+
+global_libraries.cohContainerMatchHeights:
+  js:
+    js/global-libraries/coh-container-match-heights.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - cohesion/global_libraries.matchHeight
+    - cohesion/global_libraries.responsiveJs
+
+global_libraries.parallax_scrolling:
+  js:
+    js/global-libraries/jquery.paroller.js: {}
+    js/global-libraries/init.paroller.js: { weight: -2 }
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once
+
+global_libraries.pep:
+  js:
+    js/global-libraries/pep.js: {}
+  dependencies:
+    - core/jquery
+
+global_libraries.jquery_ui_effect:
+  js:
+    js/global-libraries/jquery-ui/effect.js: {}
+  dependencies:
+    - core/jquery
+
+global_libraries.jquery_ui_effect_blind:
+  js:
+    js/global-libraries/jquery-ui/effect-blind.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_bounce:
+  js:
+    js/global-libraries/jquery-ui/effect-bounce.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_clip:
+  js:
+    js/global-libraries/jquery-ui/effect-clip.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_drop:
+  js:
+    js/global-libraries/jquery-ui/effect-drop.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_explode:
+  js:
+    js/global-libraries/jquery-ui/effect-explode.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_fade:
+  js:
+    js/global-libraries/jquery-ui/effect-fade.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_fold:
+  js:
+    js/global-libraries/jquery-ui/effect-fold.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_highlight:
+  js:
+    js/global-libraries/jquery-ui/effect-highlight.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_puff:
+  js:
+    js/global-libraries/jquery-ui/effect-puff.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+    - cohesion/global_libraries.jquery_ui_effect_scale
+
+global_libraries.jquery_ui_effect_pulsate:
+  js:
+    js/global-libraries/jquery-ui/effect-pulsate.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_scale:
+  js:
+    js/global-libraries/jquery-ui/effect-scale.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+    - cohesion/global_libraries.jquery_ui_effect_size
+
+global_libraries.jquery_ui_effect_shake:
+  js:
+    js/global-libraries/jquery-ui/effect-shake.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_size:
+  js:
+    js/global-libraries/jquery-ui/effect-size.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_slide:
+  js:
+    js/global-libraries/jquery-ui/effect-slide.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_effect_transfer:
+  js:
+    js/global-libraries/jquery-ui/effect-transfer.js: {}
+  dependencies:
+    - cohesion/global_libraries.jquery_ui_effect
+
+global_libraries.jquery_ui_resizable:
+  js:
+    js/global-libraries/jquery-ui/resizable.js: {}
+  dependencies:
+    - core/jquery
+    - jquery_ui/widget
+    - jquery_ui/mouse
+
+global_libraries.visual_page_builder_element_js_loader:
+  js:
+    js/global-libraries/state.responsiveTabs.js: { weight: -1 }
+    js/global-libraries/state.slick.js: { weight: -1 }
+    js/global-libraries/state.read-more.js: { weight: -20 }
+
+cohesion-frontend-edit-scripts:
+  js:
+    js/react-app/app.js: { minified: true }
+
+coh_responsive_grid:
+  css:
+    component:
+      css/dist/responsive-grid-settings/responsive-grid-settings.css: {}

@@ -1,0 +1,29 @@
+{
+    "row-for-columns": ["column"],
+    "google-map": ["google-map-marker"],
+    "accordion-tabs-container": ["accordion-tabs-item"],
+    "slider-container": ["slide"],
+    "menu-list-container": ["menu-list-item"],
+    "list-container": ["list-item"],
+    "form-tab-container": ["form-tab-item"],
+    "universal": [
+        "component-drop-zone-placeholder",
+        "component-pattern-repeater",
+        "pattern-repeater",
+        "entity-reference",
+        "breadcrumb",
+        "pagination",
+        "drupal-region",
+        "drupal-block",
+        "drupal-content",
+        "drupal-menu",
+        "drupal-field",
+        "drupal-field-item",
+        "drupal-view",
+        "drupal-view-contents",
+        "drupal-view-item",
+        "drupal-view-variable",
+        "drupal-view-filter",
+        "drupal-view-filter-submit"
+    ]
+}

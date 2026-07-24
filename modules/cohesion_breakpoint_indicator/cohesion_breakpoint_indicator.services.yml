@@ -1,0 +1,7 @@
+services:
+  Drupal\cohesion_breakpoint_indicator\Hook\CohesionBreakpointIndicatorHooks:
+    class: Drupal\cohesion_breakpoint_indicator\Hook\CohesionBreakpointIndicatorHooks
+    arguments:
+      - '@current_user'
+      - '@config.factory'
+      - '@theme.manager'
