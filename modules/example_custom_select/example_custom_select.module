@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_alter().
+ */
+function example_custom_select_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  // Get the entity from the form.
+  if (method_exists($form_state->getFormObject(), 'getEntity')) {
+    $entity = $form_state->getFormObject()->getEntity();
+
+    // Attach our JS library to any nodes that have a LayoutCanvas.
+    if ($entity instanceof ContentEntityInterface) {
+      foreach ($entity->getFieldDefinitions() as $field) {
+        if ($field->getType() == 'cohesion_entity_reference_revisions') {
+          attachExampleSelectLibrary($form);
+        }
+      }
+    }
+
+    // Attach our library to the component form.
+    if ($entity->getEntityTypeId() == 'cohesion_component') {
+      attachExampleSelectLibrary($form);
+    }
+  }
+}
+
+function attachExampleSelectLibrary(&$form) {
+  $form['#attached']['library'][] = 'example_custom_select/admin-custom-select';
+}

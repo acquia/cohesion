@@ -1,0 +1,12 @@
+administer master templates:
+  title: Site Studio Master templates
+  description: 'Grant access to create, edit and manage Site Studio master templates.'
+administer content templates:
+  title: Site Studio Content templates
+  description: 'Grant access to create, edit and manage Site Studio content templates.'
+administer view templates:
+  title: Site Studio View templates
+  description: 'Grant access to create, edit and manage Site Studio view templates.'
+administer menu templates:
+  title: Site Studio Menu templates
+  description: 'Grant access to create, edit and manage Site Studio menu templates.'
