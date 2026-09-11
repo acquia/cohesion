@@ -1,0 +1,27 @@
+cohesion_style_guide.preview.css:
+  path: '/cohesionapi/style-guide/preview/css'
+  defaults:
+    _controller: '\Drupal\cohesion_style_guide\Controller\StyleGuideController::styleGuideCSS'
+    _title: 'Style guide css preview'
+  requirements:
+    _access: 'TRUE'
+
+cohesion_style_guide.preview.build:
+  path: '/cohesionapi/style-guide/preview'
+  defaults:
+    _controller: '\Drupal\cohesion_style_guide\Controller\StyleGuideController::buildStyleGuidePreview'
+    _title: 'Style guide css preview'
+  methods:  [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _content_type_format: json
+
+cohesion_style_guide.preview_full:
+  path: '/admin/cohesion/style_guides/preview'
+  defaults:
+    _controller: '\Drupal\cohesion_style_guide\Controller\StyleGuideController::previewFull'
+    _title: "Preview style guide"
+  requirements:
+    _permission: 'administer cohesion'
+  options:
+    no_cache: 'TRUE'

@@ -1,0 +1,9 @@
+cohesion-breakpoint-indicator:
+  js:
+    js/cohesion-breakpoint-indicator.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+  css:
+    theme:
+      css/cohesion-breakpoint-indicator.css: { weight: 200 }

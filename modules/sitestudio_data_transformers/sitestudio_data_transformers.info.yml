@@ -1,0 +1,10 @@
+name: Site Studio data transformers
+type: module
+description: 'Transforms complex Site Studio data format into consumable abstract data structure.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion
+  - cohesion_elements
+  - jsonapi
+  - drupal:serialization

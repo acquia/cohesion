@@ -1,0 +1,85 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+    pull-request-branch-name:
+      # Change the default separator (/) to a hyphen (-)
+      separator: "-"
+    target-branch: '${{ github.head_ref }}-dependabot-vulnerabilities'
+    versioning-strategy: 'increase'
+    groups:
+      root-major:
+        update-types:
+          - 'major'
+      root-minor:
+        update-types:
+          - 'minor'
+      root-patch:
+        update-types:
+          - 'patch'
+
+  - package-ecosystem: 'npm'
+    directory: '/cohesion-services/dx8-gateway/node'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+    pull-request-branch-name:
+      # Change the default separator (/) to a hyphen (-)
+      separator: "-"
+    target-branch: '${{ github.head_ref }}-dependabot-vulnerabilities'
+    versioning-strategy: 'increase'
+    groups:
+      gateway-node-major:
+        update-types:
+          - 'major'
+      gateway-node-minor:
+        update-types:
+          - 'minor'
+      gateway-node-patch:
+        update-types:
+          - 'patch'
+
+  - package-ecosystem: 'npm'
+    directory: '/apps'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+    pull-request-branch-name:
+      # Change the default separator (/) to a hyphen (-)
+      separator: "-"
+    target-branch: '${{ github.head_ref }}-dependabot-vulnerabilities'
+    versioning-strategy: 'increase'
+    groups:
+      apps-major:
+        update-types:
+          - 'major'
+      apps-minor:
+        update-types:
+          - 'minor'
+      apps-patch:
+        update-types:
+          - 'patch'
+
+  - package-ecosystem: 'composer'
+    directory: '/cohesion-services/dx8-gateway/php'
+    schedule:
+      interval: 'weekly'
+      day: 'friday'
+    pull-request-branch-name:
+      # Change the default separator (/) to a hyphen (-)
+      separator: "-"
+    target-branch: '${{ github.head_ref }}-dependabot-vulnerabilities'
+    versioning-strategy: 'increase'
+    groups:
+      gateway-php-major:
+        update-types:
+          - 'major'
+      gateway-php-minor:
+        update-types:
+          - 'minor'
+      gateway-php-patch:
+        update-types:
+          - 'patch'

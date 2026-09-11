@@ -1,0 +1,26 @@
+/**
+ * @file
+ * Admin styling for the element usage page.
+ */
+
+/* Element toggle page */
+.element-toggle .element-category {
+  font-weight: bold;
+}
+
+.element-toggle .element {
+  padding-left: 1.5em; /* LTR */
+}
+
+[dir="rtl"] .element-toggle .element {
+  padding-right: 1.5em;
+  padding-left: 0;
+}
+
+.element-toggle .checkbox {
+  text-align: left;
+}
+
+table.element-toggle.sticky-header thead {
+  z-index: 1;
+}

@@ -1,0 +1,5 @@
+cohesion_style_helpers.add_page:
+  route_name: 'entity.cohesion_style_helper.add_page'
+  title: 'Add style helpers'
+  appears_on:
+    - entity.cohesion_style_helper.collection

@@ -1,0 +1,32 @@
+<div class="test-sdc">
+  <div>Text: {{ text }} </div>
+  <div>Select: {{ select }}</div>
+  <div>Boolean: {{ boolean }}</div>
+  <div>Integer: {{ integer }}</div>
+  <div>Integer from range slider: {{ integer_range_minimum }}</div>
+  <img src="{{ file_url(image_src) }}" alt="Test placeholder" />
+  <a href="{{ link }}" target="_blank">My link</a>
+
+  <p>Example video</p>
+  <video width="500" height="250" controls>
+    <source src="{{ video_url }}">
+    <track label="English" kind="descriptions" srclang="en"  default src="">
+    Your browser does not support the video tag.
+  </video>
+
+  <p>Example YouTube embed</p>
+  <iframe src="{{ youtube_url}}" title="example YouTube"></iframe>
+
+  <p>Example entity reference:</p>
+  <div class="twig-entity-reference">
+    {{  renderContent(entity_reference_entity_type, entity_reference_view_mode, entity_reference_entity) }}
+  </div>
+
+  <div class="slot">
+    <p>Example Slot</p>
+    {% block slot_example %}
+      Default contents for a slot.
+    {% endblock %}
+  </div>
+
+</div>

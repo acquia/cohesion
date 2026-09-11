@@ -1,0 +1,24 @@
+.js-component-with-select-container {
+    width: 30%;
+    padding: 10px;
+    margin: 5px;
+    background-color: #F2F2F2;
+    line-height: normal;
+}
+
+.js-component-with-select-container h2 {
+    font-size: 30px;
+}
+
+.js-component-with-select-container .heading-text {
+    width: 100%;
+    font-size: 25px;
+    background-color: #E1E1E1;
+    padding: 10px;
+}
+
+.js-component-with-select-container .content-text,
+.js-component-with-select-container .custom-select {
+    background-color: #E1E1E1;
+    padding: 10px;
+}

@@ -1,0 +1,7 @@
+name: Site Studio Visual Page Builder
+type: module
+description: 'Allows users to create and edit Site Studio content using a visual drag and drop page builder.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion

@@ -1,0 +1,19 @@
+cohesion_templates.cohesion_content_templates.*:
+  type: cohesion_template
+  label: 'Content templates configuration'
+  mapping:
+    default:
+      type: boolean
+      label: 'Default'
+    entity_type:
+      type: string
+      label: 'Entity type'
+    bundle:
+      type: string
+      label: 'Entity bundle'
+    view_mode:
+      type: string
+      label: 'View mode'
+    master_template:
+      type: string
+      label: 'Master template'

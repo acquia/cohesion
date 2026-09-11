@@ -1,0 +1,147 @@
+cohesion_sync.index:
+  path: '/admin/cohesion/sync'
+  defaults:
+    _controller: '\Drupal\cohesion\Controller\AdministrationController::index'
+    _title: 'Sync packages'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export_settings:
+  path: '/admin/cohesion/sync/export_settings'
+  defaults:
+    _title: 'Full export settings'
+    _form: '\Drupal\cohesion_sync\Form\ExportSettingsForm'
+    config_type: NULL
+    config_name: NULL
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.import:
+  path: '/admin/cohesion/sync/import'
+  defaults:
+    _title: 'Import packages'
+    _form: '\Drupal\cohesion_sync\Form\ImportFileForm'
+    config_type: NULL
+    config_name: NULL
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.sync:
+  path: '/admin/cohesion/sync/configuration'
+  defaults:
+    _form: '\Drupal\cohesion_sync\Form\CohesionConfigSync'
+    _title: 'Synchronize'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.import_report:
+  path: '/admin/cohesion/sync/import/report'
+  defaults:
+    _title: 'Import report'
+    _controller: '\Drupal\cohesion_sync\Controller\ImportReportController::index'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export_all:
+  path: '/admin/cohesion/sync/export_all'
+  defaults:
+    _title: 'Export full package'
+    _form: '\Drupal\cohesion_sync\Form\ExportAllForm'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export_all.generate_full_package:
+  path: '/admin/cohesion/sync/export_all/generate'
+  defaults:
+    _title: 'Generate full package'
+    _controller: '\Drupal\cohesion_sync\Controller\PackageExportGenerateController::generateFullPackage'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export_all.download:
+  path: '/admin/cohesion/sync/export_all/download/{filename}'
+  defaults:
+    _title: 'Download full package'
+    _controller: '\Drupal\cohesion_sync\Controller\PackageExportDownloadController::download'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export.generate_package:
+  path: '/admin/cohesion/sync/packages/generate/{package}'
+  defaults:
+    _title: 'Generate single package'
+    _controller: '\Drupal\cohesion_sync\Controller\PackageExportGenerateController::generatePackage'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export.export_package:
+  path: '/admin/cohesion/sync/packages/export/{package}'
+  defaults:
+    _title: 'Download package'
+    _form: '\Drupal\cohesion_sync\Form\ExportPackageForm'
+  options:
+    parameters:
+      package:
+        type: 'entity:cohesion_sync_package'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export.export_single_entity_package:
+  path: '/admin/cohesion/sync/packages/export_single_entity/{entity_type}/{entity_uuid}'
+  defaults:
+    _title: 'Download package'
+    _controller: '\Drupal\cohesion_sync\Controller\PackageExportGenerateController::exportSingleEntityPackage'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export.download:
+  path: '/admin/cohesion/sync/packages/download/{filename}'
+  defaults:
+    _title: 'Download package'
+    _controller: '\Drupal\cohesion_sync\Controller\PackageExportDownloadController::download'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.export.remove:
+  path: '/admin/cohesion/sync/packages/remove/{package}'
+  defaults:
+    _title: 'Remove package file'
+    _controller: '\Drupal\cohesion_sync\Controller\PackageExportGenerateController::remove'
+  requirements:
+    _permission: 'access cohesion sync'
+
+cohesion_sync.entity_lock_toggle:
+  path: '/admin/cohesion/sync/entity_lock/{entity_type}/{entity_uuid}'
+  defaults:
+    _title: 'Prevent updates'
+    _controller: '\Drupal\cohesion_sync\Controller\LockToggleController::index'
+  requirements:
+    _permission: 'access cohesion sync'
+
+# Appears as an action link next to each entity on their list builder pages.
+cohesion_sync.operation_export_single:
+  path: '/admin/cohesion/sync/export_single/{entity_type}/{entity_uuid}'
+  defaults:
+    _title: 'Sync export'
+    _controller: '\Drupal\cohesion_sync\Controller\OperationExportController::index'
+  requirements:
+    _permission: 'access cohesion sync'
+
+# React app refresh endpoint.
+cohesion_sync.refresh:
+  path: '/admin/cohesion/sync/refresh'
+  defaults:
+    _controller: '\Drupal\cohesion_sync\Controller\PackageFormRefreshController::index'
+    _title: "Package form refresh"
+  methods:  [POST]
+  requirements:
+    _permission: 'access cohesion sync'
+
+# Chunked file upload endpoint
+cohesion_sync.chunked:
+  path: '/admin/chunked/file'
+  defaults:
+    _controller: '\Drupal\cohesion_sync\Controller\ChunkedUploadController::receiveChunkedUpload'
+  methods: [POST]
+  requirements:
+    _permission: 'access cohesion sync'

@@ -1,0 +1,487 @@
+{
+    "canvas": [
+        {
+            "type": "item",
+            "uid": "component-drop-zone-placeholder",
+            "title": "Component drop zone",
+            "status": {
+                "collapsed": true
+            },
+            "iconColor": "content",
+            "uuid": "c6d16282-1402-41cc-bcfd-c8204b3aae0b",
+            "parentUid": "root",
+            "children": []
+        }
+    ],
+    "disabledNodes": [],
+    "componentForm": [
+        {
+            "type": "form-field",
+            "uid": "form-input",
+            "title": "Input",
+            "translate": true,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "4aeff0f2-25e1-415c-b3bb-39cef56e32a0",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-textarea",
+            "title": "Plain text area",
+            "translate": true,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "04678bc6-6791-4f20-a616-418255799d9a",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-entity-reference",
+            "title": "Entity reference",
+            "selected": false,
+            "status": {
+                "collapsed": false,
+                "isopen": false
+            },
+            "iconColor": "formField",
+            "uuid": "954f324a-d706-4f72-9cfa-e74d02aa692f",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-colorpicker",
+            "title": "Color picker",
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "a4c1188b-adec-4b33-a0db-7d21fdaaaf06",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-select",
+            "title": "Select",
+            "translate": false,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "80bfab7d-11f9-4bec-8fbb-531f65876867",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-checkbox-toggle",
+            "title": "Toggle",
+            "translate": true,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "0c5b3559-f208-4ca5-95b9-fec32f7be7c3",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-input",
+            "title": "Input",
+            "translate": true,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "c22602ec-470c-4a9b-82ea-7c4dc1ae2757",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-range-slider",
+            "title": "Range slider",
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "0e214cb1-f50a-4d06-b2b3-769830316cd1",
+            "parentUid": "root",
+            "children": []
+        },
+        {
+            "type": "form-field",
+            "uid": "form-wysiwyg",
+            "title": "WYSIWYG",
+            "translate": true,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "a96c12c7-944b-48f4-9134-9e40f0d4516b",
+            "parentUid": "root"
+        },
+        {
+            "type": "form-field",
+            "uid": "form-link",
+            "title": "Link to page",
+            "translate": true,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "b8d3f740-8ad8-4ca0-b6f0-196c1bd572cc",
+            "parentUid": "root"
+        },
+        {
+            "type": "form-field",
+            "uid": "form-image",
+            "title": "Image uploader",
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "3b254b54-e359-4707-ab28-6159811fd0a5",
+            "parentUid": "root"
+        },
+        {
+            "type": "form-field",
+            "uid": "form-youtube-embed",
+            "title": "Youtube URL",
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "574ebb4c-bc6b-475f-b0bc-5c69088bc8ea",
+            "parentUid": "root"
+        },
+        {
+            "type": "form-field",
+            "uid": "form-video-embed",
+            "title": "Video",
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "468d4838-6ec5-4e1b-8014-74507d43872a",
+            "parentUid": "root"
+        },
+        {
+            "type": "form-field",
+            "uid": "form-fontpicker",
+            "title": "Font picker",
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "040e1060-7001-4fcd-835a-e33fe273a100",
+            "parentUid": "root"
+        }
+    ],
+    "model": {
+        "c6d16282-1402-41cc-bcfd-c8204b3aae0b": {
+            "settings": {
+                "dropzoneHideSelector": ""
+            }
+        },
+        "4aeff0f2-25e1-415c-b3bb-39cef56e32a0": {
+            "settings": {
+                "title": "Input",
+                "schema": {
+                    "type": "string",
+                    "escape": true
+                },
+                "machineName": "input",
+                "tooltipPlacement": "auto right"
+            },
+            "contextVisibility": {
+                "condition": "ALL"
+            }
+        },
+        "04678bc6-6791-4f20-a616-418255799d9a": {
+            "settings": {
+                "title": "Plain text area",
+                "type": "cohTextarea",
+                "schema": {
+                    "type": "string",
+                    "escape": true
+                },
+                "machineName": "plain-text-area",
+                "tooltipPlacement": "auto right"
+            },
+            "contextVisibility": {
+                "condition": "ALL"
+            }
+        },
+        "954f324a-d706-4f72-9cfa-e74d02aa692f": {
+            "settings": {
+                "title": "Entity reference",
+                "type": "cohEntityPicker",
+                "schema": {
+                    "type": "object"
+                },
+                "machineName": "entity-reference",
+                "options": {
+                    "entity_type_disabled": false
+                },
+                "entityTypeTooltipPlacement": "auto right",
+                "viewModeTooltipPlacement": "auto right",
+                "entityTooltipPlacement": "auto right"
+            },
+            "contextVisibility": {
+                "condition": "ALL"
+            },
+            "model": {
+                "value": {
+                    "entity_type": "user",
+                    "view_mode": "full"
+                }
+            }
+        },
+        "a4c1188b-adec-4b33-a0db-7d21fdaaaf06": {
+            "settings": {
+                "title": "Color picker",
+                "type": "cohColourPickerOpener",
+                "colourPickerOptions": {
+                    "flat": true,
+                    "showOnly": ""
+                },
+                "schema": {
+                    "type": "object"
+                },
+                "machineName": "color-picker",
+                "restrictBy": "none",
+                "tooltipPlacement": "auto right"
+            },
+            "contextVisibility": {
+                "condition": "ALL"
+            }
+        },
+        "80bfab7d-11f9-4bec-8fbb-531f65876867": {
+            "settings": {
+                "type": "cohSelect",
+                "title": "Select",
+                "selectType": "custom",
+                "machineName": "select",
+                "options": [
+                    {
+                        "label": "Option 1",
+                        "value": "option-1"
+                    },
+                    {
+                        "label": "Option 2",
+                        "value": "option-2"
+                    }
+                ],
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            },
+            "model": {
+                "value": ""
+            }
+        },
+        "0c5b3559-f208-4ca5-95b9-fec32f7be7c3": {
+            "settings": {
+                "type": "checkboxToggle",
+                "title": "Toggle",
+                "schema": {
+                    "type": "string"
+                },
+                "machineName": "toggle",
+                "toggleType": "boolean",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            },
+            "model": {
+                "value": false
+            }
+        },
+        "c22602ec-470c-4a9b-82ea-7c4dc1ae2757": {
+            "settings": {
+                "type": "cohTextBox",
+                "title": "Integer",
+                "schema": {
+                    "type": "number"
+                },
+                "machineName": "integer",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            }
+        },
+        "0e214cb1-f50a-4d06-b2b3-769830316cd1": {
+            "settings": {
+                "type": "cohRange",
+                "title": "Integer Range Minimum",
+                "min": 0,
+                "max": 40,
+                "step": 1,
+                "schema": {
+                    "type": "number"
+                },
+                "machineName": "integer-range-minimum",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            }
+        },
+        "b8d3f740-8ad8-4ca0-b6f0-196c1bd572cc": {
+            "settings": {
+                "isStyle": true,
+                "type": "cohTypeahead",
+                "key": "linkToPage",
+                "title": "Link to page",
+                "placeholder": "Type page name",
+                "labelProperty": "name",
+                "valueProperty": "id",
+                "endpoint": "/cohesionapi/link-autocomplete?q=",
+                "schema": {
+                    "type": "string"
+                },
+                "machineName": "link-to-page",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right",
+                "entityTypes": false
+            }
+        },
+        "3b254b54-e359-4707-ab28-6159811fd0a5": {
+            "settings": {
+                "type": "cohFileBrowser",
+                "options": {
+                    "buttonText": "Select image",
+                    "imageUploader": "false",
+                    "allowedDescription": "Allowed: png, gif, jpg, jpeg \nMax file size: 2MB",
+                    "removeLabel": "Remove"
+                },
+                "title": "Image uploader",
+                "isStyle": true,
+                "defaultActive": true,
+                "schema": {
+                    "type": "string"
+                },
+                "machineName": "image-uploader",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            }
+        },
+        "a96c12c7-944b-48f4-9134-9e40f0d4516b": {
+            "settings": {
+                "type": "cohWysiwyg",
+                "title": "WYSIWYG",
+                "schema": {
+                    "type": "object"
+                },
+                "machineName": "wysiwyg",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            },
+            "model": {
+                "value": {
+                    "textFormat": "cohesion",
+                    "text": ""
+                }
+            }
+        },
+        "574ebb4c-bc6b-475f-b0bc-5c69088bc8ea": {
+            "settings": {
+                "type": "cohYoutubeEmbed",
+                "title": "Youtube URL",
+                "schema": {
+                    "type": "string",
+                    "cohValidate": [
+                        "youTubeUrl"
+                    ]
+                },
+                "machineName": "youtube-url",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            }
+        },
+        "468d4838-6ec5-4e1b-8014-74507d43872a": {
+            "settings": {
+                "type": "cohMediaEmbed",
+                "options": {
+                    "noPlugin": true
+                },
+                "title": "Video URL",
+                "schema": {
+                    "type": "string"
+                },
+                "machineName": "video-url",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            }
+        },
+        "040e1060-7001-4fcd-835a-e33fe273a100": {
+            "settings": {
+                "type": "cohSelect",
+                "title": "Font picker",
+                "selectType": "existing",
+                "valueProperty": "stack.variable",
+                "labelProperty": "stack.name",
+                "selectModel": [
+                    "styles",
+                    "font_and_color",
+                    "font-and-color",
+                    "font-family.value"
+                ],
+                "machineName": "font-picker",
+                "enableDecisionTree": false,
+                "tooltipPlacement": "auto right"
+            }
+        }
+    },
+    "mapper": {
+        "c6d16282-1402-41cc-bcfd-c8204b3aae0b": {},
+        "80bfab7d-11f9-4bec-8fbb-531f65876867": {},
+        "0c5b3559-f208-4ca5-95b9-fec32f7be7c3": {},
+        "c22602ec-470c-4a9b-82ea-7c4dc1ae2757": {},
+        "0e214cb1-f50a-4d06-b2b3-769830316cd1": {},
+        "b8d3f740-8ad8-4ca0-b6f0-196c1bd572cc": {},
+        "3b254b54-e359-4707-ab28-6159811fd0a5": {},
+        "a96c12c7-944b-48f4-9134-9e40f0d4516b": {},
+        "574ebb4c-bc6b-475f-b0bc-5c69088bc8ea": {},
+        "468d4838-6ec5-4e1b-8014-74507d43872a": {},
+        "040e1060-7001-4fcd-835a-e33fe273a100": {}
+    },
+    "previewModel": {
+        "954f324a-d706-4f72-9cfa-e74d02aa692f": {},
+        "04678bc6-6791-4f20-a616-418255799d9a": {},
+        "4aeff0f2-25e1-415c-b3bb-39cef56e32a0": {},
+        "a4c1188b-adec-4b33-a0db-7d21fdaaaf06": {},
+        "80bfab7d-11f9-4bec-8fbb-531f65876867": {},
+        "0c5b3559-f208-4ca5-95b9-fec32f7be7c3": {},
+        "c22602ec-470c-4a9b-82ea-7c4dc1ae2757": {},
+        "0e214cb1-f50a-4d06-b2b3-769830316cd1": {},
+        "b8d3f740-8ad8-4ca0-b6f0-196c1bd572cc": {},
+        "3b254b54-e359-4707-ab28-6159811fd0a5": {},
+        "a96c12c7-944b-48f4-9134-9e40f0d4516b": {},
+        "574ebb4c-bc6b-475f-b0bc-5c69088bc8ea": {},
+        "468d4838-6ec5-4e1b-8014-74507d43872a": {},
+        "040e1060-7001-4fcd-835a-e33fe273a100": {}
+    },
+    "variableFields": {
+        "954f324a-d706-4f72-9cfa-e74d02aa692f": [],
+        "04678bc6-6791-4f20-a616-418255799d9a": [],
+        "4aeff0f2-25e1-415c-b3bb-39cef56e32a0": [],
+        "a4c1188b-adec-4b33-a0db-7d21fdaaaf06": [],
+        "80bfab7d-11f9-4bec-8fbb-531f65876867": [],
+        "0c5b3559-f208-4ca5-95b9-fec32f7be7c3": [],
+        "c22602ec-470c-4a9b-82ea-7c4dc1ae2757": [],
+        "0e214cb1-f50a-4d06-b2b3-769830316cd1": [],
+        "b8d3f740-8ad8-4ca0-b6f0-196c1bd572cc": [],
+        "3b254b54-e359-4707-ab28-6159811fd0a5": [],
+        "a96c12c7-944b-48f4-9134-9e40f0d4516b": [],
+        "574ebb4c-bc6b-475f-b0bc-5c69088bc8ea": [],
+        "468d4838-6ec5-4e1b-8014-74507d43872a": [],
+        "040e1060-7001-4fcd-835a-e33fe273a100": []
+    },
+    "meta": {}
+}

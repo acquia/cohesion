@@ -1,0 +1,6 @@
+entity.cohesion_base_styles.canonical:
+  path: '/admin/cohesion/styles/cohesion_base_styles/{cohesion_base_styles}/edit'
+  defaults:
+    _entity_form: cohesion_base_styles.edit
+  requirements:
+    _entity_access: cohesion_base_styles.update

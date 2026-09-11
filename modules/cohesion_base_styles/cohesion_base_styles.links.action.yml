@@ -1,0 +1,5 @@
+cohesion_base_styles.add_page:
+  route_name: 'entity.cohesion_base_styles.add_form'
+  title: 'Add base style'
+  appears_on:
+    - entity.cohesion_base_styles.collection

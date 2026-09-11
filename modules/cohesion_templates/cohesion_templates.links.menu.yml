@@ -1,0 +1,38 @@
+cohesion.settings.templates:
+  title: Templates
+  description: Manage your templates
+  route_name: cohesion.settings.templates
+  parent: cohesion.settings
+  weight: 60
+
+entity.cohesion_master_templates.collection:
+  title: 'Master templates'
+  description: 'Manage your master template.'
+  route_name: entity.cohesion_master_templates.collection
+  parent: cohesion.settings.templates
+  weight: 0
+
+entity.cohesion_content_templates:
+  title: 'Content templates'
+  description: 'Manage your content templates, including Global, Full content and View mode templates.'
+  route_name: entity.cohesion_content_templates
+  parent: cohesion.settings.templates
+  weight: 1
+
+entity.cohesion_content_templates.collection:
+  class: Drupal\cohesion_templates\Plugin\Menu\CohesionContentTemplateMenuLink
+  deriver: Drupal\cohesion_templates\Plugin\Derivative\CohesionContentTemplateMenuLink
+
+entity.cohesion_view_templates.collection:
+  title: 'View templates'
+  description: 'Manage your view templates.'
+  route_name: entity.cohesion_view_templates.collection
+  parent: cohesion.settings.templates
+  weight: 2
+
+entity.cohesion_menu_templates.collection:
+  title: 'Menu templates'
+  description: 'Manage your menu templates.'
+  route_name: entity.cohesion_menu_templates.collection
+  parent: cohesion.settings.templates
+  weight: 3

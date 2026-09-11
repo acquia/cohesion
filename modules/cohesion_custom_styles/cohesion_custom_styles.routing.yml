@@ -1,0 +1,41 @@
+# endpoint that returns all the custom styles
+cohesion_custom_style.endpoint_all:
+  path: '/cohesionapi/custom_styles'
+  defaults:
+    _controller: '\Drupal\cohesion_custom_styles\Controller\CustomStylesEndpointController::getCustomStyles'
+  requirements:
+    _access: 'TRUE'
+    _user_is_logged_in: 'TRUE'
+  _format: json
+
+cohesion_custom_style.endpoint:
+  path: '/cohesionapi/custom_styles/{custom_style_type}'
+  defaults:
+    _controller: '\Drupal\cohesion_custom_styles\Controller\CustomStylesEndpointController::getCustomStyles'
+  options:
+    parameters:
+      custom_style_type:
+        type: entity:custom_style_type
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  _format: json
+
+cohesion.custom_style_type.all:
+  path: '/cohesionapi/custom_style_types'
+  defaults:
+    _controller: '\Drupal\cohesion_custom_styles\Controller\CustomStylesEndpointController::customStyleTypeAll'
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  _format: json
+
+# Batch re-save all the custom styles.
+cohesion_custom_style.batch_resave:
+  path: '/admin/cohesion/styles/cohesion_custom_styles/rebuild'
+  defaults:
+    _controller: '\Drupal\cohesion_custom_styles\CustomStyleBatch::run'
+    _title: 'Reorder custom styles'
+  requirements:
+    _access: 'TRUE'
+    _permission: 'administer website settings'

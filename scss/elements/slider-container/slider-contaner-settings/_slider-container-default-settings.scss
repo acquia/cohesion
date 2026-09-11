@@ -1,0 +1,41 @@
+/// @name slider-continer-default-settings
+/// @group Elements > Slider container settings
+/// @descripton Sets defaults Slider container
+@mixin slider-container-default-settings() {
+
+    .coh-slider-container {
+        position: relative;
+
+        &-mid {
+            overflow: hidden;
+            position: relative;
+        }
+
+        &-inner {
+            overflow: hidden;
+
+            // The slider inner container is initially hidden
+            visibility: hidden;
+
+            // Show it one slick has finished initializing the container (stops "jumpy" appearance of slider on initial load).
+            &.slick-initialized {
+                visibility: visible;
+            }
+        }
+
+        // Boxed width
+        &-boxed {
+            max-width: var(--ssa-responsive-grid-settings-boxed-width);
+            margin-left: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+            margin-right: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+        }
+
+        &-inner {
+
+            > .slick-list {
+                margin-left: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+                margin-right: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+            }
+        }
+    }
+}

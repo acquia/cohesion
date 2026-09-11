@@ -1,0 +1,5 @@
+name: Site Studio claro
+type: module
+description: 'Provides styling and templates for media library when using Visual page builder'
+package: Site Studio
+core_version_requirement: ^10.2.2 || ^11

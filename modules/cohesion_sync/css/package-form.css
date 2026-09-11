@@ -1,0 +1,35 @@
+.package-loading-overlay {
+  min-height: 200px;
+}
+
+.flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px;
+}
+
+.flex-row .package-requirements,
+.flex-row .package-content {
+  -ms-flex-preferred-size: 0;
+  -webkit-flex-basis: 0;
+  flex-basis: 0;
+  -ms-flex-positive: 1;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+  max-width: 100%;
+  position: relative;
+  width: 100%;
+  min-height: 1px;
+  box-sizing: border-box;
+  margin: 0 15px;
+}
+
+@media(max-width: 1199px) {
+  .flex-row .package-requirements,
+  .flex-row .package-content {
+    -ms-flex-preferred-size: 100%;
+    -webkit-flex-basis: 100%;
+    flex-basis: 100%;
+  }
+}
