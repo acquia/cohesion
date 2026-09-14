@@ -1,0 +1,166 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\cohesion_elements\Hook\CohesionElementsHooks;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+
+const COHESION_ELEMENTS_COHESION_COMPONENT_CATEGORY_COUNT = 15;
+const COHESION_ELEMENTS_COHESION_COMPONENT_TAG_COUNT = 15;
+
+/**
+ * Implements hook_help().
+ */
+#[LegacyHook]
+function cohesion_elements_help($route_name) {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->help($route_name);
+}
+
+/**
+ * Implements hook_library_info_alter().
+ */
+#[LegacyHook]
+function cohesion_elements_library_info_alter(&$libraries, $extension): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->library_info_alter($libraries, $extension);
+}
+
+/**
+ * Copy parent context to current context (for tokens).
+ *
+ * @param $variables
+ */
+#[LegacyHook]
+function preprocess_cohesion_elements_component(&$variables): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->preprocess_cohesion_elements_component($variables);
+}
+
+/**
+ * Implements hook_theme().
+ */
+#[LegacyHook]
+function cohesion_elements_theme($existing, $type, $theme, $path) {
+  return \Drupal::getContainer()->get(CohesionElementsHooks::class)->theme($existing, $type, $theme, $path);
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+#[LegacyHook]
+function cohesion_elements_page_attachments(array &$attachments): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->page_attachments($attachments);
+}
+
+/**
+ * @inheritdoc
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+#[LegacyHook]
+function cohesion_elements_theme_suggestions_component_alter(array &$suggestions, array &$variables): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->theme_suggestions_component_alter($suggestions, $variables);
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Our cohesion_elements_form_language_content_settings_form_alter() needs to be
+ * run after that of the content_translation module in order to see the current
+ * state of the translation field.
+ *
+ * The hook here can't be more specific, as the $hook that's passed in to this
+ * function is form_alter, and not form_FORM_ID_alter.
+ */
+function cohesion_elements_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'form_alter' && isset($implementations['cohesion_elements'])) {
+    $group = $implementations['cohesion_elements'];
+    unset($implementations['cohesion_elements']);
+    $implementations['cohesion_elements'] = $group;
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for field templates.
+ */
+#[LegacyHook]
+function cohesion_elements_preprocess_field(&$variables): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->preprocess_field($variables);
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+#[LegacyHook]
+function cohesion_elements_theme_registry_alter(&$theme_registry): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->theme_registry_alter($theme_registry);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Indicate unsupported multilingual paragraphs field configuration.
+ *
+ * Add a warning that paragraph fields can not be translated.
+ * Switch to error if a paragraph field is marked as translatable.
+ */
+#[LegacyHook]
+function cohesion_elements_form_language_content_settings_form_alter(&$form): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->form_language_content_settings_form_alter($form);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'field_ui_field_storage_add_form'.
+ */
+#[LegacyHook]
+function cohesion_elements_form_field_ui_field_storage_add_form_alter(array &$form): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->form_field_ui_field_storage_add_form_alter($form);
+}
+
+/**
+ * Implements hook_field_ui_preconfigured_options_alter().
+ */
+#[LegacyHook]
+function cohesion_elements_field_ui_preconfigured_options_alter(array &$options, string $field_type): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->field_ui_preconfigured_options_alter($options, $field_type);
+}
+
+/**
+ * Implements hook_preprocess_image_widget().
+ */
+#[LegacyHook]
+function cohesion_elements_preprocess_image_widget(&$variables): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->preprocess_image_widget($variables);
+}
+
+/**
+ * Implements hook_menu_local_actions_alter().
+ */
+#[LegacyHook]
+function cohesion_elements_menu_local_actions_alter(&$local_actions): void {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->menu_local_actions_alter($local_actions);
+}
+
+/**
+ * Implements hook_entity_revision_create().
+ */
+#[LegacyHook]
+function cohesion_elements_entity_revision_create(ContentEntityInterface $new_revision, ContentEntityInterface $entity, $keep_untranslatable_fields) {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->entity_revision_create($new_revision, $entity, $keep_untranslatable_fields);
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+#[LegacyHook]
+function cohesion_elements_user_cancel($edit, $account, $method) {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->user_cancel($edit, $account, $method);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for user entities.
+ */
+#[LegacyHook]
+function cohesion_elements_user_predelete($account) {
+  \Drupal::getContainer()->get(CohesionElementsHooks::class)->user_predelete($account);
+}

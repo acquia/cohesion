@@ -1,0 +1,14 @@
+uuid: c3d29167-f296-4854-b9bb-300e409d8d7f
+langcode: en
+status: true
+dependencies: {  }
+id: cpt_cat_test_category
+label: 'Test Category'
+json_values: '{}'
+json_mapper: '{}'
+last_entity_update: entityupdate_0033
+locked: false
+modified: false
+selectable: true
+class: category-1
+weight: 1

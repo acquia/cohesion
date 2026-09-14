@@ -1,0 +1,21 @@
+{
+    "form": [
+        {
+            "type": "canvasPreview",
+            "title": "Component preview",
+            "options": {
+                "standAlone": true,
+                "sgmPreview": false,
+                "canvasPreview": true,
+                "toolbar": {
+                    "columns": true,
+                    "scale": false,
+                    "grid": true,
+                    "breakpoints": true,
+                    "colorpicker": true
+                }
+            }
+        }
+    ],
+    "model": []
+}

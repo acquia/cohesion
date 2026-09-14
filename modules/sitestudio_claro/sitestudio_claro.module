@@ -1,0 +1,533 @@
+<?php
+
+/**
+ * @file
+ * Fixes for media library within Site Studio Visual page builder.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Include the 'claro.theme' file so that Media Library hooks and preprocess
+ * function can be executed active theme.
+ */
+require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
+
+const SITESTUDIO_CLARO_LIBRARIES_TO_ATTACH = [
+  'claro.drupal.dialog',
+  'media_library.theme',
+  'media_library.ui',
+];
+
+/**
+ * Build custom library.
+ *
+ * @param $libraries
+ * @param $extension
+ */
+function sitestudio_claro_library_info_alter(&$libraries) {
+  // Create a library on the fly, of claro variables as these are needed, and
+  // we don't want to attach the global-styles library.
+  $themeHandler = \Drupal::service('theme_handler');
+  $claroThemePath = $themeHandler->getTheme('claro')->getPath();
+  $pathToCss = '/' . $claroThemePath . '/css/base/variables.css';
+
+  $libraries['claro_vars']['css']['base'][$pathToCss] = [
+    'weight' => -10,
+  ];
+}
+
+/**
+ * The templates responsible for the Claro Media Library are:
+ * - media
+ * - media__media_library
+ * - media_library_wrapper
+ * - media_library_item
+ * - media_library_item__small
+ * - media_library_item__widget
+ * - views_view__media_library
+ * - views_view_unformatted__media_library
+ * - views_view_fields__media_library
+ * - fieldset__media_library_widget
+ * - links__media_library_menu
+ * - item_list__media_library_add_form_media_list
+ * - details__media_library_add_form_selected_media
+ * - container__media_library_widget_selection
+ * - container__media_library_content
+ */
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * Add the Claro Media Library templates with their default Claro settings
+ * if they not yet exist in to the active theme registry.
+ */
+function sitestudio_claro_theme_registry_alter(&$theme_registry) {
+  /** @var \Drupal\Core\Extension\ThemeHandler $themeHandler */
+  $themeHandler = \Drupal::service('theme_handler');
+  $claroThemePath = $themeHandler->getTheme('claro')->getPath();
+
+  if (!in_array('media', $theme_registry)) {
+    $template = 'media';
+    $path = $claroThemePath . '/templates/classy/content';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['media'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'elements',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_media',
+          'contextual_preprocess',
+          'media_library_preprocess_media',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('media__media_library', $theme_registry)) {
+    $template = 'media--media-library';
+    $path = $claroThemePath . '/templates/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['media__media_library'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'elements',
+        'theme path' => $claroThemePath,
+        'type' => 'theme_engine',
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_media',
+          'contextual_preprocess',
+          'media_library_preprocess_media',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('media_library_wrapper', $theme_registry)) {
+    $template = 'media-library-wrapper';
+    $path = $claroThemePath . '/templates/classy/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['media_library_wrapper'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          "template_preprocess",
+          "template_preprocess_media_library_wrapper",
+          "contextual_preprocess",
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('media_library_item', $theme_registry)) {
+    $template = 'media-library-item';
+    $path = $claroThemePath . '/templates/classy/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['media_library_item'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_media_library_item',
+          'contextual_preprocess',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('media_library_item__small', $theme_registry)) {
+    $template = 'media-library-item--small';
+    $path = $claroThemePath . '/templates/classy/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['media_library_item__small'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'type' => 'theme_engine',
+        'base hook' => 'media_library_item',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_media_library_item',
+          'contextual_preprocess',
+          'claro_preprocess_media_library_item__small',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('media_library_item__widget', $theme_registry)) {
+    $template = 'media-library-item';
+    $path = $claroThemePath . '/templates/classy/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['media_library_item__widget'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'type' => 'theme_engine',
+        'base hook' => 'media_library_item',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_media_library_item',
+          'contextual_preprocess',
+          'claro_preprocess_media_library_item__widget',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('pager', $theme_registry)) {
+    $template = 'pager';
+    $path = $claroThemePath . '/templates';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['pager__media_library'] = [
+        'template' => $template,
+        'render element' => 'pager',
+        'path' => $path,
+        'type' => 'base_theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_pager',
+          'contextual_preprocess',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('views_view__media_library', $theme_registry)) {
+    $template = 'views-view--media-library';
+    $path = $claroThemePath . '/templates/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['views_view__media_library'] = [
+        'template' => $template,
+        'path' => $path,
+        'variables' => [
+          'view_array' => [],
+          'view' => NULL,
+          'rows' => [],
+          'header' => [],
+          'footer' => [],
+          'empty' => [],
+          'exposed' => [],
+          'more' => [],
+          'feed_icons' => [],
+          'pager' => [],
+          'title' => '',
+          'attachment_before' => [],
+          'attachment_after' => [],
+        ],
+        'base hook' => 'views_view',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          "template_preprocess",
+          "template_preprocess_views_view",
+          "contextual_preprocess",
+          'views_ui_preprocess_views_view',
+          'media_library_preprocess_views_view__media_library',
+        ],
+        'includes' => [
+          'core/modules/views/views.theme.inc',
+          'core/modules/views/views.theme.inc',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('views_view_unformatted__media_library', $theme_registry)) {
+    $template = 'views-view-unformatted--media-library';
+    $path = $claroThemePath . '/templates/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['views_view_unformatted__media_library'] = [
+        'template' => $template,
+        'path' => $path,
+        'base hook' => 'views_view_unformatted',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'variables' => [
+          'view' => NULL,
+          'options' => NULL,
+          'rows' => NULL,
+          'title' => NULL,
+        ],
+        'preprocess functions' => [
+          "template_preprocess",
+          "template_preprocess_views_view_unformatted",
+          "contextual_preprocess",
+        ],
+        'includes' => [
+          'core/modules/views/views.theme.inc',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('views_view_fields__media_library', $theme_registry)) {
+    $template = 'views-view-fields';
+    $path = 'core/modules/views/templates';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['views_view_fields__media_library'] = [
+        'template' => $template,
+        'path' => $path,
+        'base hook' => 'views_view_fields',
+        'type' => 'module',
+        'theme path' => 'core/modules/views',
+        'variables' => [
+          'view' => NULL,
+          'options' => NULL,
+          'row' => NULL,
+          'field_alias' => NULL,
+        ],
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_views_view_fields',
+          'bo_preprocess_views_view_fields',
+          'contextual_preprocess',
+          'media_library_preprocess_views_view_fields',
+          'claro_preprocess_views_view_fields__media_library',
+        ],
+        'includes' => [
+          'core/modules/views/views.theme.inc',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('fieldset__media_library_widget', $theme_registry)) {
+    $template = 'fieldset--media-library-widget';
+    $path = $claroThemePath . '/templates/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['fieldset__media_library_widget'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'base hook' => 'fieldset',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_fieldset',
+          'contextual_preprocess',
+          'claro_preprocess_fieldset',
+          'claro_preprocess_fieldset__media_library_widget',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('links__media_library_menu', $theme_registry)) {
+    $template = 'links--media-library-menu';
+    $path = $claroThemePath . '/templates/classy/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['links__media_library_menu'] = [
+        'template' => $template,
+        'path' => $path,
+        'variables' => [
+          'links' => [],
+          'attributes' => [
+            'class' => [
+              'links',
+            ],
+          ],
+          'heading' => [],
+          'set_active_class' => FALSE,
+        ],
+        'base hook' => 'links',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_links',
+          'contextual_preprocess',
+          'claro_preprocess_links',
+          'claro_preprocess_links__media_library_menu',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('item_list__media_library_add_form_media_list', $theme_registry)) {
+    $template = 'item-list--media-library-add-form-media-list';
+    $path = $claroThemePath . '/templates/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['item_list__media_library_add_form_media_list'] = [
+        'template' => $template,
+        'path' => $path,
+        'variables' => [
+          'items' => [],
+          'title' => "",
+          'list_type' => "ul",
+          'wrapper_attributes' => [],
+          'attributes' => [],
+          'empty' => NULL,
+          'context' => [],
+        ],
+        'base hook' => 'item_list',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_item_list',
+          'contextual_preprocess',
+          'claro_preprocess_item_list__media_library_add_form_media_list',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('details__media_library_add_form_selected_media', $theme_registry)) {
+    $template = 'details--media-library-add-form-selected-media';
+    $path = $claroThemePath . '/templates/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['details__media_library_add_form_selected_media'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'base hook' => 'details',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_details',
+          'contextual_preprocess',
+          'claro_preprocess_details',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('container__media_library_widget_selection', $theme_registry)) {
+    $template = 'container--media-library-widget-selection';
+    $path = $claroThemePath . '/templates/classy/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['container__media_library_widget_selection'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'base hook' => 'container',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_container',
+          'contextual_preprocess',
+        ],
+      ];
+    }
+  }
+
+  if (!in_array('container__media_library_content', $theme_registry)) {
+    $template = 'container--media-library-content';
+    $path = $claroThemePath . '/templates/classy/media-library';
+    if (sitestudio_claro_template_exists($path, $template)) {
+      $theme_registry['container__media_library_content'] = [
+        'template' => $template,
+        'path' => $path,
+        'render element' => 'element',
+        'base hook' => 'container',
+        'type' => 'theme_engine',
+        'theme path' => $claroThemePath,
+        'preprocess functions' => [
+          'template_preprocess',
+          'template_preprocess_container',
+          'contextual_preprocess',
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function sitestudio_claro_views_pre_render(ViewExecutable $view) {
+  if (function_exists('claro_views_pre_render')) {
+    claro_views_pre_render($view);
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function sitestudio_claro_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $isAdmin = \Drupal::service('cohesion.utils')->isAdminTheme();
+  $libraryDiscovery = \Drupal::service('library.discovery');
+  // We only really want to apply these libraries to the front-end.
+  if (!$isAdmin) {
+    foreach (SITESTUDIO_CLARO_LIBRARIES_TO_ATTACH as $lib) {
+      $form['#attached']['library'][] = 'sitestudio_claro/claro_vars';
+      // Check that the library exists, if so attach.
+      if ($libraryDiscovery->getLibraryByName('claro', $lib)) {
+        $form['#attached']['library'][] = 'claro/' . $lib;
+      }
+    }
+
+    // Load some extra custom styles.
+    $form['#attached']['library'][] = 'sitestudio_claro/claro-media-modal';
+  }
+
+  // Force loading the 'claro_form_alter()' hook. It is not executed
+  // automatically because the Claro theme isn't the active theme.
+  if (function_exists('claro_form_alter')) {
+    claro_form_alter($form, $form_state, $form_id);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function sitestudio_claro_form_media_library_add_form_alter(array &$form, FormStateInterface $form_state) {
+  // Force loading the 'claro_form_media_library_add_form_alter()' hook.
+  // It is not executed automatically because the Claro theme isn't the
+  // active theme.
+  if (function_exists('claro_form_media_library_add_form_alter')) {
+    claro_form_media_library_add_form_alter($form, $form_state);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function sitestudio_claro_form_media_library_add_form_upload_alter(array &$form, FormStateInterface $form_state) {
+  // Force loading the 'claro_form_media_library_add_form_upload_alter()' hook.
+  // It is not executed automatically because the Claro theme isn't the
+  // active theme.
+  if (function_exists('claro_form_media_library_add_form_upload_alter')) {
+    claro_form_media_library_add_form_upload_alter($form, $form_state);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function sitestudio_claro_form_media_library_add_form_oembed_alter(array &$form, FormStateInterface $form_state) {
+  // Force loading the 'claro_form_media_library_add_form_oembed_alter()' hook.
+  // It is not executed automatically because the Claro theme isn't the
+  // active theme.
+  if (function_exists('claro_form_media_library_add_form_oembed_alter')) {
+    claro_form_media_library_add_form_oembed_alter($form, $form_state);
+  }
+}
+
+/**
+ * Helper function that checks the existing of a template.
+ * @param $path
+ * @param $template
+ * @return bool
+ */
+function sitestudio_claro_template_exists($path, $template) {
+  return file_exists(DRUPAL_ROOT . '/' . $path . '/' . $template . '.html.twig');
+}

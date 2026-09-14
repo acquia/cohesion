@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\cohesion_style_helpers\Hook\CohesionStyleHelperHooks;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+
+/**
+ * Implements hook_help().
+ */
+
+#[LegacyHook]
+function cohesion_style_helpers_help($route_name) {
+  \Drupal::getContainer()->get(CohesionStyleHelperHooks::class)->help($route_name);
+}

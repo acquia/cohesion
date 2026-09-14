@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_elements",
+    "type": "drupal-module",
+    "description": "Defines the component and helper configuration entities for creating reusable layout configurations within Site Studio.",
+    "license": "GPL-2.0-or-later"
+}

@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\sitestudio_governance\Hook\SiteStudioGovernanceHooks;
+
+/**
+ * Implements hook_page_attachments().
+ */
+#[LegacyHook]
+function sitestudio_governance_page_attachments(array &$attachments) {
+  \Drupal::getContainer()->get(SiteStudioGovernanceHooks::class)->pageAttachments($attachments);
+}

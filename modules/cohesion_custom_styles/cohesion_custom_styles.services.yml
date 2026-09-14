@@ -1,0 +1,5 @@
+services:
+  Drupal\cohesion_custom_styles\Hook\CohesionCustomStylesHooks:
+    class: Drupal\cohesion_custom_styles\Hook\CohesionCustomStylesHooks
+    arguments:
+      - '@request_stack'

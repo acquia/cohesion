@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\cohesion_sync\Hook\CohesionSyncHooks;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Site\Settings;
+
+const COHESION_SYNC_DEFAULT_DIR = COHESION_FILESYSTEM_URI . 'sync';
+const COHESION_SYNC_TEMP_DIR = 'temporary://cohesion-sync-';
+const COHESION_SYNC_DEFAULT_MODULE_PACKAGES = '/config/site_studio/site_studio.packages.yml';
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+#[LegacyHook]
+function cohesion_sync_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  \Drupal::getContainer()->get(CohesionSyncHooks::class)->entity_operation_alter($operations, $entity);
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+#[LegacyHook]
+function cohesion_sync_modules_installed($modules, $is_syncing) {
+  \Drupal::getContainer()->get(CohesionSyncHooks::class)->modules_installed($modules, $is_syncing);
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+#[LegacyHook]
+function cohesion_sync_page_attachments_alter(array &$attachments) {
+  \Drupal::getContainer()->get(CohesionSyncHooks::class)->page_attachments_alter($attachments);
+}
+
+/**
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ * @return void
+ *
+ * Add a checkbox to the system settings form to show/hide the legacy sync
+ * options from the UI.
+ */
+#[LegacyHook]
+function cohesion_sync_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  \Drupal::getContainer()->get(CohesionSyncHooks::class)->form_alter($form, $form_state, $form_id);
+}
+
+/**
+ * Returns a unique cohesion sync temporary directory for this installation.
+ *
+ * @return string
+ */
+function _cohesion_sync_temp_directory() {
+  static $id;
+  if (!isset($id)) {
+    $id = substr(hash('sha256', Settings::getHashSalt()), 0, 8);
+  }
+  return COHESION_SYNC_TEMP_DIR . $id . '/';
+}
+
+/**
+ * @param $form_state
+ *
+ * Handle submit of legacy visibility option.
+ */
+function cohesion_sync_save_sync_legacy_visibility(array &$form, FormStateInterface $form_state): void {
+  $value = $form_state->getValue('sync_legacy_visibility');
+  $config = \Drupal::service('config.factory')->getEditable('cohesion.settings');
+  $config->set('sync_legacy_visibility', $value);
+  $config->save();
+}

@@ -1,0 +1,9 @@
+editor-loader:
+  css:
+    component:
+      css/editor-loader.css: {}
+  js:
+    js/editor-loader.js: {}
+  dependencies:
+    - core/jquery
+    - core/once

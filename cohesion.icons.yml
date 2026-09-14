@@ -1,0 +1,28 @@
+cohesion:
+  label: 'Site Studio'
+  extractor: svg
+  config:
+    sources:
+      - assets/icons/*.svg
+  settings:
+    size:
+      title: "Size"
+      description: "Set a size for this icon."
+      type: "integer"
+      default: 20
+    class:
+      title: "Class"
+      description: "Set a class for this icon."
+      type: "string"
+      default: ""
+  template: >
+    <svg
+      {{ attributes
+          .setAttribute('class', class)
+          .setAttribute('width', size|default('20'))
+          .setAttribute('height', size|default('20'))
+          .setAttribute('aria-hidden', 'true')
+      }}
+    >
+      {{ content }}
+    </svg>

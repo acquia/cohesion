@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\cohesion_style_guide\Hook\CohesionStyleGuidesHooks;
+
+/**
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ */
+#[LegacyHook]
+function cohesion_style_guide_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
+  \Drupal::getContainer()->get(CohesionStyleGuidesHooks::class)->form_system_theme_settings_alter($form, $form_state);
+}
+
+/**
+ * Implements hook_token_info().
+ */
+#[LegacyHook]
+function cohesion_style_guide_token_info() {
+  return \Drupal::getContainer()->get(CohesionStyleGuidesHooks::class)->token_info();
+}
+
+/**
+ * Implements hook_tokens().
+ */
+#[LegacyHook]
+function cohesion_style_guide_tokens($type, $tokens) {
+  return \Drupal::getContainer()->get(CohesionStyleGuidesHooks::class)->tokens($type, $tokens);
+}
+
+/**
+ * Implements hook_theme().
+ */
+#[LegacyHook]
+function cohesion_style_guide_theme() {
+  return \Drupal::getContainer()->get(CohesionStyleGuidesHooks::class)->theme();
+}
+
+/**
+ * Pre submit handler for theme settings style guide manager
+ */
+function cohesion_style_guide_theme_settings_pre_submit(array $form, FormStateInterface $form_state) {
+  $submit_values = &drupal_static('coh-smg-submit-values');
+  $submit_values = $form_state->getValue('json_values');
+  $form_state->unsetValue('cohesion');
+  $form_state->unsetValue('json_values');
+}
+
+/**
+ * Submit handler for theme settings style guide manager.
+ */
+function cohesion_style_guide_theme_settings_submit(array $form, FormStateInterface $form_state) {
+
+  // Get the theme id from the theme settings being edited.
+  $build_info = $form_state->getBuildInfo();
+  $args = $build_info['args'];
+  $json_values = &drupal_static('coh-smg-submit-values');
+
+  if (isset($args[0])) {
+    $theme_id = $args[0];
+    $style_guide_manager_handler = \Drupal::service('cohesion_style_guide.style_guide_handler');
+    $in_use_entities = $style_guide_manager_handler->saveStyleGuideManager($theme_id, $json_values);
+    if (!empty($in_use_entities)) {
+      \Drupal::service('cohesion.rebuild_inuse_batch')->run($in_use_entities);
+    }
+  }
+}

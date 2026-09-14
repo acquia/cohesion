@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Implements hook_page_attachments().
+ */
+
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\sitestudio_page_builder\Hook\SiteStudioPageBuilderHooks;
+
+const SITESTUDIO_PAGE_BUILDER_PAGE_BUILDER_PERMISSION = 'access visual page builder';
+
+/**
+ * Check if content lock is enabled for an entity type.
+ */
+function sitestudio_page_builder_is_content_lock_enabled($entity_type_id = 'node') {
+  static $cache = [], $module_exists, $protected_types;
+
+  return $cache[$entity_type_id] ??=
+    ($module_exists ??= \Drupal::service('module_handler')->moduleExists('content_lock')) &&
+    !empty(($protected_types ??= \Drupal::config('content_lock.settings')->get('types') ?: [])[$entity_type_id]);
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+#[LegacyHook]
+function sitestudio_page_builder_page_attachments_alter(array &$attachments) {
+  \Drupal::getContainer()->get(SiteStudioPageBuilderHooks::class)->page_attachments_alter($attachments);
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+#[LegacyHook]
+function sitestudio_page_builder_toolbar() {
+  return \Drupal::getContainer()->get(SiteStudioPageBuilderHooks::class)->toolbar();
+}
+
+/**
+ * Implements hook_theme().
+ */
+#[LegacyHook]
+function sitestudio_page_builder_theme($existing, $type, $theme, $path) {
+  return \Drupal::getContainer()->get(SiteStudioPageBuilderHooks::class)->theme($existing, $type, $theme, $path);
+}
+
+/**
+ * Implements hook_entity_display_build_alter().
+ */
+#[LegacyHook]
+function sitestudio_page_builder_entity_display_build_alter(&$build, $context) {
+  \Drupal::getContainer()->get(SiteStudioPageBuilderHooks::class)->entity_display_build_alter($build, $context);
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+#[LegacyHook]
+function sitestudio_page_builder_page_attachments(array &$attachments) {
+  \Drupal::getContainer()->get(SiteStudioPageBuilderHooks::class)->page_attachments($attachments);
+}

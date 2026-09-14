@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - cohesion_elements
+id: component_content.cohesion
+label: Cohesion
+targetEntityType: component_content
+cache: true

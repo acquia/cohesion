@@ -1,0 +1,8 @@
+services:
+
+  website_settings.defaults:
+    class: Drupal\cohesion_website_settings\DefaultEntitiesManager
+    arguments: ['@entity_type.manager']
+
+  Drupal\cohesion_website_settings\Hook\CohesionWebsiteSettingsHooks:
+    class: Drupal\cohesion_website_settings\Hook\CohesionWebsiteSettingsHooks
