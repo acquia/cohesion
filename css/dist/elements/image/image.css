@@ -1,0 +1,10 @@
+.coh-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  /*fix Edge for lazy-loading https://github.com/verlok/lazyload/issues/152 */
+}
+.coh-image[data-src], .coh-image[data-srcset] {
+  min-height: 1px;
+}

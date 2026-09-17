@@ -1,0 +1,7 @@
+cohesion_style_guide.cohesion_style_guide.*:
+  type: cohesion_config_entity
+  label: 'Style guide configuration'
+  mapping:
+    weight:
+      type: integer
+      label: 'Weight'

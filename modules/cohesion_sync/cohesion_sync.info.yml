@@ -1,0 +1,8 @@
+name: Site Studio sync
+type: module
+description: 'Share packages of dependent configuartion between sites.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion
+  - config

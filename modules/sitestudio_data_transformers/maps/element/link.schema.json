@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {"type": "string", "pattern": "^link"},
+    "id": {"type": "string", "pattern": "^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$"},
+    "data": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string"},
+        "type": {"type": "string"},
+        "target": {"type": "string"},
+        "text": {"type": "string"},
+        "value": {
+          "type": "object",
+          "properties": {
+            "url": {"type": "string"}
+          }
+        }
+      }
+    }
+  },
+  "required": ["id", "type", "data"]
+}

@@ -1,0 +1,27 @@
+.coh-video-background {
+  position: relative;
+  overflow: hidden;
+}
+.coh-video-background-inner {
+  position: absolute;
+  width: 100%;
+  min-height: 100%;
+  z-index: -100;
+  object-fit: cover;
+}
+.coh-video-background-top .coh-video-background-inner {
+  top: 0;
+  left: 0;
+  transform: translate(0);
+}
+.coh-video-background-center .coh-video-background-inner {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.coh-video-background-bottom .coh-video-background-inner {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  transform: translate(0);
+}

@@ -1,0 +1,26 @@
+.coh-youtube-embed-inner {
+  position: relative;
+  display: block;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.coh-youtube-embed-inner .coh-youtube-embed-item,
+.coh-youtube-embed-inner iframe,
+.coh-youtube-embed-inner embed,
+.coh-youtube-embed-inner object,
+.coh-youtube-embed-inner video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  border: 0;
+}
+.coh-youtube-embed-16by9 {
+  padding-bottom: 56.25%;
+}
+.coh-youtube-embed-4by3 {
+  padding-bottom: 75%;
+}

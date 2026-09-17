@@ -1,0 +1,10 @@
+entity.component_content.canonical:
+  route_name: entity.component_content.canonical
+  base_route: entity.component_content.canonical
+  title: 'Edit'
+  weight: 0
+entity.component_content.delete_form:
+  route_name: entity.component_content.delete_form
+  base_route: entity.component_content.canonical
+  title: Delete
+  weight: 10

@@ -1,0 +1,24 @@
+.coh-container {
+  display: block;
+
+  &:before, &:after {
+    clear: both;
+    content: " ";
+    display: table;
+  }
+
+  &-boxed {
+    max-width: var(--ssa-responsive-grid-settings-boxed-width);
+    margin-left: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+    margin-right: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+
+    & & {
+      margin-right: auto;
+      margin-left: auto;
+    }
+  }
+}
+
+.dx8-aov {
+  visibility: hidden;
+}
