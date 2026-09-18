@@ -1,0 +1,22 @@
+sync-package-form:
+  css:
+    base:
+      css/package-form.css: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - cohesion/cohesion-admin-styles
+
+full-package-export-form:
+  css:
+    base:
+      css/full-package-export-form.css: {}
+  dependencies:
+    - core/drupal
+
+sync-chunked-file:
+  js:
+    file-js/chunked.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

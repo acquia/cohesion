@@ -1,0 +1,13 @@
+# Site Studio entity styles menu items definition
+entity.cohesion_style_helpers:
+  title: 'Style helpers'
+  route_name: entity.cohesion_style_helper.collection
+  description: 'Manage your style helpers'
+  parent: cohesion.settings.styles
+  weight: 30
+
+cohesion.cohesion_style_helpers.add_page:
+  title: Add style helpers
+  description: 'Add a new style helpers.'
+  route_name: entity.cohesion_style_helper.add_page
+  parent: entity.cohesion_style_helpers

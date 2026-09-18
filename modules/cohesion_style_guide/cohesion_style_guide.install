@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Update style guide remove entity_type_access and bundle_access
+ */
+function cohesion_style_guide_update_8900() {
+  $style_guide_ids = \Drupal::configFactory()->listAll('cohesion_style_guide.cohesion_style_guide.');
+  foreach ($style_guide_ids as $config_id) {
+    $editable = \Drupal::configFactory()->getEditable($config_id);
+    $editable->clear('entity_type_access');
+    $editable->clear('bundle_access');
+    $editable->clear('has_quick_edit');
+    $editable->clear('twig_template');
+    $editable->save();
+  }
+}

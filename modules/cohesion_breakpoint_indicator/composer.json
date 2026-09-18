@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_breakpoint_indicator",
+    "type": "drupal-module",
+    "description": "Adds a breakpoint indicator to Site Studio, which displays the current breakpoint you're viewing.",
+    "license": "GPL-2.0-or-later"
+}

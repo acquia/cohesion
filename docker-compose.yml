@@ -1,0 +1,16 @@
+services:
+  dx8-gateway:
+    build:
+      context: cohesion-services/dx8-gateway
+      target: development
+    container_name: dx8-gateway
+    ports:
+      - "2000:3000"
+    volumes:
+      - ./cohesion-services/dx8-gateway/node:/node
+      - ./cohesion-services/dx8-gateway/php:/php
+      - ./cohesion-services/dx8-gateway/assets:/assets
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1M"

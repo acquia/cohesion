@@ -1,0 +1,13 @@
+{
+    "name": "drupal/cohesion_templates",
+    "type": "drupal-module",
+    "description": "Defines the template configuration entities for creating Site Studio templates.",
+    "license": "GPL-2.0-or-later",
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9"
+            }
+        }
+    }
+}

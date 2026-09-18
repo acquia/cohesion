@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {"type": "string", "pattern": "^google-map"},
+    "id": {"type": "string", "pattern": "^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$"},
+    "data": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string"},
+        "mapType": {"type": "string"},
+        "zoomLevel": {"type": "string"},
+        "markerType": {"type": "string"}
+      }
+    }
+  },
+  "required": ["id", "type", "data"]
+}
