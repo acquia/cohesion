@@ -1,0 +1,27 @@
+cohesion_style_helpers.endpoint_all:
+  path: '/cohesionapi/style_helpers'
+  defaults:
+      _controller: '\Drupal\cohesion_style_helpers\Controller\StyleHelpersEndpointController::getAll'
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  _format: json
+
+cohesion_style_helpers.endpoint_one:
+  path: '/cohesionapi/style_helpers/{style_helper_id}'
+  defaults:
+      _controller: '\Drupal\cohesion_style_helpers\Controller\StyleHelpersEndpointController::getOne'
+  requirements:
+    _access: 'TRUE'
+    _user_is_logged_in: 'TRUE'
+  _format: json
+
+cohesion_style_helpers.style_helper_save:
+  path: '/cohesionapi/style-helper-save'
+  defaults:
+    _controller: '\Drupal\cohesion_style_helpers\Controller\StyleHelpersEndpointController::styleHelperSave'
+    _title: 'Save an element'
+  methods:  [POST]
+  requirements:
+    _permission: 'administer style helpers'
+    _content_type_format: json

@@ -1,0 +1,106 @@
+/// @name slider-slick-default-settings
+/// @group Elements Slider container settings
+/// @description    Sets default settings taken from https://github.com/kenwheeler/slick
+/// @param
+@mixin slider-slick-default-settings()  {
+    .slick-slider {
+        position: relative;
+        display: block;
+        box-sizing: border-box;
+        user-select: none;
+        touch-action: pan-y;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .slick-sr-only {
+        border: 0;
+        clip: rect(1px,1px,1px,1px);
+        -webkit-clip-path: inset(50%);
+        clip-path: inset(50%);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+        white-space: nowrap;
+    }
+
+    .slick-list {
+        position: relative;
+        //overflow: hidden;
+        display: block;
+        margin: 0;
+        padding: 0;
+
+        &:focus {
+            outline: none;
+        }
+
+        &.dragging {
+            cursor: hand;
+        }
+    }
+    .slick-slider .slick-track,
+    .slick-slider .slick-list {
+        transform: translate3d(0, 0, 0);
+    }
+
+    .slick-track {
+        position: relative;
+        top: 0;
+        left: 0;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+
+        &:before,
+        &:after {
+            content: '';
+            display: table;
+        }
+
+        &:after {
+            clear: both;
+        }
+
+        .slick-loading & {
+            visibility: hidden;
+        }
+    }
+
+    .slick-slide {
+        float: left;
+        display: none;
+
+        [dir="rtl"] & {
+            float: right;
+        }
+
+        &.slick-loading img {
+            display: none;
+        }
+
+        &.dragging img {
+            pointer-events: none;
+        }
+
+        .slick-initialized & {
+            display: block;
+        }
+
+        .slick-loading & {
+            visibility: hidden;
+        }
+
+        .slick-vertical & {
+            display: block;
+            height: auto;
+            border: 1px solid transparent;
+        }
+    }
+
+    .slick-arrow.slick-hidden {
+        display: none;
+    }
+}

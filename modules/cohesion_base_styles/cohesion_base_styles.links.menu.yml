@@ -1,0 +1,14 @@
+# Site Studio base styles menu items definition
+entity.cohesion_base_styles.collection:
+  title: 'Base styles'
+  route_name: entity.cohesion_base_styles.collection
+  description: 'Manage your base styles'
+  parent: cohesion.settings.styles
+  weight: 10
+
+entity.cohesion_base_styles.collection.add_page:
+  title: 'Add base style'
+  route_name: entity.cohesion_base_styles.add_form
+  description: 'Add a new base style'
+  parent: entity.cohesion_base_styles.collection
+  weight: 0

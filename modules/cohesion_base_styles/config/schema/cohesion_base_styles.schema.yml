@@ -1,0 +1,7 @@
+cohesion_base_styles.cohesion_base_styles.*:
+  type: cohesion_config_entity
+  label: 'Base styles config'
+  mapping:
+    custom:
+      type: boolean
+      label: 'Custom'
