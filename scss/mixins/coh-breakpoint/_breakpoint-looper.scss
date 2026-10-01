@@ -1,0 +1,12 @@
+@use "sass:map";
+@use "../../abstracts/variables";
+
+@mixin breakpoint-looper($responsive-grid-settings: variables.$responsive-grid-settings)    {
+
+    $breakpoints: map.get($responsive-grid-settings, breakpoints);
+
+    @each $breakpoint-key, $breakpoint in $breakpoints {
+        @content($breakpoint-key);
+    }
+}
+

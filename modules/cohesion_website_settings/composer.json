@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_website_settings",
+    "type": "drupal-module",
+    "description": "Defines the website settings configuration entities.",
+    "license": "GPL-2.0-or-later"
+}

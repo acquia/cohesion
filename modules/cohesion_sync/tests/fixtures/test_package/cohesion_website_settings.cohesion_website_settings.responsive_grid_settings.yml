@@ -1,0 +1,86 @@
+uuid: a1071c2e-99d7-4d02-919b-98ea5d02c0ba
+langcode: en
+status: true
+dependencies: {  }
+id: responsive_grid_settings
+label: 'Responsive grid settings'
+json_values: |
+  {
+      "gridType": "desktop-first",
+      "columns": 12,
+      "breakpoints": {
+          "xl": {
+              "width": 1400,
+              "innerGutter": 30,
+              "outerGutter": 30,
+              "widthType": "fixed",
+              "previewColumns": 12,
+              "label": "Television",
+              "class": "coh-icon-television",
+              "iconHex": "F26C",
+              "boxedWidth": 1340
+          },
+          "lg": {
+              "width": 1170,
+              "innerGutter": 30,
+              "outerGutter": 30,
+              "widthType": "fixed",
+              "previewColumns": 12,
+              "label": "Desktop",
+              "class": "coh-icon-desktop",
+              "iconHex": "F108",
+              "boxedWidth": 1110
+          },
+          "md": {
+              "width": 1024,
+              "innerGutter": 30,
+              "outerGutter": 30,
+              "widthType": "fixed",
+              "previewColumns": 12,
+              "label": "Laptop",
+              "class": "coh-icon-laptop",
+              "iconHex": "F109",
+              "boxedWidth": 964
+          },
+          "sm": {
+              "width": 768,
+              "innerGutter": 30,
+              "outerGutter": 30,
+              "widthType": "fixed",
+              "previewColumns": 12,
+              "label": "Tablet",
+              "class": "coh-icon-tablet",
+              "iconHex": "F10A",
+              "boxedWidth": 708
+          },
+          "ps": {
+              "width": 565,
+              "innerGutter": 30,
+              "outerGutter": 30,
+              "widthType": "fixed",
+              "previewColumns": 12,
+              "label": "Mobile landscape",
+              "class": "coh-icon-mobile-landscape",
+              "iconHex": "E91E",
+              "boxedWidth": 505
+          },
+          "xs": {
+              "width": 320,
+              "innerGutter": 20,
+              "outerGutter": 20,
+              "widthType": "fluid",
+              "mobilePlaceholderWidth": 320,
+              "mobilePlaceholderType": "fluid",
+              "previewColumns": 12,
+              "label": "Mobile",
+              "class": "coh-icon-mobile",
+              "iconHex": "F10B",
+              "boxedWidth": 280
+          }
+      }
+  }
+json_mapper: '{}'
+last_entity_update: entityupdate_0033
+locked: false
+modified: true
+selectable: true

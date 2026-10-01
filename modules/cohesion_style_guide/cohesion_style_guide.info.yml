@@ -1,0 +1,7 @@
+name: Site Studio style guide manager
+type: module
+description: 'Defines a set of configuration that can be applied per theme.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion

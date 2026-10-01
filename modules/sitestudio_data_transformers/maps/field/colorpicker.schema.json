@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {"type": "string", "pattern": "^form-field$"},
+    "id": {"type": "string", "pattern": "^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$"},
+    "machine_name": {"type": "string"},
+    "data": {
+      "type": "object",
+      "properties": {
+        "uid": {"type": "string","pattern": "^form-colorpicker$"},
+        "title": {"type": "string"},
+        "value": {
+          "type": "object",
+          "properties": {
+            "link": {"type": "boolean"},
+            "value": {
+              "type": "object",
+              "properties": {
+                "hex": {"type": "string"},
+                "rgba": {"type": "string"}
+              }
+            },
+            "uid": {"type": "string"},
+            "name": {"type": "string"},
+            "class":{
+              "type": "string",
+              "pattern": "^\\.coh-color-[-a-z0-9]+$"
+            },
+            "variable": {"type":"string"}
+          }
+        }
+      }
+    }
+  },
+  "required": ["id", "type", "data"]
+}

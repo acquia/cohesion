@@ -1,0 +1,7 @@
+name: Site Studio breakpoint indicator
+description: Adds a breakpoint indicator to Site Studio, which displays the current breakpoint you're viewing.
+type: module
+package: Site Studio
+core_version_requirement: ^10.2.2 || ^11
+dependencies:
+  - cohesion

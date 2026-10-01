@@ -1,0 +1,12 @@
+/// @name grid-default-rows
+/// @group Website settings Responsive grid settings
+/// @description    Sets Responsive defaults for .coh-row and .coh-row-inner
+/// @param {Map}    $grid-settings - Keyed responsive grid settings map
+@mixin grid-default-rows() {
+  .coh-row-inner {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+      margin-right: calc(calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2) * -1);
+  }
+}

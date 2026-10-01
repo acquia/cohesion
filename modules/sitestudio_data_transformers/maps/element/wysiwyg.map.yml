@@ -1,0 +1,32 @@
+type:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uid'
+id:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uuid'
+data:
+  title:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'title'
+  content:
+    text:
+      _property: TRUE,
+      type: 'model'
+      path:
+        - 'settings'
+        - 'content'
+        - 'text'
+    textFormat:
+      _property: TRUE,
+      type: 'model'
+      path:
+        - 'settings'
+        - 'content'
+        - 'textFormat'
