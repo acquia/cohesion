@@ -1,0 +1,181 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ */
+function cohesion_style_guide_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
+  // Get the theme id from the theme settings being edited.
+  $build_info = $form_state->getBuildInfo();
+  $args = $build_info['args'];
+
+  if (isset($args[0])) {
+
+    $theme_id = $args[0];
+
+    // Check if the theme settings being edited are part of a theme with
+    // cohesion enabled.
+    if (\Drupal::service('cohesion.utils')
+      ->themeHasCohesionEnabled($theme_id)) {
+      if (Drupal::service('config.factory')->get('system.performance')->get('css.preprocess') === TRUE) {
+        Drupal::messenger()->addWarning('Please note, Style Guide preview is disabled as CSS aggregation is turned on.');
+        $form['#attached']['library'][] = 'cohesion_style_guide/hide-preview';
+      }
+
+      $style_guide_manager_handler = Drupal::service('cohesion_style_guide.style_guide_handler');
+      $form['#attached']['drupalSettings']['cohesion']['style_guides'] = $style_guide_manager_handler->getJsonDefinition();
+      $style_guide_manager_json_values = $style_guide_manager_handler->getStyleGuideManagerJsonWithParentMerged($theme_id);
+      $form['#attached']['drupalSettings']['cohesion']['parentEntityForm']['json_values'] = json_decode($style_guide_manager_json_values['parent']);
+      $form['#attached']['drupalSettings']['cohesion']['fieldPreview'] = $style_guide_manager_handler->tokensCanBePreview();
+
+      $form['#attached']['drupalSettings']['cohesion']['canvas_preview_css'] = \Drupal::service('extension.path.resolver')->getPath('module', 'cohesion_elements') . '/css/canvas-preview.css';
+      $form['#attached']['drupalSettings']['cohesion']['canvas_preview_js'] = \Drupal::service('extension.path.resolver')->getPath('module', 'cohesion_elements') . '/js/canvas-preview.js';
+
+      $form['cohesion'] = [
+        // Drupal\cohesion\Element\CohesionField.
+        '#type' => 'cohesionfield',
+        '#json_values' => $style_guide_manager_json_values['theme'],
+        '#classes' => [],
+        '#entity' => NULL,
+        '#cohFormGroup' => 'style_guide',
+        '#cohFormId' => 'style_guide_manager',
+        '#weight' => 0,
+        '#isContentEntity' => FALSE,
+      ];
+
+      // Add the shared attachments.
+      _cohesion_shared_page_attachments($form);
+
+      array_unshift($form['#submit'], 'cohesion_style_guide_theme_settings_pre_submit');
+      $form['#submit'][] = 'cohesion_style_guide_theme_settings_submit';
+    }
+  }
+}
+
+/**
+ * Pre submit handler for theme settings style guide manager
+ */
+function cohesion_style_guide_theme_settings_pre_submit(array $form, FormStateInterface $form_state) {
+  $submit_values = &drupal_static('coh-smg-submit-values');
+  $submit_values = $form_state->getValue('json_values');
+  $form_state->unsetValue('cohesion');
+  $form_state->unsetValue('json_values');
+}
+
+/**
+ * Submit handler for theme settings style guide manager.
+ */
+function cohesion_style_guide_theme_settings_submit(array $form, FormStateInterface $form_state) {
+
+  // Get the theme id from the theme settings being edited.
+  $build_info = $form_state->getBuildInfo();
+  $args = $build_info['args'];
+  $json_values = &drupal_static('coh-smg-submit-values');
+
+  if (isset($args[0])) {
+    $theme_id = $args[0];
+    $style_guide_manager_handler = Drupal::service('cohesion_style_guide.style_guide_handler');
+    $in_use_entities = $style_guide_manager_handler->saveStyleGuideManager($theme_id, $json_values);
+    if (!empty($in_use_entities)) {
+      Drupal::service('cohesion.rebuild_inuse_batch')->run($in_use_entities);
+    }
+  }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function cohesion_style_guide_token_info() {
+  // Defines style guide manager tokens.
+  $info = [];
+  $info['types']['style-guide'] = [
+    'name' => t('Style guide'),
+    'description' => t('Tokens for Site Studio style guide'),
+  ];
+
+  /** @var \Drupal\cohesion_style_guide\Entity\StyleGuide[] $style_guides */
+  $style_guide_storage = \Drupal::entityTypeManager()
+    ->getStorage('cohesion_style_guide');
+  $style_guide_ids = $style_guide_storage->getQuery()
+    ->accessCheck(TRUE)
+    ->sort('weight')
+    ->condition('status', TRUE)
+    ->execute();
+  $style_guides = $style_guide_storage->loadMultiple($style_guide_ids);
+
+  foreach ($style_guides as $style_guide) {
+    $layout_canvas = $style_guide->getLayoutCanvasInstance();
+
+    $info['types'][$style_guide->id()] = [
+      'name' => $style_guide->label(),
+      'description' => t('Site Studio style guide tokens for %s', ['%s' => $style_guide->label()]),
+      'nested' => TRUE,
+    ];
+
+    $info['tokens']['style-guide'][$style_guide->id()] = [
+      'name' => $style_guide->label(),
+      'description' => t('Site Studio style guide tokens for %s', ['%s' => $style_guide->label()]),
+      'type' => $style_guide->id(),
+    ];
+
+    foreach ($layout_canvas->iterateStyleGuideForm() as $form_element) {
+
+      $token = $form_element->getModel()->getProperty([
+        'settings',
+        'machineName',
+      ]);
+      $token_name = $form_element->getModel()->getProperty([
+        'settings',
+        'title',
+      ]);
+
+      if ($token && $token_name) {
+        $info['tokens'][$style_guide->id()][$token] = ['name' => $token_name];
+      }
+
+    }
+  }
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function cohesion_style_guide_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = [];
+  if ($type == 'style-guide') {
+    $theme = Drupal::theme()->getActiveTheme()->getExtension();
+    $style_guide_manager_token_values = Drupal::service('cohesion_style_guide.style_guide_handler')->getTokenValues($theme);
+    foreach ($tokens as $name => $original) {
+      if (isset($style_guide_manager_token_values[$name])) {
+        if (is_array($style_guide_manager_token_values[$name])) {
+          $replacements[$original] = json_encode($style_guide_manager_token_values[$name]);
+        }
+        else {
+          $replacements[$original] = $style_guide_manager_token_values[$name];
+        }
+      }
+    }
+  }
+  return $replacements;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function cohesion_style_guide_theme($existing, $type, $theme, $path) {
+  return [
+    'toolbar_tray' => [
+      'variables' => ['entities' => []],
+    ],
+  ];
+}

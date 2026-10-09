@@ -1,0 +1,19 @@
+/// @name slider-navigation-default-settings
+/// @group Elements Slider item settings
+/// @description Sets Responsive defaults for Slider item
+@mixin slider-navigation-default-settings()   {
+
+    .coh-slider-container {
+
+        // Navigation (Outside)
+        > .coh-slider-nav-top,
+        > .coh-slider-nav-bottom {
+
+            &:before, &:after {
+                clear: both;
+                content: " ";
+                display: table;
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+.ssa-download-btn {
+  width: 150px;
+  height: 36px;
+  background: #0E68A7;
+  border: none;
+  color: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 200ms ease-in-out;
+}
+
+.ssa-download-btn:hover {
+  background: #0b5386;
+}
+
+/* Hide download button when React loading */
+.ssa-form-is-loading .ssa-download-btn {
+  display: none;
+}

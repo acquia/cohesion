@@ -1,0 +1,5 @@
+services:
+
+  cohesion_style_guide.style_guide_handler:
+    class: Drupal\cohesion_style_guide\Services\StyleGuideManagerHandler
+    arguments: ['@entity_type.manager', '@entity.repository', '@cohesion_usage.update_manager', '@theme_handler', '@cohesion.utils']

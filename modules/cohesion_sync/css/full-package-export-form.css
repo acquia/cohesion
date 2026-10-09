@@ -1,0 +1,10 @@
+.file-description-container {
+  background-color: #f0f5fd;
+  padding: 20px;
+}
+.file-description-container .form-item--label {
+  font-weight: 700;
+}
+.file-description-container .form-item {
+  margin-top: 0;
+}

@@ -1,0 +1,13 @@
+@use "grid-settings";
+
+// Default Row settings
+@include grid-settings.grid-default-rows();
+
+// Default Column settings
+@include grid-settings.grid-default-columns();
+
+// Responsive Column settings
+@include grid-settings.grid-responsive-column-settings();
+
+// Responsive Row settings
+@include grid-settings.grid-responsive-row-settings();

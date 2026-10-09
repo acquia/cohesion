@@ -1,0 +1,8 @@
+name: 'Cohesion Node Access Test'
+type: module
+description: 'Test module that enables node access to test CohesionLayoutViewBuilder.'
+package: Testing
+core_version_requirement: ^10.3 || ^11
+hidden: true
+dependencies:
+  - drupal:node

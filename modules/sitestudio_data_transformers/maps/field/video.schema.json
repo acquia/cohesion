@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {"type": "string", "pattern": "^form-field$"},
+    "id": {"type": "string", "pattern": "^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$"},
+    "machine_name": {"type": "string"},
+    "data": {
+      "type": "object",
+      "properties": {
+        "uid": {"type": "string","pattern": "^form-video-embed$"},
+        "title": {"type": "string"},
+        "value": {"type": "string"}
+      }
+    }
+  },
+  "required": ["id", "type", "data"]
+}

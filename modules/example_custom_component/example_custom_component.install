@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function example_custom_component_uninstall() {
+  // Delete the example tags configuration on disable.
+  \Drupal::configFactory()->getEditable('cohesion_elements.cohesion_component_tag.cpt_tag_example_0')->delete();
+  \Drupal::configFactory()->getEditable('cohesion_elements.cohesion_component_tag.cpt_tag_example')->delete();
+}

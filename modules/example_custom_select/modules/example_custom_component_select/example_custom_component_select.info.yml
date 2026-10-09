@@ -1,0 +1,7 @@
+name: Site Studio example custom component using custom select options
+type: module
+description: 'A working example of a custom component using custom Site Studio select options.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion

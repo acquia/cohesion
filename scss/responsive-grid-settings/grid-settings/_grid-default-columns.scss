@@ -1,0 +1,17 @@
+/// @name grid-default-columns
+/// @group Website settings Responsive grid settings
+/// @description    Sets Responsive defaults for .coh-column
+/// @param {Map}    $grid-settings - Keyed responsive grid settings map
+
+@mixin grid-default-columns()   {
+
+    .coh-column {
+        position: relative;
+        width: 100%;
+        min-height: 1px;
+        box-sizing: border-box;
+        padding-left: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+        padding-right: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+    }
+}
+

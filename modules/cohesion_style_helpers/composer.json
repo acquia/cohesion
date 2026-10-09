@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_style_helpers",
+    "type": "drupal-module",
+    "description": "Defines the style helper configuration entities for creating reusable style configurations in Site Studio.",
+    "license": "GPL-2.0-or-later"
+}

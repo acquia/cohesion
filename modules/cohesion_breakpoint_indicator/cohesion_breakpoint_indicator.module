@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_page_attachments().
+ */
+function cohesion_breakpoint_indicator_page_attachments(array &$attachments) {
+  // Load library if user has permission.
+  $user = \Drupal::currentUser();
+  $permission = $user->hasPermission('access cohesion breakpoint indicator');
+  $current_theme = \Drupal::service('theme.manager')->getActiveTheme();
+  $is_admin = \Drupal::config('system.theme')->get('admin') == $current_theme->getName();
+
+  // Check if the user has permission & not on an admin url.
+  if ($permission && !$is_admin) {
+    $attachments['#attached']['library'][] = 'cohesion_breakpoint_indicator/cohesion-breakpoint-indicator';
+  }
+}

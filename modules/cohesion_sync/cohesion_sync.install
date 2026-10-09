@@ -1,0 +1,77 @@
+<?php
+
+use Drupal\Core\Config\Entity\ConfigEntityType;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Annotation\PluralTranslation;
+
+/**
+ * Install package entity.
+ */
+function cohesion_sync_update_8501() {
+  // If the entities don't exist, create them (can't rely on entup existing because of: https://www.drupal.org/node/3034742)
+  $entity_definitions = [
+    [
+      'id' => "cohesion_sync_package",
+      'label' => new TranslatableMarkup("Package"),
+      'label_singular' => new TranslatableMarkup("Package"),
+      'label_plural' => new TranslatableMarkup("Packages"),
+      'label_collection' => new TranslatableMarkup("Packages"),
+      'label_count' => new PluralTranslation([
+        'singular' => "@count package",
+        'plural' => "@count packages",
+      ]),
+      'handlers' => [
+        "list_builder" => "Drupal\cohesion_sync\PackageListBuilder",
+        "form" => [
+          "add" => "Drupal\cohesion_sync\Form\PackageForm",
+          "edit" => "Drupal\cohesion_sync\Form\PackageForm",
+          "duplicate" => "Drupal\cohesion_sync\Form\PackageForm",
+          "delete" => "Drupal\cohesion\Form\CohesionDeleteForm",
+        ],
+        "route_provider" => [
+          "html" => "Drupal\cohesion\CohesionHtmlRouteProvider",
+        ],
+      ],
+      'admin_permission' => "access cohesion sync",
+      'config_prefix' => "package",
+      'entity_keys' => [
+        "id" => "id",
+        "label" => "label",
+      ],
+      "links" => [
+        "add-form" => "/admin/cohesion/sync/packages/add",
+        "edit-form" => "/admin/cohesion/sync/packages/{cohesion_sync_package}",
+        "delete-form" => "/admin/cohesion/sync/packages/{cohesion_sync_package}/delete",
+        "duplicate-form" => "/admin/cohesion/sync/packages/{cohesion_sync_package}/duplicate",
+        "collection" => "/admin/cohesion/sync/packages",
+      ],
+    ],
+  ];
+
+  foreach ($entity_definitions as $entity_definition) {
+    $entity_update_manager = \Drupal::entityDefinitionUpdateManager();
+    $entity_type = $entity_update_manager->getEntityType($entity_definition['id']);
+
+    // If the entity type doesn't exist, create it.
+    if (!$entity_type) {
+      \Drupal::entityDefinitionUpdateManager()->installEntityType(new ConfigEntityType($entity_definition));
+    }
+  }
+
+}
+
+/**
+ * Update cohesion.sync.settings schema
+ */
+function cohesion_sync_update_8900() {
+  if($editable = \Drupal::configFactory()->getEditable('cohesion.sync.settings')){
+    if($editable->get('enabled_entity_types')) {
+      foreach ($editable->get('enabled_entity_types') as $key => $value) {
+        if(!is_string($value)) {
+          $editable->clear("enabled_entity_types.{$key}");
+        }
+      }
+      $editable->save();
+    }
+  }
+}

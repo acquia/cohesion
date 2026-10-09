@@ -1,0 +1,34 @@
+####################
+# Master templates #
+####################
+cohesion.settings.templates:
+  path: '/admin/cohesion/templates'
+  defaults:
+    _controller: '\Drupal\cohesion_templates\Controller\CohesionTemplateSettingsController::index'
+    _title: 'Templates'
+  requirements:
+    _permission: 'administer master templates+administer content templates+administer view templates+administer menu templates'
+
+#####################
+# Content templates #
+#####################
+entity.cohesion_content_templates:
+  path: '/admin/cohesion/templates/content_templates'
+  defaults:
+    _controller: '\Drupal\cohesion_templates\Controller\CohesionContentTemplatesListController::listing'
+    entity_type: 'cohesion_content_templates'
+    _title: 'Content templates'
+  requirements:
+    _permission: 'administer content templates'
+
+##################
+# Menu templates #
+##################
+
+cohesion.menu_templates.endpoint:
+  path: '/cohesionapi/menu_templates'
+  defaults:
+      _controller: '\Drupal\cohesion_templates\Controller\CohesionTemplateSettingsController::menuTemplates'
+  requirements:
+    _permission: 'administer cohesion'
+  _format: json
