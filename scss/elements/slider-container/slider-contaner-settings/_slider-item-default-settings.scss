@@ -1,0 +1,17 @@
+/// @name slider-item-default-settings
+/// @group Elements Slider item settings
+/// @description    Sets Responsive defaults for Slider item
+@mixin slider-item-default-settings()   {
+
+    .coh-slider-container {
+
+        .coh-slider-item {
+            display: block;
+        }
+
+        .coh-slider-item {
+            padding-left: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+            padding-right: calc(var(--ssa-responsive-grid-settings-inner-gutter) / 2);
+        }
+    }
+}
