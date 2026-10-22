@@ -1,0 +1,99 @@
+uuid: 13d5bb07-10a0-4ae1-8d05-e97fc0bdc87f
+langcode: en
+status: true
+dependencies:
+  config:
+    - cohesion_elements.cohesion_component_category.cpt_cat_test
+    - views.view.content
+  content:
+    - 'file:file:99e1ebbf-0ba1-4bf3-92aa-122705f75155'
+label: 'Test Component'
+id: cpt_test_component
+json_values: |
+  {
+      "canvas": [
+          {
+              "type": "item",
+              "uid": "image",
+              "title": "Image",
+              "status": {
+                  "collapsed": true
+              },
+              "uuid": "01f09cdc-1e31-40c4-bc89-bd13ac8ee120",
+              "parentUid": "root",
+              "children": []
+          }
+      ],
+      "componentForm": [],
+      "mapper": {
+          "01f09cdc-1e31-40c4-bc89-bd13ac8ee120": {}
+      },
+      "model": {
+          "01f09cdc-1e31-40c4-bc89-bd13ac8ee120": {
+              "settings": {
+                  "title": "Image",
+                  "styles": {
+                      "xl": {
+                          "displaySize": "coh-image-responsive",
+                          "imageAlignment": "coh-image-align-left"
+                      }
+                  },
+                  "customStyle": [
+                      {
+                          "customStyle": ""
+                      }
+                  ],
+                  "lazyload": false,
+                  "settings": {
+                      "lazyload": false,
+                      "styles": {
+                          "xl": {
+                              "displaySize": "coh-image-responsive"
+                          }
+                      },
+                      "imageStyle": "",
+                      "customStyle": [
+                          {
+                              "customStyle": ""
+                          }
+                      ]
+                  },
+                  "imageStyle": "",
+                  "image": "[media-reference:file:99e1ebbf-0ba1-4bf3-92aa-122705f75155]"
+              },
+              "context-visibility": {
+                  "contextVisibility": {
+                      "condition": "ALL"
+                  }
+              },
+              "styles": {
+                  "settings": {
+                      "element": "img"
+                  }
+              }
+          }
+      },
+      "previewModel": {
+          "01f09cdc-1e31-40c4-bc89-bd13ac8ee120": {}
+      },
+      "variableFields": {
+          "01f09cdc-1e31-40c4-bc89-bd13ac8ee120": []
+      },
+      "disabledNodes": [],
+      "meta": {
+          "lastModifiedEl": "01f09cdc-1e31-40c4-bc89-bd13ac8ee120",
+          "fieldHistory": []
+      }
+  }
+json_mapper: '{}'
+last_entity_update: entityupdate_0035
+locked: false
+modified: true
+selectable: true
+category: cpt_cat_test
+preview_image: ''
+has_quick_edit: null
+entity_type_access: {  }
+bundle_access: {  }
+twig_template: component--cohesion-cpt-test-component
+weight: 0

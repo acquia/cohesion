@@ -1,0 +1,5 @@
+cohesion_sync_package.add_form:
+  route_name: 'entity.cohesion_sync_package.add_form'
+  title: 'Add package'
+  appears_on:
+    - entity.cohesion_sync_package.collection

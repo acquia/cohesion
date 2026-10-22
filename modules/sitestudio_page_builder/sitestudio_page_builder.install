@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Site Studio Visual page builder Installation Checks.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function sitestudio_page_builder_requirements($phase) {
+
+  $requirements = [];
+  $moduleHandler = \Drupal::moduleHandler();
+
+  if ($moduleHandler->moduleExists('media_library') && !$moduleHandler->moduleExists('sitestudio_claro')) {
+    $requirements['sitestudio_claro'] = [
+      'title' => t('Site Studio Page Builder'),
+      'description' => t('It is recommended that the "Site Studio Claro" sub-module is installed when using Site Studio Page Builder and the Claro admin theme; this resolves template and styling issues when using media library in a Page Builder context.'),
+      'severity' => REQUIREMENT_WARNING,
+    ];
+  }
+
+  return $requirements;
+}

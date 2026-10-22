@@ -1,0 +1,16 @@
+type:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uid'
+id:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uuid'
+data:
+  settings:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'

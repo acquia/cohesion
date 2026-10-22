@@ -1,0 +1,8 @@
+example-custom-select.options:
+  path: '/sitestudio/select-options'
+  defaults:
+    _controller: '\Drupal\example_custom_select\Controller\ExampleCustomSelectController::index'
+  methods:  [GET]
+  requirements:
+    _access: 'TRUE'
+  _format: json

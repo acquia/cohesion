@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 7sjruqck0NB93tJ3awkyoUR7yJ6VACDkrsY29d19Pow
+name: dx8_component_preview
+label: 'Component preview'
+effects:
+  93201fea-d82d-498b-9cba-55947fda91fd:
+    uuid: 93201fea-d82d-498b-9cba-55947fda91fd
+    id: image_scale
+    weight: 1
+    data:
+      width: 250
+      height: 250
+      upscale: true
