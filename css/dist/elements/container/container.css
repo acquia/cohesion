@@ -1,0 +1,21 @@
+.coh-container {
+  display: block;
+}
+.coh-container:before, .coh-container:after {
+  clear: both;
+  content: " ";
+  display: table;
+}
+.coh-container-boxed {
+  max-width: var(--ssa-responsive-grid-settings-boxed-width);
+  margin-left: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+  margin-right: var(--ssa-responsive-grid-settings-boxed-width-outer-gutter);
+}
+.coh-container-boxed .coh-container-boxed {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.dx8-aov {
+  visibility: hidden;
+}

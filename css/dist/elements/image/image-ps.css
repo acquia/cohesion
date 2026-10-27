@@ -1,0 +1,41 @@
+
+  .coh-image-ps {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+  }
+  .coh-image-responsive-ps {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    float: none;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-float-left-ps {
+    float: left;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-float-right-ps {
+    float: right;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-align-left-ps {
+    float: none;
+    margin-left: 0;
+    transform: translateX(0);
+  }
+  .coh-image-align-centre-ps {
+    float: none;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+  .coh-image-align-right-ps {
+    float: none;
+    margin-left: 100%;
+    transform: translateX(-100%);
+  }

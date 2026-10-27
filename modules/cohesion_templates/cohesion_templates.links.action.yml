@@ -1,0 +1,15 @@
+entity.cohesion_view_templates.add_form:
+  route_name: 'entity.cohesion_view_templates.add_form'
+  title: 'Add views template'
+  appears_on:
+    - entity.cohesion_view_templates.collection
+entity.cohesion_menu_templates.add_form:
+  route_name: 'entity.cohesion_menu_templates.add_form'
+  title: 'Add menu template'
+  appears_on:
+    - entity.cohesion_menu_templates.collection
+entity.cohesion_master_templates.add_form:
+  route_name: 'entity.cohesion_master_templates.add_form'
+  title: 'Add master template'
+  appears_on:
+    - entity.cohesion_master_templates.collection
