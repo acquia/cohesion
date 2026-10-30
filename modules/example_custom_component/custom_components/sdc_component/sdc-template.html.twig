@@ -1,0 +1,36 @@
+<div class="sdc-twig-component">
+  <h2>SDC in custom component</h2>
+
+  {#  Render Single Directory component - Test SDC #}
+  {% embed 'example_custom_component:test_sdc' with {
+    text: field.input,
+    select: field.select,
+    boolean: field.toggle,
+    integer: field.integer,
+    integer_range_minimum: field.integer_range_minimum,
+    image_src: field.image_uploader,
+    link: field.link_to_page,
+    youtube_url: field.youtube_url,
+    video_url: field.video_url,
+    font: field.font_picker,
+    entity_reference_entity_type: field.entity_reference['#entity_type'],
+    entity_reference_view_mode: field.entity_reference['#view_mode'],
+    entity_reference_entity: field.entity_reference['#entity'],
+  } %}
+    {# Optionally override blocks here #}
+    {% block slot_example %}
+      {{ dropzones['dropzone_c6d16282_1402_41cc_bcfd_c8204b3aae0b'] }}
+    {% endblock %}
+  {% endembed %}
+
+    {% set styles %}
+    <style>
+        .sdc-twig-component .inline-style {
+            color: {{ field.color_picker }};
+        }
+    </style>
+    {% endset %}
+
+    {{ renderInlineStyle(styles) }}
+
+</div>

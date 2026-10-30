@@ -1,0 +1,28 @@
+@use "slider-contaner-settings";
+
+// Default Slick slider CSS
+@include slider-contaner-settings.slider-slick-default-settings();
+
+// Default Container settings
+@include slider-contaner-settings.slider-container-default-settings();
+
+// Default Navigation settings
+@include slider-contaner-settings.slider-navigation-default-settings();
+
+// Default Slider item settings
+@include slider-contaner-settings.slider-item-default-settings();
+
+// Responsive Slider container settings
+@include slider-contaner-settings.slider-container-responsive-settings();
+
+// Responsive Slider navigation settings
+@include slider-contaner-settings.slider-navigation-responsive-settings();
+
+// Responsive Slider pagination settings
+@include slider-contaner-settings.slider-pagination-responsive-settings();
+
+// Responsive Slider playpause settings
+@include slider-contaner-settings.slider-playpause-responsive-settings();
+
+// Responsive Slider counter settings
+@include slider-contaner-settings.slider-counter-responsive-settings();

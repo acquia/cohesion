@@ -1,0 +1,9 @@
+name: Twig custom component
+category: cpt_cat_example
+tag:
+  - cpt_tag_example_0
+template: template.html.twig
+form: form.json
+css:
+  twig-component.css: {}
+preview_image: preview.png

@@ -1,0 +1,43 @@
+@mixin media-element-custom-settings() {
+
+    .coh-video {
+        iframe,
+        video {
+            width: 100%;
+            height: 100%;
+        }
+
+        .mejs__container:not(.mejs__container-fullscreen) {
+            video {
+                // maintains video aspect ratio when setting fixed height (not fullscreen)
+                object-fit: cover;
+            }
+        }
+
+        // always hide controls container when no controls are made visible
+        &-hide-controls {
+            .mejs__controls {
+                display: none;
+            }
+        }
+
+        // hide center play button from video
+        &-hide-center-play {
+            .mejs__overlay-play .mejs__overlay-button,
+            .mejs__overlay-loading-bg-img {
+                display: none;
+            }
+        }
+
+        // always hide overlays for iframe videos (Vimeo, YouTube)
+        &-vimeo_iframe,
+        &-youtube_iframe {
+            .mejs__iframe-overlay,
+            .mejs__poster,
+            .mejs__overlay-play {
+                display: none;
+            }
+        }
+    }
+
+}
