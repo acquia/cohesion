@@ -1,0 +1,8 @@
+name: SDC custom component
+category: cpt_cat_example
+tag:
+  - cpt_tag_example_0
+template: sdc-template.html.twig
+form: form.json
+css:
+  twig-component.css: {}

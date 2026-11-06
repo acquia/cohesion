@@ -1,0 +1,87 @@
+<?php
+
+/**
+ * @file
+ * Test module for node access with CohesionLayoutViewBuilder.
+ *
+ * This module simulates the bug in content_access module where node access
+ * conditions incorrectly reference 'nid' instead of 'entity_id' on revision
+ * field tables, causing SQL errors like:
+ * "Column not found: 1054 Unknown column 'node_revision__field_layout.nid'"
+ */
+
+use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_node_access_records().
+ *
+ * Grants view access based on a simple realm to trigger node access checks.
+ */
+function cohesion_node_access_test_node_access_records(NodeInterface $node): array {
+  return [
+    [
+      'realm' => 'cohesion_node_access_test',
+      'gid' => 1,
+      'grant_view' => 1,
+      'grant_update' => 0,
+      'grant_delete' => 0,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_node_grants().
+ *
+ * Provides the grant for viewing nodes.
+ */
+function cohesion_node_access_test_node_grants($account, $operation): array {
+  if ($operation === 'view') {
+    return ['cohesion_node_access_test' => [1]];
+  }
+  return [];
+}
+
+/**
+ * Implements hook_query_TAG_alter() for node_access tag.
+ *
+ * This simulates the content_access module bug where it adds a node access
+ * subquery that incorrectly references 'nid' on revision field tables.
+ * Revision field tables (like node_revision__field_layout) use 'entity_id'
+ * not 'nid', so this causes a SQL error.
+ */
+function cohesion_node_access_test_query_node_access_alter(AlterableInterface $query): void {
+  if (!$query instanceof SelectInterface) {
+    return;
+  }
+
+  // Only apply to queries that have revision field tables joined.
+  $tables = $query->getTables();
+  $revision_field_alias = NULL;
+
+  foreach ($tables as $alias => $table_info) {
+    if (is_string($table_info['table']) && str_starts_with($table_info['table'], 'node_revision__')) {
+      $revision_field_alias = $alias;
+      break;
+    }
+  }
+
+  if (!$revision_field_alias) {
+    return;
+  }
+
+  // Simulate the content_access bug: add a node_access check that incorrectly
+  // uses 'nid' instead of 'entity_id' on the revision field table.
+  // This is the exact pattern that causes the reported error.
+  $subquery = \Drupal::database()->select('node_access', 'na');
+  $subquery->addField('na', 'nid');
+  $subquery->condition('na.grant_view', 1, '>=');
+  $subquery->condition('na.realm', 'cohesion_node_access_test');
+  $subquery->condition('na.gid', 1);
+  // BUG: Using 'nid' instead of 'entity_id' - this column doesn't exist
+  // on revision field tables like node_revision__field_layout.
+  $subquery->where("$revision_field_alias.nid = na.nid");
+
+  $query->exists($subquery);
+}
