@@ -1,0 +1,82 @@
+/* Base styling for tag items */
+.priority-medium .coh-tag-color-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: flex-start;
+
+  .coh-tag-color-item {
+    position: relative;
+    line-height: normal;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+
+    .coh-tag-label {
+      color: white;
+      font-size: 12px;
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+    .coh-tag-label:hover::before,
+    .coh-tag-label:hover::after {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    
+    .coh-tag-label:hover::before {
+      content: attr(data-title);
+      top: -40px;
+      background-color: black;
+      color: white;
+      padding: 5px;
+      font-weight: normal;
+      border-radius: 3px;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    
+    .coh-tag-label:hover::after {
+      content: '';
+      top: -16px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: black transparent transparent transparent;
+    }
+
+    /* Apply tag-specific background colors */
+    &.tag-1 { background-color: #fec231; }
+    &.tag-2 { background-color: #f47a20; }
+    &.tag-3 { background-color: #ce2727; }
+    &.tag-4 { background-color: #26a3dd; }
+    &.tag-5 { background-color: #0e68a7; }
+    &.tag-6 { background-color: #09426b; }
+    &.tag-7 { background-color: #dd87f0; }
+    &.tag-8 { background-color: #9928af; }
+    &.tag-9 { background-color: #661078; }
+    &.tag-10 { background-color: #66c8ca; }
+    &.tag-11 { background-color: #3ba3a5; }
+    &.tag-12 { background-color: #216372; }
+    &.tag-13 { background-color: #b2ea63; }
+    &.tag-14 { background-color: #70b812; }
+    &.tag-15 { background-color: #478500; }
+  }
+}
+
+/* Default styling when no tag exist */
+.coh-tag-color-item.none {
+  color: #999;
+}
+
+.component-machine-name {
+  color: #989898;
+}

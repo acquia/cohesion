@@ -1,0 +1,11 @@
+api_url: ''
+api_key: ''
+organization_key: ''
+site_id: ''
+# tracks API request status - 'NO_CONTENT' = no data waiting, 'PROCESSING', 'READY', 'ERROR'/null
+api_build_status: 'NO_CONTENT'
+google_map_api_key: ''
+elements_permissions: '{}'
+sidebar_view_style: 'thumbnails'
+element_toggle: '{"link":true,"list-container":true,"list-item":true,"inline-element":true,"container":true,"row-for-columns":true,"column":true,"iframe":true,"image":true,"picture":true,"video":true,"video-background":true,"youtube-video-embed":true,"youtube-video-background":true,"button":true,"slider-container":true,"slide":true,"accordion-tabs-container":true,"accordion-tabs-item":true,"google-map":true,"google-map-marker":true,"read-more":true,"modal":true,"drupal-view":true,"drupal-view-contents":true,"drupal-view-item":true,"drupal-view-variable":true,"pattern-repeater":true,"pagination":true,"drupal-view-filter":true,"drupal-view-filter-submit":true,"menu-list-container":true,"menu-list-item":true,"menu-link":true,"menu-button":true,"drupal-region":true,"drupal-block":true,"drupal-content":true,"drupal-menu":true,"drupal-field":true,"drupal-field-item":true,"breadcrumb":true,"entity-reference":true,"entity-browser":true,"wysiwyg":true,"heading":true,"paragraph":true,"blockquote":true}'
+element_usage_last_run: 0

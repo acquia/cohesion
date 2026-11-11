@@ -1,0 +1,175 @@
+services:
+
+  # This alias is how code should interact with the template storage backend.
+  # Specific backends should not be referred to directly because the template
+  # storage system is intended to behave like a single, stable monolith. To
+  # override which specific backend is used, developers should override this
+  # alias -- ideally in settings.php using a custom container YAML file --
+  # and change which "real" backend it points to.
+  cohesion.template_storage:
+    alias: cohesion.template_storage.files
+
+  cohesion.template_storage.key_value:
+    class: Drupal\cohesion\TemplateStorage\KeyValueStorage
+    arguments:
+      - '@keyvalue'
+      - '@file_system'
+      - '@cache.static'
+
+  cohesion.template_storage.files:
+    class: Drupal\cohesion\TemplateStorage\FileStorage
+    arguments:
+      - '@twig.loader.filesystem'
+      - '@file_system'
+      - '@keyvalue'
+      - '@cohesion.local_files_manager'
+      - '@cohesion.utils'
+
+  stream_wrapper.cohesion:
+    class: Drupal\cohesion\StreamWrapper\CohesionStream
+    arguments: ['@string_translation']
+    tags:
+      - { name: 'stream_wrapper', scheme: cohesion }
+
+  cohesion.element.storage:
+    class: Drupal\cohesion\CohesionApiElementStorage
+    tags:
+      - { name: 'cohesion.element.storage', scheme: cohesion }
+
+  cohesion.route_subscriber:
+    class: Drupal\cohesion\Routing\RouteSubscriber
+    tags:
+      - { name: 'event_subscriber', scheme: cohesion  }
+
+  settings.endpoint.utils:
+    class: Drupal\cohesion\SettingsEndpointUtils
+    arguments: ['@cohesion.element.storage', '@entity_type.manager', '@plugin.manager.entity_groups.processor']
+
+  cohesion.api_client:
+    class: Drupal\cohesion\CohesionApiClient
+
+  cohesion.utils:
+    class: Drupal\cohesion\Services\CohesionUtils
+    arguments:
+      - '@theme_handler'
+      - '@theme.manager'
+      - '@entity_type.manager'
+      - '@language_manager'
+      - '@logger.factory'
+      - '@config.factory'
+
+  cohesion.xss:
+    class: Drupal\cohesion\Services\JsonXss
+    arguments: ['@current_user']
+
+  cohesion.html_response_subscriber:
+    class: Drupal\cohesion\EventSubscriber\CohesionHtmlResponseSubscriber
+    tags:
+      - { name: 'event_subscriber' }
+
+  cohesion.icon_interpreter:
+    class: '\Drupal\cohesion\Plugin\IconInterpreter'
+    tags:
+      - { name: 'icon_interpreter' }
+
+  cohesion.api.utils:
+    class: Drupal\cohesion\ApiUtils
+    arguments: ['@uuid']
+    tags:
+      - { name: cohesion.api.utils, scheme: cohesion }
+
+  cohesion.local_files_manager:
+    class: Drupal\cohesion\Services\LocalFilesManager
+    arguments:
+    - '@string_translation'
+    - '@config.factory'
+    - '@keyvalue'
+    - '@tempstore.shared'
+    - '@cohesion.utils'
+    - '@session'
+    - '@file.repository'
+    - '@logger.factory'
+    tags:
+      - { name: cohesion.local_files_manager, scheme: cohesion }
+
+  cohesion.autocomplete_matcher:
+    class: Drupal\cohesion\Entity\CohesionEntityAutocompleteMatcher
+    arguments: ['@plugin.manager.entity_reference_selection', '@entity_type.manager']
+
+  # Usage
+  plugin.manager.usage.processor:
+    class: Drupal\cohesion\UsagePluginManager
+    parent: default_plugin_manager
+    arguments: ['@entity_type.manager', '@config.storage']
+
+  cohesion_usage.update_manager:
+    class: Drupal\cohesion\UsageUpdateManager
+    arguments: ['@plugin.manager.usage.processor', '@database', '@entity.repository', '@entity_type.manager', '@logger.factory']
+
+  # SendToApi
+  plugin.manager.api.processor:
+    class: Drupal\cohesion\ApiPluginManager
+    parent: default_plugin_manager
+
+  # Group of entities (website settings)
+  plugin.manager.entity_groups.processor:
+    class: Drupal\cohesion\EntityGroupsPluginManager
+    parent: default_plugin_manager
+
+  # Image browser
+  plugin.manager.image_browser.processor:
+    class: Drupal\cohesion\ImageBrowserPluginManager
+    parent: default_plugin_manager
+
+  cohesion_image_browser.update_manager:
+    class: Drupal\cohesion\ImageBrowserUpdateManager
+    arguments: ['@config.factory', '@plugin.manager.image_browser.processor', '@module_handler', '@entity.repository']
+
+  # Entity update service.
+  plugin.manager.entity_update.processor:
+    class: Drupal\cohesion\EntityUpdatePluginManager
+    parent: default_plugin_manager
+
+  cohesion.entity_update_manager:
+    class: Drupal\cohesion\EntityUpdateManager
+    arguments: ['@plugin.manager.entity_update.processor']
+
+  # Support help keys.
+  cohesion.support_url:
+    class: Drupal\cohesion\CohesionSupportUrl
+
+  cohesion.rebuild_inuse_batch:
+    class: Drupal\cohesion\Services\RebuildInuseBatch
+    arguments: ['@module_handler', '@cohesion_usage.update_manager', '@entity.repository', '@string_translation', '@entity_type.manager']
+
+  cohesion.event_subscriber:
+    class: '\Drupal\cohesion\EventSubscriber\CohesionEventSubscriber'
+    arguments: ['@messenger', '@cohesion.utils', '@theme_handler']
+    tags:
+      - { name: 'event_subscriber' }
+
+  html_response.attachments_processor.cohesion:
+    public: false
+    class: \Drupal\cohesion\Render\CohesionAttachmentsProcessor
+    decorates: html_response.attachments_processor
+    decoration_priority: 100
+    parent: html_response.attachments_processor
+
+  cohesion.eventsubscriber.frontend_url:
+    class: '\Drupal\cohesion\EventSubscriber\CohesionFrontendUrlSubscriber'
+    tags:
+      - { name: 'event_subscriber' }
+
+  cohesion_current_route_match:
+    class: Drupal\cohesion\Routing\CohesionCurrentRouteMatch
+    arguments: [ '@request_stack' ]
+
+  cohesion.ckeditor.overrider:
+    class: Drupal\cohesion\Config\CKeditorStylesOverrides
+    arguments: [ '@module_handler', '@config.factory' ]
+    tags:
+      - { name: config.factory.override, priority: 5 }
+
+  cohesion.text_format_styles:
+    class: Drupal\cohesion\Services\TextFormatStyles
+    arguments: [ '@entity_type.manager' ]

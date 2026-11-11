@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\cohesion_custom_styles\Entity\CustomStyleType;
+
+const COHESION_CUSTOM_STYLES_CLASS_PREFIX = '.coh-style-';
+
+/**
+ * Implements hook_help().
+ */
+function cohesion_custom_styles_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the cohesion_custom_styles module.
+    case 'help.page.cohesion_custom_styles':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module defines the custom style config entities for creating custom CSS class styles.') . '</p>';
+      $output .= '<p><ul>';
+      $output .= '  <li>Custom style configuration entity and supporting forms.</li>';
+      $output .= '  <li>Site Studio API integration.</li>';
+      $output .= '</ul></p>';
+      $output .= '<p><a href="https://sitestudiodocs.acquia.com/" target="_blank">https://sitestudiodocs.acquia.com/</a></p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Process a batch of settings to import.
+ *
+ * @param $context
+ */
+function cohesion_custom_styles_process_batch(&$context) {
+  if (!isset($context['results']['error'])) {
+    $context['message'] = t('Importing custom style entities');
+    $elements = \Drupal::service('cohesion.element.storage')->getByGroup('custom_styles');
+
+    // Import elements.
+    if ($elements) {
+      CustomStyleType::importCustomStyleTypeEntities($elements);
+    }
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function cohesion_custom_styles_page_attachments(array &$attachments) {
+  // Set active custom style accordion group.
+  if (($active_group = \Drupal::request()->query->get('active_group'))) {
+    $attachments['#attached']['drupalSettings']['cohesion']['activeCustomStyleGroup'] = $active_group;
+  }
+}
+
+/**
+ * Implements hook_menu_local_actions_alter().
+ */
+function cohesion_custom_styles_menu_local_actions_alter(&$local_actions) {
+  // Add class to custom styles admin link actions.
+  if (isset($local_actions['cohesion_custom_style.toggle_style_groups'])) {
+    $local_actions['cohesion_custom_style.toggle_style_groups']['options']['attributes']['class'][] = 'coh-toggle-accordion';
+    $local_actions['cohesion_custom_style.toggle_style_groups']['options']['attributes']['class'][] = 'open';
+    $local_actions['cohesion_custom_style.toggle_style_groups']['options']['attributes']['role'][] = 'button';
+  }
+}

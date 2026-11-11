@@ -1,0 +1,29 @@
+type:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uid'
+id:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uuid'
+data:
+  title:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'title'
+  images:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'styles'
+  attributes:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'attributes'

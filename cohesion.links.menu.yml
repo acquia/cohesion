@@ -1,0 +1,76 @@
+cohesion.settings:
+  title: 'Site Studio'
+  description: 'All Site Studio related settings.'
+  route_name: cohesion.settings
+  parent: system.admin
+  weight: -7
+
+cohesion.configuration:
+  title: 'Configuration'
+  description: 'Manage your global configuration'
+  route_name: cohesion.configuration
+  parent: cohesion.settings
+  weight: 10
+
+cohesion.configuration.account_settings:
+  title: 'Account settings'
+  description: 'Account settings configuration'
+  route_name: cohesion.configuration.account_settings
+  parent: cohesion.configuration
+  weight: -1
+
+cohesion.settings.styles:
+  title: 'Styles'
+  description: 'Manage your Site Studio styles'
+  route_name: cohesion.settings.styles
+  parent: cohesion.settings
+  weight: 40
+
+cohesion.developer:
+  title: 'Developer tools'
+  description: 'Manage Site Studio developer configuration'
+  route_name: cohesion.developer
+  parent: cohesion.settings
+  weight: 20
+
+cohesion.configuration.system_settings:
+  title: 'System settings'
+  description: 'Configure Site Studio system settings'
+  route_name: cohesion.configuration.system_settings
+  parent: cohesion.configuration
+  weight: 0
+
+cohesion.configuration.google_map_api_key:
+  title: 'Google Maps API key'
+  description: 'Manage Google Maps API key'
+  route_name: cohesion.configuration.google_map_api_key
+  parent: cohesion.configuration
+  weight: 1
+
+cohesion.configuration.elements_settings:
+  title: 'Elements settings'
+  description: 'Manage element settings'
+  route_name: cohesion.configuration.elements_settings
+  parent: cohesion.configuration
+  weight: 4
+
+cohesion.configuration.elements_permission_settings:
+  title: 'Element permission settings'
+  description: 'Manage element permission settings'
+  route_name: cohesion.configuration.elements_permission_settings
+  parent: cohesion.configuration.elements_settings
+  weight: 1
+
+cohesion.configuration.rebuild_all:
+  title: 'Rebuild'
+  description: 'Rebuild'
+  route_name: cohesion.configuration.rebuild
+  parent: cohesion.developer
+  weight: 3
+
+cohesion.configuration.frontend_settings:
+  title: 'Front-end settings'
+  description: 'Configure front-end JS settings'
+  route_name: cohesion.configuration.frontend_settings
+  parent: cohesion.developer
+  weight: 4

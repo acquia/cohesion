@@ -1,0 +1,103 @@
+# Site Studio Permissions
+administer cohesion settings:
+  title: Administer Site Studio configuration
+  description: 'Grant access to administer Site Studio account settings and global settings.'
+  restrict access: TRUE
+
+administer cohesion:
+  title: Administer Site Studio
+  description: 'Grant access to the Site Studio menu.'
+
+administer front end settings:
+  title: Administer Site Studio front-end configuration
+  description: 'Grant access to administer Site Studio front-end settings configuration.'
+
+bypass xss cohesion:
+  title: Bypass XSS validation in element forms
+  description: 'Allow site builders to add script tags and other potentially dangerous markup to elements within Site Studio.'
+  restrict access: TRUE
+
+access components:
+  title: Site Studio Access components group
+  description: 'Grant access to the Site Studio components within the sidebar browser.'
+
+access elements:
+  title: Site Studio Access elements group
+  description: 'Grant access to the Site Studio elements within the sidebar browser.'
+
+access helpers:
+  title: Site Studio Access helpers group
+  description: 'Grant access to the Site Studio helpers within the sidebar browser.'
+
+access fields:
+  title: Site Studio Access fields group
+  description: 'Grant access to the Site Studio fields within the sidebar browser.'
+
+access component content:
+  title: Site Studio Access component content group
+  description: 'Grant access to the Site Studio component content within the sidebar browser.'
+
+
+access content elements group:
+  title: Site Studio Elements - Content elements group
+  description: 'Grant access to the Site Studio content elements group within the sidebar browser.'
+access layout elements group:
+  title: Site Studio Elements - Layout elements group
+  description: 'Grant access to the Site Studio layout elements group within the sidebar browser.'
+access media elements group:
+  title: Site Studio Elements - Media elements group
+  description: 'Grant access to the Site Studio media elements group within the sidebar browser.'
+access interactive elements group:
+  title: Site Studio Elements - Interactive elements group
+  description: 'Grant access to the Site Studio interactive elements group within the sidebar browser.'
+access view elements group:
+  title: Site Studio Elements - View elements group
+  description: 'Grant access to the Site Studio view elements group within the sidebar browser.'
+access menu elements group:
+  title: Site Studio Elements - Menu elements group
+  description: 'Grant access to the Site Studio menu elements group within the sidebar browser.'
+access drupal core elements group:
+  title: Site Studio Elements - Core elements group
+  description: 'Grant access to the Site Studio core elements group within the sidebar browser.'
+access custom elements group:
+  title: Site Studio Elements - Custom elements group
+  description: 'Grant access to the Site Studio custom elements group within the sidebar browser.'
+access component builder elements group:
+  title: Site Studio Elements - Component builder elements group
+  description: 'Grant access to the Site Studio component builder elements group within the sidebar browser.'
+
+access styles:
+  title: Site Studio Elements tab - Styles
+  description: 'Grant access to the element styles tab.'
+access markup:
+  title: Site Studio Elements tab - Markup
+  description: 'Grant access to the element markup tab.'
+access seo:
+  title: Site Studio Elements tab - SEO
+  description: 'Grant access to the element SEO tab.'
+access analytics:
+  title: Site Studio Elements tab - Analytics
+  description: 'Grant access to the element analytics tab.'
+access context visibility:
+  title: Site Studio Elements tab - Context visibility
+  description: 'Grant access to the element context visibility tab.'
+access tokens:
+  title: Site Studio Elements tab - Token browser and toggle variable mode
+  description: 'Grant access to open the token browser and to toggle variable mode.'
+access animate on view:
+  title: Site Studio Elements tab - Animate on view
+  description: 'Grant access to the element animate on view tab.'
+access hide no data:
+  title: Site Studio Elements tab - Hide if no data
+  description: 'Grant access to the element hide if no data tab.'
+
+# Access permissions for element groups under fields tab
+access form layout fields group:
+  title: Site Studio Component builder - Form layout group
+  description: 'Grant access to the Site Studio form layout group within the sidebar browser.'
+access form help fields group:
+  title: Site Studio Component builder - Form help group
+  description: 'Grant access to the Site Studio form help group within the sidebar browser.'
+access form fields fields group:
+  title: Site Studio Component builder - Form fields group
+  description: 'Grant access to the Site Studio form fields group within the sidebar browser.'

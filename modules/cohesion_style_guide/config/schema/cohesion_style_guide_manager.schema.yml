@@ -1,0 +1,10 @@
+cohesion_style_guide.cohesion_style_guide_manager.*:
+  type: cohesion_config_entity
+  label: 'Style guide manager config'
+  mapping:
+    theme:
+      type: string
+      label: 'Theme id'
+    style_guide_uuid:
+      type: string
+      label: 'Style guide uuid'

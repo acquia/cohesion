@@ -1,0 +1,30 @@
+type:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uid'
+id:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uuid'
+data:
+  title:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'title'
+  image:
+    _property: TRUE,
+    _process_token: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'image'
+  attributes:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'attributes'

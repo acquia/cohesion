@@ -1,0 +1,9 @@
+name: Site Studio elements
+type: module
+description: 'Defines the component and helper configuration entities for creating reusable layout configurations within Site Studio.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion
+  - cohesion_templates
+  - jquery_ui
