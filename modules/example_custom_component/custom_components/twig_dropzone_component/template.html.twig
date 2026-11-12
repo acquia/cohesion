@@ -1,0 +1,19 @@
+<div class="twig-component">
+    <h2>Twig custom component with dropzone</h2>
+
+    <label>Dropzone content:</label>
+    <div class="twig-dropzone">
+        {{ dropzones['dropzone_238adb6e_0628_4dfb_a0c6_beaf719c5c1a'] }}
+    </div>
+
+    {% set styles %}
+    <style>
+        .twig-component .inline-style {
+            color: {{ field.color_picker }};
+        }
+    </style>
+    {% endset %}
+
+    {{ renderInlineStyle(styles) }}
+
+</div>

@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies: {  }
+label: Test tag
+id: cpt_tag_test_tag
+json_values: '{}'
+json_mapper: '{}'
+locked: false
+modified: false
+selectable: true
+class: tag-3
+weight: 7

@@ -1,0 +1,18 @@
+{
+    "name": "acquia/sitestudio_legacy_ckeditor",
+    "type": "drupal-module",
+    "description": "Adds deprecated CKEditor 4 module to Site Studio",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Acquia Engineering",
+            "homepage": "https://www.acquia.com",
+            "role": "Maintainer"
+        }
+    ],
+    "require": {
+        "drupal/ckeditor": "^1.0",
+        "acquia/cohesion": "^8.0"
+    }
+}
+

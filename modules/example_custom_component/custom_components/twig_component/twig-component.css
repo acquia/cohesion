@@ -1,0 +1,28 @@
+.twig-component {
+    width: 30%;
+    padding: 10px;
+    margin: 5px;
+    background-color: #F2F2F2;
+    line-height: normal;
+}
+
+.twig-component h2 {
+    font-size: 30px;
+}
+
+.twig-component .twig-title {
+    width: 100%;
+    font-size: 25px;
+    background-color: #E1E1E1;
+    padding: 10px;
+}
+
+.twig-component .twig-entity-reference, .twig-component .twig-paragraph {
+    background-color: #E1E1E1;
+    padding: 10px;
+}
+
+.twig-component .twig-dropzone {
+    background-color: #E1E1E1;
+    padding: 10px;
+}

@@ -1,0 +1,26 @@
+# handles relations between variables/components and entries with the var/component as the master lookup
+cohesion.cohesion_variables:
+  type: config_entity
+  label: 'Site Studio variables'
+  mapping:
+    variables:
+      type: sequence
+      label: 'Variables'
+      sequence:
+        type: mapping
+        label: 'Variables'
+        mapping:
+        #type is 'variable' or 'component'
+          type:
+            type: string
+            label: 'Type'
+          name:
+            type: text
+            label: 'Variable Name'
+        #sequence of entities linked to this var/component - abritrary entries for now
+          entity:
+            type: sequence
+            label: 'A sequence of entities it is linked to'
+            sequence:
+              type: string
+              label: 'Entity'

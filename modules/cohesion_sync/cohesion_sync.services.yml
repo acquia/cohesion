@@ -1,0 +1,107 @@
+services:
+  # Group of entities (website settings)
+  plugin.manager.cohesion_sync.processor:
+    class: Drupal\cohesion_sync\SyncPluginManager
+    parent: default_plugin_manager
+
+  cohesion_sync.packager:
+    class: Drupal\cohesion_sync\PackagerManager
+    arguments: ['@entity.repository', '@entity_type.manager', '@plugin.manager.cohesion_sync.processor', '@cohesion_usage.update_manager', '@file_system', '@logger.factory', '@config.storage']
+
+  cohesion_sync.drush_helpers:
+    class: \Drupal\cohesion_sync\Drush\CommandHelpers
+    arguments: ['@entity_type.manager', '@config.factory', '@cohesion_sync.packager', '@entity.repository', '@state', '@file_system', '@uuid']
+
+  cohesion_sync.config_import_subscriber.decorator:
+    class: Drupal\cohesion_sync\EventSubscriber\Import\SyncConfigImportSubscriber
+    decorates: config_import_subscriber
+    parent: config_import_subscriber
+    decoration_priority: 5
+    tags:
+      - { name: event_subscriber }
+
+  cohesion_sync.config_import_subscriber.component_config_validation:
+    class: Drupal\cohesion_sync\EventSubscriber\Import\ComponentConfigImportSubscriber
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@entity_type.manager', '@cohesion_usage.update_manager', '@database', '@string_translation', '@cohesion.entity_update_manager']
+
+  cohesion_sync.config_import_subscriber.style_guide_config_validation:
+    class: Drupal\cohesion_sync\EventSubscriber\Import\StyleGuideConfigImportSubscriber
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@entity_type.manager', '@cohesion_usage.update_manager', '@database', '@string_translation', '@cohesion.entity_update_manager']
+
+  cohesion_sync.full_package_storage:
+    class: Drupal\cohesion_sync\Config\CohesionFullPackageStorage
+    arguments: [ '@config.storage', '@config.manager', '@plugin.manager.usage.processor']
+
+  cohesion_sync.package_storage:
+    class: Drupal\cohesion_sync\Config\CohesionPackageStorage
+    arguments: [ '@config.storage', '@config.manager', '@database']
+
+  cohesion_sync.individual_entity_package_storage:
+    class: Drupal\cohesion_sync\Config\CohesionIndividualEntityPackageStorage
+    arguments: [ '@config.storage', '@config.manager', '@database' ]
+
+  cohesion_sync.package_import.sync_files_subscriber:
+    class: Drupal\cohesion_sync\EventSubscriber\Import\SiteStudioSyncFilesSubscriber
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@entity_type.manager', '@file_system', '@logger.factory']
+
+  cohesion_sync.file_storage:
+    class: Drupal\cohesion_sync\Config\CohesionFileStorage
+    factory: Drupal\cohesion_sync\Config\CohesionFileStorageFactory::buildExportFileStorage
+
+  cohesion_sync.import_file_storage:
+    class: Drupal\cohesion_sync\Config\CohesionFileStorage
+    factory: Drupal\cohesion_sync\Config\CohesionFileStorageFactory::buildImportFileStorage
+
+  cohesion_sync.sync_import:
+    class: Drupal\cohesion_sync\Services\SyncImport
+    arguments: ['@cohesion_usage.update_manager']
+
+  cohesion_sync.package_source_manager:
+    class: Drupal\cohesion_sync\PackageSourceManager
+    tags:
+      - { name: service_collector, tag: sitestudio_package_source, call: addSourceService }
+
+  cohesion_sync.package_source.default_module_package:
+    class: Drupal\cohesion_sync\Services\DefaultModulePackage
+    arguments:
+      - '@module_handler'
+      - '@extension.path.resolver'
+    tags:
+      - { name: sitestudio_package_source, priority: 50}
+
+  cohesion_sync.package_source.package:
+    class: Drupal\cohesion_sync\Services\Package
+    tags:
+      - { name: sitestudio_package_source, priority: 50}
+
+  cohesion_sync.package_source.tar_archive_package:
+    class: Drupal\cohesion_sync\Services\TarArchivePackage
+    arguments:
+      - '@settings'
+      - '@file_system'
+    tags:
+      - { name: sitestudio_package_source, priority: 51}
+
+  cohesion_sync.package_import_handler:
+    class: Drupal\cohesion_sync\Services\PackageImportHandler
+    arguments:
+      - '@event_dispatcher'
+      - '@file_system'
+      - '@config.manager'
+      - '@lock.persistent'
+      - '@config.typed'
+      - '@module_handler'
+      - '@module_installer'
+      - '@theme_handler'
+      - '@string_translation'
+      - '@extension.list.module'
+      - '@extension.list.theme'
+      - '@config.storage'
+      - '@cohesion_usage.update_manager'
+      - '@cohesion_sync.package_source_manager'

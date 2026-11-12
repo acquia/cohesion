@@ -1,0 +1,121 @@
+# Components index
+cohesion.settings.components:
+  path: '/admin/cohesion/components'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\CohesionElementSettingsController::index'
+    _title: 'Components'
+  requirements:
+    _permission: 'administer components+administer component content'
+
+# Get component instances
+cohesion_elements.endpoints.component_contents:
+  path: '/cohesionapi/component-contents'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\ComponentContentController::getComponentContents'
+    _title: "List of custom block global components"
+    componentPath: ''
+  methods:  [GET]
+  requirements:
+    _permission: 'access component content'
+
+# Get component instances
+cohesion_elements.endpoints.component_contents_ids:
+  path: '/cohesionapi/component-contents-ids'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\ComponentContentController::getComponentContentsByIds'
+    _title: "List of custom block global components"
+  methods:  [GET]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+cohesion_elements.endpoints.component_content_save:
+  path: '/cohesionapi/component-content-save'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\ComponentContentController::save'
+    _title: "Save a component content"
+  methods:  [POST]
+  requirements:
+    _permission: 'administer component content'
+    _content_type_format: json
+
+# Preview
+cohesion_elements.component.preview_post:
+  path: '/cohesionapi/component/preview_post'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\CohesionComponentController::previewPost'
+    _title: "Post preview component"
+  methods:  [POST]
+  requirements:
+    _permission: 'administer cohesion'
+  options:
+    no_cache: 'TRUE'
+
+cohesion_elements.component.preview:
+  path: '/cohesionapi/component/preview'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\CohesionComponentController::preview'
+    _title: "Preview component"
+  methods:  [GET]
+  requirements:
+    _permission: 'administer cohesion'
+  options:
+    no_cache: 'TRUE'
+
+cohesion_elements.component.preview_full:
+  path: '/admin/cohesion/component/preview'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\CohesionComponentController::previewFull'
+    _title: "Preview component full page"
+  requirements:
+    _permission: 'administer cohesion'
+  options:
+    no_cache: 'TRUE'
+
+# component content add page
+cohesion_elements.component_content.add_page:
+  path: '/admin/cohesion/components/component_contents/add'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\ComponentContentController::addPage'
+    _title: 'Add component content'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer component content'
+
+# helpers index
+cohesion.settings.helpers:
+  path: '/admin/cohesion/helpers'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\CohesionElementSettingsController::index'
+    _title: 'Helpers'
+  requirements:
+    _permission: 'administer helpers'
+
+# custom component builder
+cohesion_elements.custom_component.builder:
+  path: '/admin/cohesion/components/custom-component-builder/{machine_name}'
+  defaults:
+    _form: '\Drupal\cohesion_elements\Form\CustomComponentBuilderForm'
+    _title: 'Custom component builder'
+    machine_name: ''
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'use custom component builder'
+
+# toggle elements.
+cohesion_elements.configuration.elements_toggle_settings:
+  path: '/admin/cohesion/configuration/elements-toggle-settings'
+  defaults:
+    _form: '\Drupal\cohesion_elements\Form\ElementsToggleSettingsForm'
+    _title: 'Toggle elements'
+  requirements:
+    _permission: 'toggle elements'
+
+cohesion_elements.element_usage_batch:
+  path: '/admin/cohesion/elements-toggle-settings/rebuild'
+  defaults:
+    _controller: '\Drupal\cohesion_elements\Controller\ElementsController::runElementUsageBatch'
+    _title: 'Element usage batch'
+  requirements:
+    _permission: 'toggle elements'
