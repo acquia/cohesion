@@ -1,0 +1,35 @@
+type:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uid'
+id:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uuid'
+data:
+  title:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'title'
+  mapType:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'mapType'
+  zoomLevel:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'zoomLevel'
+  markerType:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'markerType'

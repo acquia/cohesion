@@ -1,0 +1,52 @@
+type:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uid'
+id:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uuid'
+data:
+  title:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'title'
+  markerType:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'markerType'
+  link:
+    type:
+      _property: TRUE,
+      type: 'model'
+      path:
+        - 'settings'
+        - 'link'
+        - 'type'
+  markerInfo:
+    text:
+      _property: TRUE,
+      type: 'model'
+      path:
+        - 'settings'
+        - 'markerInfo'
+        - 'text'
+    textFormat:
+      _property: TRUE,
+      type: 'model'
+      path:
+        - 'settings'
+        - 'markerInfo'
+        - 'textFormat'
+  label:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'label'

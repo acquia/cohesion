@@ -1,0 +1,5 @@
+entity.cohesion_style_guide.add_form:
+  route_name: 'entity.cohesion_style_guide.add_form'
+  title: 'Add style guide'
+  appears_on:
+    - entity.cohesion_style_guide.collection

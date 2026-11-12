@@ -1,0 +1,63 @@
+{
+    "canvas": [
+        {
+            "type": "item",
+            "uid": "component-drop-zone-placeholder",
+            "title": "Component drop zone",
+            "status": {
+                "collapsed": true
+            },
+            "iconColor": "content",
+            "uuid": "f05eff15-335f-4a16-8cdf-e84c8601e345",
+            "parentUid": "root"
+        }
+    ],
+    "disabledNodes": [],
+    "componentForm": [
+        {
+            "type": "form-field",
+            "uid": "form-input",
+            "title": "Input",
+            "translate": true,
+            "status": {
+                "collapsed": false
+            },
+            "iconColor": "formField",
+            "uuid": "b4062958-3767-45ed-832d-7b25a88a5960",
+            "parentUid": "root"
+        }
+    ],
+    "model": {
+        "f05eff15-335f-4a16-8cdf-e84c8601e345": {
+            "settings": {
+                "dropzoneHideSelector": ""
+            }
+        },
+        "b4062958-3767-45ed-832d-7b25a88a5960": {
+            "settings": {
+                "title": "Input",
+                "schema": {
+                    "type": "string",
+                    "escape": true
+                },
+                "machineName": "input",
+                "tooltipPlacement": "auto right"
+            },
+            "contextVisibility": {
+                "condition": "ALL"
+            }
+        }
+    },
+    "mapper": {
+        "f05eff15-335f-4a16-8cdf-e84c8601e345": {}
+    },
+    "previewModel": {
+        "b4062958-3767-45ed-832d-7b25a88a5960": {}
+    },
+    "variableFields": {
+        "b4062958-3767-45ed-832d-7b25a88a5960": []
+    },
+    "meta": {
+        "lastModifiedEl": "b4062958-3767-45ed-832d-7b25a88a5960"
+    }
+}

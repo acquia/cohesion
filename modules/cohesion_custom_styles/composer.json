@@ -1,0 +1,6 @@
+{
+    "name": "drupal/cohesion_custom_styles",
+    "type": "drupal-module",
+    "description": "Defines the custom style configuration entities for creating custom CSS class styles.",
+    "license": "GPL-2.0-or-later"
+}
