@@ -1,0 +1,43 @@
+cohesion_website_settings.cohesion_website_settings.*:
+  type: cohesion_config_entity
+  label: 'Website settings config'
+
+cohesion_website_settings.cohesion_color.*:
+  type: cohesion_config_entity
+  label: 'Color config'
+  mapping:
+    weight:
+      type: integer
+      label: 'Weight'
+
+cohesion_website_settings.cohesion_icon_library.*:
+  type: cohesion_config_entity
+  label: 'Icon library config'
+  mapping:
+      source:
+        type: string
+        label: 'Source'
+
+cohesion_website_settings.cohesion_font_library.*:
+  type: cohesion_config_entity
+  label: 'Font library config'
+  mapping:
+    source:
+      type: string
+      label: 'Source'
+
+cohesion_website_settings.cohesion_font_stack.*:
+  type: cohesion_config_entity
+  label: 'Font stack config'
+  mapping:
+    source:
+      type: string
+      label: 'Source'
+
+cohesion_website_settings.cohesion_scss_variable.*:
+  type: cohesion_config_entity
+  label: 'SCSS Variable config'
+  mapping:
+    weight:
+      type: integer
+      label: 'Weight'

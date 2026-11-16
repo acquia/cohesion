@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * An example of how to create Site Studio custom components.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function example_custom_component_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.example_custom_component':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module is an example of how a developer can create a custom component. The component will be available to use in the sidebar browser and will have a form and output defined by the developer.') . '</p>';
+      $output .= "<p>For details on how ot create a custom component, see modules/example_custom_component/custom_components</p>";
+      $output .= '<p><a href="https://sitestudiodocs.acquia.com/" target="_blank">https://sitestudiodocs.acquia.com/</a></p>';
+      return $output;
+
+    default:
+  }
+}

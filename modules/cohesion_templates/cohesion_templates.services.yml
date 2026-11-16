@@ -1,0 +1,29 @@
+services:
+
+  cohesion_templates.template_extension:
+    class: Drupal\cohesion_templates\TwigExtension\TwigExtension
+    arguments:
+      - '@renderer'
+      - '@token'
+      - '@theme.registry'
+      - '@twig'
+      - '@uuid'
+      - '@entity_type.manager'
+      - '@stream_wrapper_manager'
+      - '@file.mime_type.guesser.extension'
+      - '@theme.manager'
+      - '@cohesion.utils'
+      - '@logger.factory'
+      - '@cohesion_current_route_match'
+      - '@current_user'
+      - '@file_url_generator'
+      - '@entity.repository'
+      - '@cohesion_usage.update_manager'
+    tags:
+      - { name: twig.extension }
+
+  cohesion_templates.context.cache_metadata:
+    class: Drupal\cohesion_templates\ContextCacheMetadata
+    arguments:
+      - '@module_handler'
+      - '@keyvalue'

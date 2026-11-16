@@ -1,0 +1,28 @@
+sitestudio-page-builder.save:
+  path: '/cohesionapi/fontend-builder/save'
+  defaults:
+    _controller: '\Drupal\sitestudio_page_builder\Controller\SitestudioPageBuilderController::saveFrontendBuilder'
+  methods:  [POST]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access visual page builder'
+  _format: json
+
+route_callbacks:
+  - '\Drupal\sitestudio_page_builder\Routing\Routes::routes'
+
+sitestudio-page-builder.content-lock:
+  path: '/cohesionapi/content-lock'
+  defaults:
+    _controller: '\Drupal\sitestudio_page_builder\Controller\SitestudioPageBuilderController::contentLock'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access visual page builder'
+
+sitestudio-page-builder.release-lock:
+  path: '/cohesionapi/release-lock/{node_id}'
+  defaults:
+    _controller: '\Drupal\sitestudio_page_builder\Controller\SitestudioPageBuilderController::releaseLock'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'access visual page builder'

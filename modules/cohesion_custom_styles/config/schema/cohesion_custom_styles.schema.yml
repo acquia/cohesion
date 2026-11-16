@@ -1,0 +1,30 @@
+cohesion_custom_styles.cohesion_custom_style.*:
+  type: cohesion_config_entity
+  label: 'Custom style config'
+  mapping:
+    class_name:
+      type: string
+      label: 'Class Name'
+    custom_style_type:
+      type: string
+      label: 'Custom style type'
+    available_in_wysiwyg:
+      type: boolean
+      label: 'Available in CKEditor block'
+    available_in_wysiwyg_inline:
+      type: boolean
+      label: 'Available in CKEditor inline'
+    parent:
+      type: string
+      label: 'Extended from'
+    weight:
+      type: integer
+      label: 'Weight'
+
+cohesion_custom_styles.cohesion_custom_style_type.*:
+  type: cohesion_config_entity
+  label: 'Custom style type config'
+  mapping:
+    element:
+      type: string
+      label: 'HTML Element'

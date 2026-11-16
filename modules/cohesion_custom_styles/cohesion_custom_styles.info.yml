@@ -1,0 +1,7 @@
+name: Site Studio custom styles
+type: module
+description: 'Defines the custom style configuration entities for creating custom CSS class styles.'
+core_version_requirement: ^10.2.2 || ^11
+package: Site Studio
+dependencies:
+  - cohesion

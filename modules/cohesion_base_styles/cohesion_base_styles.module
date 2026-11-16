@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\cohesion_base_styles\Entity\BaseStyles;
+
+/**
+ * Implements hook_help().
+ */
+function cohesion_base_styles_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the cohesion_base_styles module.
+    case 'help.page.cohesion_base_styles':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module defines the base style config entities for creating HTML element base styles.') . '</p>';
+      $output .= '<p><ul>';
+      $output .= '  <li>Base style configuration entity and supporting forms.</li>';
+      $output .= '  <li>Site Studio API integration.</li>';
+      $output .= '</ul></p>';
+      $output .= '<p><a href="https://sitestudiodocs.acquia.com/" target="_blank">https://sitestudiodocs.acquia.com/</a></p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Process a batch of settings to import.
+ *
+ * @param array $context
+ *   Batch context.
+ */
+function cohesion_base_styles_process_batch(&$context) {
+  if (!isset($context['results']['error'])) {
+    $context['message'] = t('Importing base style entities');
+    $elements = \Drupal::service('cohesion.element.storage')->getByGroup('base_styles');
+
+    // Import elements.
+    if ($elements) {
+      BaseStyles::importEntities($elements);
+    }
+  }
+}

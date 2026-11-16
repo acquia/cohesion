@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * @file
+ * An example of how to create custom Site Studio elements.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function example_element_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the cohesion_templates module.
+    case 'help.page.example_element':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module is an example of how a developer can create a custom element. The element will be available to use in the sidebar browser and will have a form and output defined by the developer.') . '</p>';
+      $output .= '<p><ul>';
+      $output .= '  <li>Sample implementation of CustomElementPluginBase plugin to define a element for an render function.</li>';
+      $output .= '  <li>Sample render function using form data defined in the plugin and returned by the Site Studio API.</li>';
+      $output .= '</ul></p>';
+      $output .= "<p>For details on how ot create a custom element, see modules/example_element/README.md</p>";
+      $output .= '<p><a href="https://sitestudiodocs.acquia.com/" target="_blank">https://sitestudiodocs.acquia.com/</a></p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function example_element_theme($existing, $type, $theme, $path) {
+  return [
+    'example_element' => [
+      'template' => 'example-element-template',
+      'variables' => [
+        'elementSettings' => NULL,
+        'elementMarkup' => NULL,
+        'elementContext' => NULL,
+        'elementClass' => NULL,
+      ],
+      'render element' => 'children',
+    ],
+    'example_container_element' => [
+      'template' => 'example-container-element-template',
+      'variables' => [
+        'elementSettings' => NULL,
+        'elementMarkup' => NULL,
+        'elementContext' => NULL,
+        'elementClass' => NULL,
+        'elementChildren' => NULL,
+      ],
+      'render element' => 'children',
+    ],
+  ];
+}

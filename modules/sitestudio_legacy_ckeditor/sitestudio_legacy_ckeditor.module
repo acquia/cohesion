@@ -1,0 +1,87 @@
+<?php
+
+/**
+ * @file
+ * Provides integration CKEditor 4 & Site Studio.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function sitestudio_legacy_ckeditor_help($route_name) {
+  switch ($route_name) {
+    case 'help.page.sitestudio_legacy_ckeditor':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module provides deprecated CKEditor 4 support for Site Studio.') . '</p>';
+      $output .= '<p><ul>';
+      $output .= '  <li>Provides Site Studio CKEditor 4 plugins.</li>';
+      $output .= '  <li>Provides Site Studio CSS to CKEditor 4.</li>';
+      $output .= '</ul></p>';
+      $output .= '<p><a href="https://sitestudiodocs.acquia.com/user-guide/using-ckeditor-legacy-module">https://sitestudiodocs.acquia.com/user-guide/using-ckeditor-legacy-module</a></p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_ckeditor_css_alter().
+ */
+function sitestudio_legacy_ckeditor_ckeditor_css_alter(&$css, $editor) {
+  // Attach reset, plugin, base, theme, icon and fonts css files to ckeditor.
+  $base_styles_edit_route = \Drupal::service('router.route_provider')
+    ->getRoutesByNames(['entity.cohesion_base_styles.edit_form']);
+  if (!(count($base_styles_edit_route) === 1)) {
+    return;
+  }
+
+  $body_route = Url::fromRoute('entity.cohesion_base_styles.edit_form', ['cohesion_base_styles' => 'body']);
+  $current_path = $body_route->isRouted() ? Url::fromRoute('<current>') : NULL;
+
+  // If paths don't match.
+  if ($current_path->getInternalPath() != $body_route->getInternalPath()) {
+
+    try {
+      // If the editor is set to "Site Studio" text format.
+      if ($editor->getFilterFormat() && $editor->getFilterFormat()
+        ->get('format') == 'cohesion') {
+        $wysiwyg_cache_token = \Drupal::keyValue('cohesion.wysiwyg_cache_token');
+        $wysiwyg_cache_buster = $wysiwyg_cache_token->get('cache_token') ? '?_t=' . $wysiwyg_cache_token->get('cache_token') : '';
+        // Reset and ckeditor specific styles.
+        $css[] = \Drupal::service('extension.path.resolver')->getPath('module', 'cohesion') . '/css/reset.css' . $wysiwyg_cache_buster;
+        $css[] = \Drupal::service('extension.path.resolver')->getPath('module', 'sitestudio_legacy_ckeditor') . '/css/plugin-styles.css' . $wysiwyg_cache_buster;
+
+        $default_theme_id = \Drupal::service('theme_handler')->getDefault();
+
+        if (\Drupal::service('cohesion.utils')->themeHasCohesionEnabled($default_theme_id)) {
+          $css_base_filename = \Drupal::service('cohesion.local_files_manager')
+            ->getStyleSheetFilename('base', $default_theme_id, TRUE);
+          $css_theme_filename = \Drupal::service('cohesion.local_files_manager')
+            ->getStyleSheetFilename('theme', $default_theme_id, TRUE);
+          // Generated stylesheets.
+          $css[] = \Drupal::service('file_url_generator')->generateAbsoluteString($css_base_filename) . $wysiwyg_cache_buster;
+          $css[] = \Drupal::service('file_url_generator')->generateAbsoluteString($css_theme_filename) . $wysiwyg_cache_buster;
+
+        }
+        // Add the body reset stylesheet.
+        $css[] = \Drupal::service('extension.path.resolver')->getPath('module', 'sitestudio_legacy_ckeditor') . '/css/cohesion-body-reset.css' . $wysiwyg_cache_buster;
+      }
+    } catch (\Exception $e) {
+
+    }
+  }
+
+  // Icons and font libraries
+  if (($font_libraries = \Drupal::service('settings.endpoint.utils')
+    ->siteLibraries('font_libraries'))) {
+    $css = array_merge($css, $font_libraries);
+  }
+
+  if (($icon_libraries = \Drupal::service('settings.endpoint.utils')
+    ->siteLibraries('icon_libraries'))) {
+    $css = array_merge($css, $icon_libraries);
+  }
+  $css = array_filter($css);
+  \Drupal::service('router.builder')->rebuildIfNeeded();
+}

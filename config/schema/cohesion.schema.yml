@@ -1,0 +1,160 @@
+cohesion_config_entity:
+  type: config_entity
+  label: 'Site Studio configuration entity base'
+  mapping:
+    label:
+      type: label
+      label: 'Name'
+    id:
+      type: string
+      label: 'Machine-readable name'
+    json_values:
+      type: string
+      label: 'Values Data'
+    json_mapper:
+      type: string
+      label: 'Mapper'
+    last_entity_update:
+      type: string
+      label: 'Last entity update'
+    locked:
+      type: boolean
+      label: 'Locked'
+    modified:
+      type: boolean
+      label: 'Modified'
+    selectable:
+      type: boolean
+      label: 'Selectable'
+cohesion.settings:
+  type: config_entity
+  label: 'Global settings for Site Studio'
+  mapping:
+    api_build_status:
+      type: string
+      label: 'Api build status'
+    api_url:
+      type: string
+      label: 'Api url'
+    api_key:
+      type: string
+      label: 'Api key'
+    organization_key:
+      type: string
+      label: 'Organization key'
+    site_id:
+      type: string
+      label: 'Site id'
+    use_dx8:
+      type: string
+      label: 'Use site studio'
+    upload_max_filesize:
+      type: string
+      label: 'Max upload file size'
+    google_map_api_key:
+      type: string
+      label: 'Google map key'
+    google_map_api_key_geo:
+      type: string
+      label: 'Google map Geocoding key'
+    asset_is_imported:
+      type: string
+      label: 'Assets imported'
+    animate_on_view_mobile:
+      type: string
+      label: 'Animate on view mobile'
+    dx8_imce_stream_wrapper:
+      type: string
+      label: 'Imce stream wrapper'
+    elements_permissions:
+      type: string
+      label: 'Permissions on elements'
+    sidebar_view_style:
+      type: string
+      label: 'Sidebar view style'
+    log_dx8_error:
+      type: string
+      label: 'Log site studio errors'
+    add_animation_classes:
+      type: string
+      label: 'Animation classes'
+    sync_legacy_visibility:
+      type: boolean
+      label: 'Show legacy sync in UI'
+    element_toggle:
+      type: string
+      label: 'Element toggle settings'
+    element_usage_last_run:
+      type: integer
+      label: 'Last time element usage was run'
+    image_browser:
+      type: mapping
+      mapping:
+        config:
+          type: mapping
+          mapping:
+            type:
+              type: string
+            dx8_imce_stream_wrapper:
+              type: string
+            cohesion_media_lib_types:
+              type: sequence
+              label: 'Media library types'
+              sequence:
+                type: string
+                label: 'Type'
+        content:
+          type: mapping
+          mapping:
+            type:
+              type: string
+            dx8_imce_stream_wrapper:
+              type: string
+            cohesion_media_lib_types:
+              type: sequence
+              label: 'Media library types'
+              sequence:
+                type: string
+                label: 'Type'
+    stylesheet_json_storage_keyvalue:
+      type: boolean
+      label: 'Use key/value storage for stylesheet json'
+    compress_outbound_request:
+      type: boolean
+      label: 'Send call to the Site studio API gzipped or not, default TRUE'
+editor.editor.*.third_party.cohesion:
+  type: mapping
+  label: 'Site Studio settings'
+  mapping:
+    ssa_enabled:
+      type: boolean
+      label: 'SSA enabled'
+cohesion.frontend.settings:
+  type: config_entity
+  label: 'Front end settings for Site Studio'
+  mapping:
+    js:
+      type: sequence
+      label: 'JS settings'
+      sequence:
+        type: integer
+      matchHeight:
+        type: integer
+        label: 'Toggle match height global library'
+      parallax_scrolling:
+        type: integer
+        label: 'Toggle parallax scrolling global library'
+      cohMatchHeights:
+        type: integer
+        label: 'Toggle cohesion match height global library'
+    css:
+      type: sequence
+      label: 'CSS settings'
+      sequence:
+        type: integer
+      custom_styles_on_page:
+        type: integer
+        label: 'Toggle only load custom styles needed on the page'
+      element_styles_on_page:
+        type: integer
+        label: 'Toggle to load only custom element styles needed on the page'
