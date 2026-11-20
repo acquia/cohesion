@@ -1,0 +1,10 @@
+cohesion_template:
+  type: cohesion_config_entity
+  label: 'Site Studio template base'
+  mapping:
+    custom:
+      type: boolean
+      label: 'Custom'
+    twig_template:
+      type: path
+      label: 'Twig template filename'

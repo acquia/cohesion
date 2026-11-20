@@ -1,0 +1,398 @@
+services:
+  sitestudio_data_transformers.layout_canvas_manager:
+    class: Drupal\sitestudio_data_transformers\Services\LayoutCanvasManager
+    arguments:
+      - '@sitestudio_data_transformers.form_field_manager'
+      - '@sitestudio_data_transformers.element_manager'
+    tags:
+      - { name: service_collector, tag: component_level_handler, call: addHandler }
+
+  sitestudio_data_transformers.component_level_handler.component:
+    class: Drupal\sitestudio_data_transformers\Handlers\ComponentLevel\ComponentHandler
+    arguments:
+    - '@sitestudio_data_transformers.form_field_manager'
+    - '@sitestudio_data_transformers.form_field_level_handler.form-field-repeater'
+    - '@sitestudio_data_transformers.form_field_level_handler.form-container'
+    tags:
+      - { name: component_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.component_level_handler.component_content:
+    class: Drupal\sitestudio_data_transformers\Handlers\ComponentLevel\ComponentContentHandler
+    arguments:
+      - '@entity_type.manager'
+      - '@sitestudio_data_transformers.form_field_manager'
+      - '@sitestudio_data_transformers.form_field_level_handler.form-field-repeater'
+      - '@sitestudio_data_transformers.form_field_level_handler.form-container'
+    tags:
+      - { name: component_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.component_level_handler.custom_component:
+    class: Drupal\sitestudio_data_transformers\Handlers\ComponentLevel\CustomComponentHandler
+    arguments:
+      - '@sitestudio_data_transformers.form_field_manager'
+      - '@custom.components'
+      - '@sitestudio_data_transformers.form_field_level_handler.form-field-repeater'
+      - '@sitestudio_data_transformers.form_field_level_handler.form-container'
+    tags:
+      - { name: component_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_manager:
+    class: Drupal\sitestudio_data_transformers\Services\FormFieldManager
+    tags:
+      - { name: service_collector, tag: form_level_handler, call: addHandler }
+
+  sitestudio_data_transformers.form_field_level_handler.input:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\InputHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.input-hidden:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\InputHiddenHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.textarea:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\TextareaHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.wysiwyg:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\WysiwygHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.image:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\ImageHandler
+    arguments:
+      - '@module_handler'
+      - '@cohesion_image_browser.update_manager'
+      - '@file_url_generator'
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.select:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\SelectHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.toggle:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\ToggleHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.link:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\LinkHandler
+    arguments:
+      - '@module_handler'
+      - '@cohesion.utils'
+      - '@url_generator'
+      - '@entity_type.manager'
+      - '@jsonapi.resource_type.repository'
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.range:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\RangeHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.colorpicker:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\ColorpickerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.iconpicker:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\IconpickerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.youtube:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\YoutubeHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.video:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\VideoHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.google-map-marker:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\GoogleMapMarkerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.entity-reference:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\EntityReferenceHandler
+    arguments:
+      - '@module_handler'
+      - '@url_generator'
+      - '@entity_type.manager'
+      - '@jsonapi.resource_type.repository'
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.entity-browser:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\EntityBrowserHandler
+    arguments:
+      - '@module_handler'
+      - '@url_generator'
+      - '@entity_type.manager'
+      - '@jsonapi.resource_type.repository'
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.form-container:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\FormContainerHandler
+    arguments:
+      - '@module_handler'
+      - '@sitestudio_data_transformers.form_field_manager'
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.form_field_level_handler.form-field-repeater:
+    class: Drupal\sitestudio_data_transformers\Handlers\FormFieldLevel\FieldRepeaterHandler
+    arguments:
+      - '@module_handler'
+      - '@sitestudio_data_transformers.form_field_manager'
+    tags:
+      - { name: form_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_manager:
+    class: Drupal\sitestudio_data_transformers\Services\ElementManager
+    tags:
+      - { name: service_collector, tag: element_level_handler, call: addHandler }
+
+  sitestudio_data_transformers.element_level_handler.container:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ContainerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.row:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\RowHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.column:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ColumnHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.iframe:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\IframeHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.paragraph:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ParagraphHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.heading:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\HeadingHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.wysiwyg:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\WysiwygHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.blockquote:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\BlockquoteHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.link:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\LinkHandler
+    arguments:
+      - '@module_handler'
+      - '@cohesion.utils'
+      - '@url_generator'
+      - '@entity_type.manager'
+      - '@jsonapi.resource_type.repository'
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.list_container:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ListContainerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.list_item:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ListItemHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.inline_element:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\InlineElementHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.image:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ImageHandler
+    arguments:
+      - '@module_handler'
+      - '@cohesion_image_browser.update_manager'
+      - '@file_url_generator'
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.picture:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\PictureHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.video:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\VideoHandler
+    arguments:
+      - '@module_handler'
+      - '@cohesion_image_browser.update_manager'
+      - '@file_url_generator'
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.video_background:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\VideoBackgroundHandler
+    arguments:
+      - '@module_handler'
+      - '@cohesion_image_browser.update_manager'
+      - '@file_url_generator'
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.button:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ButtonHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.slider_container:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\SliderContainerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.slide:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\SlideHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.accordion_tabs_container:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\AccordionTabsContainerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.accordion_tabs_item:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\AccordionTabsItemHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.google_map:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\GoogleMapHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.google_map_marker:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\GoogleMapMarkerHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.read_more:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ReadMoreHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.modal:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\ModalHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.drupal_block:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\DrupalBlockHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.drupal_menu:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\DrupalMenuHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.breadcrumb:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\BreadcrumbHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.entity_browser:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\EntityBrowserHandler
+    arguments:
+      - '@module_handler'
+      - '@url_generator'
+      - '@entity_type.manager'
+      - '@jsonapi.resource_type.repository'
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.entity_reference:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\EntityReferenceHandler
+    arguments:
+      - '@module_handler'
+      - '@url_generator'
+      - '@entity_type.manager'
+      - '@jsonapi.resource_type.repository'
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.custom_element:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\CustomElementHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.youtube_video_embed:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\YoutubeVideoEmbedHandler
+    arguments: [ '@module_handler' ]
+    tags:
+      - { name: element_level_handler, priority: 30 }
+
+  sitestudio_data_transformers.element_level_handler.youtube_video_background:
+    class: Drupal\sitestudio_data_transformers\Handlers\ElementLevel\YoutubeVideoBackgroundHandler
+    arguments:
+      - '@module_handler'
+      - '@cohesion_image_browser.update_manager'
+      - '@file_url_generator'
+    tags:
+      - { name: element_level_handler, priority: 30 }

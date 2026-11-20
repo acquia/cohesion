@@ -1,0 +1,7 @@
+cohesion_style_helpers.cohesion_style_helper.*:
+  type: cohesion_config_entity
+  label: 'Style helper config'
+  mapping:
+    custom_style_type:
+      type: string
+      label: 'Custom style type'

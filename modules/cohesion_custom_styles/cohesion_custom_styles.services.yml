@@ -1,0 +1,5 @@
+services:
+  cohesion_custom_styles.rest_resource_stale_config_subscriber:
+    class: Drupal\cohesion_custom_styles\EventSubscriber\RestResourceStaleConfigSubscriber
+    tags:
+      - { name: event_subscriber }

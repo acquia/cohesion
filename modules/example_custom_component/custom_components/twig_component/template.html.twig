@@ -1,0 +1,26 @@
+<div class="twig-component">
+    <h2>Twig custom component</h2>
+    <label>Input field:</label>
+    <h3 class="twig-title inline-style">{{ field.input }}</h3>
+    <label>Paragraph field:</label>
+    <p class="twig-paragraph">{{ field.plain_text_area }}</p>
+    <label>Entity reference:</label>
+    <div class="twig-entity-reference">
+        {{  renderContent(field.entity_reference['#entity_type'], field.entity_reference['#view_mode'], field.entity_reference['#entity']) }}
+    </div>
+    <label>Dropzone content:</label>
+    <div class="twig-dropzone">
+        {{ dropzones['dropzone_c6d16282_1402_41cc_bcfd_c8204b3aae0b'] }}
+    </div>
+
+    {% set styles %}
+    <style>
+        .twig-component .inline-style {
+            color: {{ field.color_picker }};
+        }
+    </style>
+    {% endset %}
+
+    {{ renderInlineStyle(styles) }}
+
+</div>

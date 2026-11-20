@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * Site Studio Claro Installation Checks.
+ */
+
+use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
+
+/**
+ * Implements hook_requirements().
+ *
+ * The #[LegacyRequirementsHook] attribute avoids a duplicate-invocation
+ * regression on Drupal 11.3+ (see https://www.drupal.org/node/3549685). The
+ * attribute class only exists in core 11.3+; on earlier versions it is
+ * provided by includes/legacy_requirements_hook.polyfill.php (loaded via
+ * composer.json's autoload.files) so the reference always resolves.
+ */
+#[LegacyRequirementsHook]
+function sitestudio_claro_requirements($phase) {
+  $requirements = [];
+
+  if ($phase !== 'install') {
+    return $requirements;
+  }
+
+  // We need to check if Claro theme is installed.
+  $installed = \Drupal::service('theme_handler')->themeExists('claro');
+
+  // Claro is installed everything's fine.
+  if ($installed) {
+    return $requirements;
+  }
+
+  global $install_state;
+
+  // Check if Drupal should be installed and Claro is in the install profile.
+  if (
+    InstallerKernel::installationAttempted()
+    && isset($install_state['profile_info']['themes'])
+    && in_array('claro', $install_state['profile_info']['themes'], TRUE)
+  ) {
+    return $requirements;
+  }
+
+  // Claro theme is not installed and is required.
+  $requirements['claro'] = [
+    'title' => t('Claro'),
+    'description' => t('The Site Studio Claro module works with Claro or Claro based themes only, please enable the Claro theme to use this module.'),
+    'severity' => REQUIREMENT_ERROR,
+  ];
+
+  return $requirements;
+}

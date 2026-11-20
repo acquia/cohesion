@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Site Studio governance module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function sitestudio_governance_install($is_syncing) {
+  \Drupal::messenger()->addMessage(t("Enabling this module requires updating of user roles for existing users to not lose current abilities."), 'warning');
+}

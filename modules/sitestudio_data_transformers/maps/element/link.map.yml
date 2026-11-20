@@ -1,0 +1,42 @@
+type:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uid'
+id:
+  _property: TRUE,
+  type: 'element'
+  path:
+    - 'uuid'
+data:
+  title:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'title'
+  type:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'type'
+  target:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'target'
+  text:
+    _property: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'linkText'
+  value:
+    _property: TRUE,
+    _process_token: TRUE,
+    type: 'model'
+    path:
+      - 'settings'
+      - 'linkToPage'

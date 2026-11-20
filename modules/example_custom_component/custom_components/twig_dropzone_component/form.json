@@ -1,0 +1,75 @@
+{
+    "canvas": [
+        {
+            "type": "item",
+            "uid": "component-drop-zone-placeholder",
+            "title": "Component drop zone",
+            "status": {
+                "collapsed": true
+            },
+            "uuid": "238adb6e-0628-4dfb-a0c6-beaf719c5c1a",
+            "parentUid": "root"
+        }
+    ],
+    "disabledNodes": [],
+    "componentForm": [],
+    "model": {
+        "238adb6e-0628-4dfb-a0c6-beaf719c5c1a": {
+            "settings": {
+                "dropzoneHideSelector": "",
+                "title": "Component drop zone",
+                "tags": [
+                    {
+                        "value": "cpt_tag_test_tag",
+                        "label": "Test tag",
+                        "class": "tag-3"
+                    }
+                ]
+            }
+        }
+    },
+    "mapper": {
+        "238adb6e-0628-4dfb-a0c6-beaf719c5c1a": {
+            "settings": {
+                "formDefinition": [
+                    {
+                        "formKey": "component-drop-zone-placeholder-settings",
+                        "children": [
+                            {
+                                "formKey": "component-drop-zone-placeholder-hide",
+                                "breakpoints": [],
+                                "activeFields": [
+                                    {
+                                        "name": "dropzoneHideSelector",
+                                        "active": true
+                                    }
+                                ]
+                            },
+                            {
+                                "formKey": "component-drop-zone-placeholder-allowed-tags",
+                                "breakpoints": [],
+                                "activeFields": [
+                                    {
+                                        "name": "tags",
+                                        "active": true
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "selectorType": "topLevel",
+                "form": null,
+                "items": [],
+                "title": "Default"
+            }
+        }
+    },
+    "previewModel": {
+        "238adb6e-0628-4dfb-a0c6-beaf719c5c1a": {}
+    },
+    "variableFields": {
+        "238adb6e-0628-4dfb-a0c6-beaf719c5c1a": []
+    },
+    "meta": {}
+}

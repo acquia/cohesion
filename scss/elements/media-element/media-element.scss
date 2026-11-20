@@ -1,0 +1,7 @@
+@use "media-element-settings";
+
+// Default Media element CSS
+@include media-element-settings.media-element-default-settings();
+
+// Custom Media element CSS
+@include media-element-settings.media-element-custom-settings();

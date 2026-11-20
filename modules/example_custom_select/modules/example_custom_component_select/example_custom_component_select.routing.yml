@@ -1,0 +1,8 @@
+example-custom-component-select.options:
+  path: '/sitestudio/eu-countries'
+  defaults:
+    _controller: '\Drupal\example_custom_component_select\Controller\ExampleCustomComponentSelectController::index'
+  methods:  [GET]
+  requirements:
+    _access: 'TRUE'
+  _format: json

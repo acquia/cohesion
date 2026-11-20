@@ -1,0 +1,14 @@
+{
+    "file:file:99e1ebbf-0ba1-4bf3-92aa-122705f75155": {
+        "fid": "1",
+        "uuid": "99e1ebbf-0ba1-4bf3-92aa-122705f75155",
+        "langcode": "en",
+        "filename": "image_1.png",
+        "uri": "public:\/\/image_1.png",
+        "filemime": "image\/png",
+        "filesize": "4594",
+        "status": "1",
+        "created": "1658875721",
+        "changed": "1658875721"
+    }
+}
